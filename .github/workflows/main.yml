@@ -1,8 +1,9 @@
 name: documentation
 
 on:
+  [workflow_dispatch,
   release:
-    types: [published]
+    types: [published]]
 
 permissions:
   contents: write
