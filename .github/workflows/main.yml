@@ -10,6 +10,16 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
+        - uses: actions/setup-python@v5
+        - name: Install pumpia dependencies
+          run: |
+            pip install -r requirements.txt
+        - name: Install dependencies
+          run: |
+            pip install sphinx sphinx_rtd_theme myst_parser
+        - name: Sphinx build
+          run: |
+            sphinx-build docs/source docs/_build
         - name: Deploy to GitHub Pages
           uses: peaceiris/actions-gh-pages@v3
           if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
