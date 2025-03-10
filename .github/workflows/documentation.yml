@@ -1,4 +1,4 @@
-name: DOCS
+name: documentation
 
 on:
   workflow_dispatch:
@@ -11,6 +11,7 @@ permissions:
 jobs:
   docs:
       runs-on: ubuntu-latest
+      environment: DOCS
       steps:
         
         - uses: actions/create-github-app-token@v1
