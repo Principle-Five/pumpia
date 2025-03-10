@@ -32,6 +32,13 @@ from pumpia.module_handling.context import (BaseContext,
                                             PhantomShape,
                                             PhantomShapes)
 
+side_map: dict[str, SideType] = {"Top": "top",
+                                 "Bottom": "bottom",
+                                 "Left": "left",
+                                 "Right": "right"}
+inv_side_map: dict[SideType, str] = {v: k for k, v in side_map.items()}
+side_opts = list(side_map.keys())
+
 
 class BaseContextManager(ABC, ttk.Labelframe):
     """
@@ -464,12 +471,6 @@ class AutoPhantomManager(PhantomContextManager):
     shape : PhantomShapes, optional
         The initial shape of the phantom (default is None).
     """
-    side_map: dict[str, SideType] = {"Top": "top",
-                                     "Bottom": "bottom",
-                                     "Left": "left",
-                                     "Right": "right"}
-    inv_side_map: dict[SideType, str] = {v: k for k, v in side_map.items()}
-    side_opts = list(side_map.keys())
 
     @overload
     def __init__(self,
@@ -614,11 +615,11 @@ class AutoPhantomManager(PhantomContextManager):
         self.bubble_offset_label = ttk.Label(self.manual_frame, text="Bubble Offset (Px):")
         self.bubble_offset_entry = IntEntry(self.manual_frame, textvariable=self.bubble_offset_var)
 
-        self.bubble_side_var = tk.StringVar(self, self.inv_side_map[bubble_side])
+        self.bubble_side_var = tk.StringVar(self, inv_side_map[bubble_side])
         self.bubble_side_label = ttk.Label(self.manual_frame, text="Bubble Side:")
         self.bubble_side_combo = ttk.Combobox(self.manual_frame,
                                               textvariable=self.bubble_side_var,
-                                              values=list(self.side_opts),
+                                              values=list(side_opts),
                                               height=4,
                                               state="readonly")
 
@@ -702,7 +703,7 @@ class AutoPhantomManager(PhantomContextManager):
         sensitivity = self.sensitivity_var.get()
         top_perc = self.top_perc_var.get()
         bubble_offset = self.bubble_offset_var.get()
-        bubble_side = self.side_map[self.bubble_side_var.get()]
+        bubble_side = side_map[self.bubble_side_var.get()]
         bounds = phantom_boundbox_manual(array,
                                          sensitivity,
                                          top_perc,

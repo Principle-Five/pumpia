@@ -39,6 +39,8 @@ Three context managers and generators are provided:
     * :py:class:`ManualPhantomManager <pumpia.widgets.context_managers.ManualPhantomManager>` : :py:class:`ManualPhantomManagerGenerator <pumpia.widgets.context_managers.ManualPhantomManagerGenerator>`
     * :py:class:`AutoPhantomManager <pumpia.widgets.context_managers.AutoPhantomManager>` : :py:class:`AutoPhantomManagerGenerator <pumpia.widgets.context_managers.AutoPhantomManagerGenerator>`
 
+When creating your own context manager you must provide the :py:meth:`get_context <pumpia.widgets.context_managers.BaseContextManager.get_context>` method.
+
 :doc:`collections`
 ------------------
 Collections are used to group modules together, with a main tab showing the context and any defined viewers.
