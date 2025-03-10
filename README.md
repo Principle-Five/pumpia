@@ -5,6 +5,8 @@ PumpIA is a python framework designed to allow users to visualise the analysis o
 It does not do any image analysis itself, but rather provides a platform for users to write their own analysis code and view the results.
 This means that the full power of python and its libraries are available to the user.
 
+See documentation at [PumpIA](https://principle-five.github.io/PumpIA/).
+
 Requirements
 ------------
 PumpIA has been designed to use the minimum number of dependencies, so the user interface relies on tkinter.
