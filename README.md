@@ -22,6 +22,6 @@ Installation
 ------------
 
 PumpIA requires python 3.12 or greater.
-To use PumpIA, install it using pip:
+To use PumpIA, install from [PyPI](https://pypi.org/project/pumpia/) it using pip:
 
     pip install pumpia
