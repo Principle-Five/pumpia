@@ -557,13 +557,11 @@ class AutoPhantomManager(PhantomContextManager):
         self.shape_checks: list[ttk.Checkbutton] = []
         self.shape_vars: list[tk.StringVar] = []
         for opt in self.shape_opts:
-            if opt != self.inv_shape_map[None]:
-                if (shape is None
-                        or (isinstance(shape, list) and self.shape_map[opt] in shape)
-                        or self.shape_map[opt] == shape):
-                    var = tk.StringVar(self, value=opt)
-                else:
-                    var = tk.StringVar(self)
+            if (opt != self.inv_shape_map[None]
+                and ((isinstance(shape, list) and self.shape_map[opt] in shape)
+                     or self.shape_map[opt] == shape)):
+
+                var = tk.StringVar(self, value=opt)
                 button = ttk.Checkbutton(self.auto_shape_frame,
                                          offvalue="",
                                          onvalue=opt,
