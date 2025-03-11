@@ -559,16 +559,17 @@ class AutoPhantomManager(PhantomContextManager):
         for opt in self.shape_opts:
             if (opt != self.inv_shape_map[None]
                 and ((isinstance(shape, list) and self.shape_map[opt] in shape)
-                     or self.shape_map[opt] == shape)):
-
+                     or self.shape_map[opt] == shape
+                     or shape is None)):
                 var = tk.StringVar(self, value=opt)
-                button = ttk.Checkbutton(self.auto_shape_frame,
-                                         offvalue="",
-                                         onvalue=opt,
-                                         text=opt,
-                                         variable=var)
-                self.shape_checks.append(button)
                 self.shape_vars.append(var)
+                if isinstance(shape, list) or shape is None:
+                    button = ttk.Checkbutton(self.auto_shape_frame,
+                                             offvalue="",
+                                             onvalue=opt,
+                                             text=opt,
+                                             variable=var)
+                    self.shape_checks.append(button)
 
         self.shape_radios: list[ttk.Radiobutton] = []
         self.man_shape_var = tk.StringVar(self)
@@ -580,7 +581,10 @@ class AutoPhantomManager(PhantomContextManager):
             self.man_shape_var.set(self.inv_shape_map[shape])
 
         for opt in self.shape_opts:
-            if opt != self.inv_shape_map[None]:
+            if (opt != self.inv_shape_map[None]
+                and ((isinstance(shape, list) and self.shape_map[opt] in shape)
+                     or self.shape_map[opt] == shape
+                     or shape is None)):
                 button = ttk.Radiobutton(self.manual_shape_frame,
                                          value=opt,
                                          text=opt,
