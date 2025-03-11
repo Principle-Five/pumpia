@@ -598,12 +598,12 @@ class AutoPhantomManager(PhantomContextManager):
                                           value="auto",
                                           command=self._update_mode)
         self.manual_radio = ttk.Radiobutton(self.mode_frame,
-                                            text="Manual Fitting",
+                                            text="Manual Boundary Control",
                                             variable=self.mode_var,
                                             value="manual",
                                             command=self._update_mode)
         self.fine_tune_radio = ttk.Radiobutton(self.mode_frame,
-                                               text="Fine Tune",
+                                               text="Full Manual Control",
                                                variable=self.mode_var,
                                                value="fine tune",
                                                command=self._update_mode)
