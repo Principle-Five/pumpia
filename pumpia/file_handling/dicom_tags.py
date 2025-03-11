@@ -112,6 +112,14 @@ class DicomTags():
                                            0x5200,
                                            0x9230)
 
+    ReferencedImageSequence = Tag("ReferencedImageSequence",
+                                  0x0008,
+                                  0x1140,
+                                  [TagLink(SharedFunctionalGroupsSequence)])
+    FrameAnatomySequence = Tag("FrameAnatomySequence",
+                               0x0020,
+                               0x9071,
+                               [TagLink(SharedFunctionalGroupsSequence)])
     FrameContentSequence = Tag("FrameContentSequence",
                                0x0020,
                                0x9111,
@@ -136,6 +144,14 @@ class DicomTags():
                                            0x0028,
                                            0x9145,
                                            [TagLink(PerFrameFunctionalGroupsSequence, True)])
+    RealWorldValueMappingSequence = Tag("RealWorldValueMappingSequence",
+                                        0x0040,
+                                        0x9096,
+                                        [TagLink(PerFrameFunctionalGroupsSequence, True)])
+    PurposeOfReferenceCodeSequence = Tag("PurposeOfReferenceCodeSequence",
+                                         0x0040,
+                                         0xA170,
+                                         [TagLink(ReferencedImageSequence)])
 
     ImplementationVersionName = Tag("ImplementationVersionName",
                                     0x0002,
@@ -177,6 +193,22 @@ class DicomTags():
     ManufacturerModelName = Tag("ManufacturerModelName",
                                 0x0008,
                                 0x1090)
+    ReferencedSOPClassUID = Tag("ReferencedSOPClassUID",
+                                0x0008,
+                                0x1150,
+                                [TagLink(ReferencedImageSequence)])
+    ReferencedSOPInstanceUID = Tag("ReferencedSOPInstanceUID",
+                                   0x0008,
+                                   0x1155,
+                                   [TagLink(ReferencedImageSequence)])
+    ReferencedFrameNumber = Tag("ReferencedFrameNumber",
+                                0x0008,
+                                0x1160,
+                                [TagLink(ReferencedImageSequence)])
+    AnatomicRegionSequence = Tag("AnatomicRegionSequence",
+                                 0x0008,
+                                 0x2218,
+                                 [TagLink(FrameAnatomySequence)])
 
     PatientName = Tag("PatientName",
                       0x0010,
@@ -243,6 +275,10 @@ class DicomTags():
                                 0x0020,
                                 0x9057,
                                 [TagLink(FrameContentSequence)])
+    FrameLaterality = Tag("FrameLaterality",
+                          0x0020,
+                          0x9072,
+                          [TagLink(FrameAnatomySequence)])
     FrameAcquisitionNumber = Tag("FrameAcquisitionNumber",
                                  0x0020,
                                  0x9156,
@@ -318,6 +354,34 @@ class DicomTags():
                       0x0028,
                       0x1054,
                       [TagLink(PixelValueTransformationSequence)])
+    LUTExplanation = Tag("LUTExplanation",
+                         0x0028,
+                         0x3003,
+                         [TagLink(RealWorldValueMappingSequence)])
+    MeasurementUnitsCodeSequence = Tag("MeasurementUnitsCodeSequence",
+                                       0x0040,
+                                       0x08EA,
+                                       [TagLink(RealWorldValueMappingSequence)])
+    LUTLabel = Tag("LUTLabel",
+                   0x0040,
+                   0x9210,
+                   [TagLink(RealWorldValueMappingSequence)])
+    RealWorldValueLastValueMapped = Tag("RealWorldValueLastValueMapped",
+                                        0x0040,
+                                        0x9211,
+                                        [TagLink(RealWorldValueMappingSequence)])
+    RealWorldValueFirstValueMapped = Tag("RealWorldValueFirstValueMapped",
+                                         0x0040,
+                                         0x9216,
+                                         [TagLink(RealWorldValueMappingSequence)])
+    RealWorldValueIntercept = Tag("ealWorldValueIntercept",
+                                  0x0040,
+                                  0x9224,
+                                  [TagLink(RealWorldValueMappingSequence)])
+    RealWorldValueSlope = Tag("RealWorldValueSlope",
+                              0x0040,
+                              0x9225,
+                              [TagLink(RealWorldValueMappingSequence)])
 
     @classmethod
     def list_tags(cls) -> list[Tag]:
@@ -408,6 +472,7 @@ class MRTags(DicomTags):
                                  0x0018,
                                  0x9049,
                                  [TagLink(DicomTags.SharedFunctionalGroupsSequence)])
+
     MRTimingAndRelatedParametersSequence = Tag("MRTimingAndRelatedParametersSequence",
                                                0x0018,
                                                0x9112,
@@ -425,6 +490,10 @@ class MRTags(DicomTags):
                          0x0018,
                          0x9114,
                          [TagLink(DicomTags.PerFrameFunctionalGroupsSequence, True)])
+    MRMetaboliteMapSequence = Tag("MRMetaboliteMapSequence",
+                                  0x0018,
+                                  0x9152,
+                                  [TagLink(DicomTags.PerFrameFunctionalGroupsSequence, True)])
     MRDiffusionSequence = Tag("MRDiffusionSequence",
                               0x0018,
                               0x9117,
@@ -432,7 +501,8 @@ class MRTags(DicomTags):
     MRAveragesSequence = Tag("MRAveragesSequence",
                              0x0018,
                              0x9119,
-                             [TagLink(DicomTags.PerFrameFunctionalGroupsSequence, True)])
+                             [TagLink(DicomTags.PerFrameFunctionalGroupsSequence, True),
+                              TagLink(DicomTags.SharedFunctionalGroupsSequence)])
     MRImageFrameTypeSequence = Tag("MRImageFrameTypeSequence",
                                    0x0018,
                                    0x9226,
@@ -680,6 +750,10 @@ class MRTags(DicomTags):
                                        0x0018,
                                        0x9078,
                                        [TagLink(MRModifierSequence)])
+    MetaboliteMapDescription = Tag("MetaboliteMapDescription",
+                                   0x0018,
+                                   0x9080,
+                                   [TagLink(MRMetaboliteMapSequence)])
     PartialFourier = Tag("PartialFourier",
                          0x0018,
                          0x9081,
@@ -713,6 +787,10 @@ class MRTags(DicomTags):
                                                  0x0018,
                                                  0x9231,
                                                  [TagLink(MRFOVGeometrySequence)])
+    MRAcquisitionPhaseEncodingStepsOutOfPlane = Tag("MRAcquisitionPhaseEncodingStepsOutOfPlane",
+                                                    0x0018,
+                                                    0x9232,
+                                                    [TagLink(MRFOVGeometrySequence)])
     RFEchoTrainLength = Tag("RFEchoTrainLength",
                             0x0018,
                             0x9240,
