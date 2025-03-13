@@ -32,6 +32,6 @@ license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 
 [project.urls]
-Homepage = "https://principle-five.github.io/PumpIA/index.html"
+Homepage = "https://principle-five.github.io/pumpia/index.html"
 Source = "https://github.com/Principle-Five/PumpIA"
 Issues = "https://github.com/Principle-Five/PumpIA/issues"
