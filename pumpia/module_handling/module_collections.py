@@ -486,6 +486,11 @@ class BaseCollection(ABC, ttk.Frame):
 
         self.button_frame = ttk.Labelframe(self.output_frame, text="Commands")
         self.command_buttons: list[ttk.Button] = []
+        if self.direction == "horizontal":
+            self.button_frame.grid(column=0, row=self.output_frame_count, sticky="nsew")
+        else:
+            self.button_frame.grid(column=self.output_frame_count, row=0, sticky="nsew")
+        self.output_frame_count += 1
 
         self.context_frame = ScrolledWindow(self.main_window)
         self.context_manager: BaseContextManager = self.context_manager_generator(
@@ -535,11 +540,6 @@ class BaseCollection(ABC, ttk.Frame):
                     if self.viewer_count == 0 or v.main:
                         self.main_viewer = attr
                     self.viewer_count += 1
-
-        if self.direction == "horizontal":
-            self.button_frame.grid(column=0, row=self.output_frame_count, sticky="nsew")
-        else:
-            self.button_frame.grid(column=self.output_frame_count, row=0, sticky="nsew")
 
         self.rois_button = ttk.Button(self.button_frame,
                                       text="Draw ROIs",
