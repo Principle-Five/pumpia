@@ -183,7 +183,7 @@ def nth_max_positions(array: np.ndarray,
     mask = ((lt_half_maximum & np.roll(gte_half_maximum, -1))
             | (np.roll(lt_half_maximum, -1) & gte_half_maximum))
 
-    return mask.nonzero()[0]
+    return mask[:-1].nonzero()[0]
 
 
 def nth_max_up_positions(array: np.ndarray,
@@ -224,7 +224,7 @@ def nth_max_up_positions(array: np.ndarray,
     lt_half_maximum = array < half_maximum
     mask = lt_half_maximum & np.roll(gte_half_maximum, -1)
 
-    return mask.nonzero()[0]
+    return mask[:-1].nonzero()[0]
 
 
 def nth_max_down_positions(array: np.ndarray,
@@ -265,7 +265,7 @@ def nth_max_down_positions(array: np.ndarray,
     lt_half_maximum = array < half_maximum
     mask = np.roll(lt_half_maximum, -1) & gte_half_maximum
 
-    return mask.nonzero()[0]
+    return mask[:-1].nonzero()[0]
 
 
 def nth_max_bounds(array: np.ndarray,
