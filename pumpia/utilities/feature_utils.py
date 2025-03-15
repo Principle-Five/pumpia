@@ -11,7 +11,7 @@ Functions:
 
 import numpy as np
 from scipy.optimize import curve_fit
-from pumpia.utilities.array_utils import nth_max_widest_peak, nth_max_bounds, MinMaxPix
+from pumpia.utilities.array_utils import nth_max_widest_peak, nth_max_bounds, MinMax
 from pumpia.utilities.typing import SideType
 
 from pumpia.module_handling.context import BoundBoxContext, PhantomContext, PhantomShapes
@@ -171,13 +171,13 @@ def single_feature_boundbox(array: np.ndarray,
     max_val = np.percentile(array, top_perc)
     h_profile = np.max(array, axis=0)
     v_profile = np.max(array, axis=1)
-    h_bounds: MinMaxPix = nth_max_widest_peak(h_profile, divisor, maximum=max_val)  # type:ignore
-    v_bounds: MinMaxPix = nth_max_widest_peak(v_profile, divisor, maximum=max_val)  # type:ignore
+    h_bounds: MinMax = nth_max_widest_peak(h_profile, divisor, maximum=max_val)
+    v_bounds: MinMax = nth_max_widest_peak(v_profile, divisor, maximum=max_val)
 
-    return BoundBoxContext(h_bounds.minimum,
-                           h_bounds.maximum,
-                           v_bounds.minimum,
-                           v_bounds.maximum)
+    return BoundBoxContext(round(h_bounds.minimum),
+                           round(h_bounds.maximum),
+                           round(v_bounds.minimum),
+                           round(v_bounds.maximum))
 
 
 def phantom_boundbox_manual(array: np.ndarray,
