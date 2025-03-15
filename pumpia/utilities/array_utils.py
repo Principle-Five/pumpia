@@ -22,7 +22,6 @@ Classes:
  """
 
 from dataclasses import dataclass
-from collections.abc import Iterable
 from typing import Literal
 import numpy as np
 
@@ -111,11 +110,11 @@ class MinMax:
         The maximum value.
     difference : np.floating or float or int
     """
-    minimum: np.floating | float | int
-    maximum: np.floating | float | int
+    minimum: float | int
+    maximum: float | int
 
     @property
-    def difference(self) -> np.floating | float | int:
+    def difference(self) -> float | int:
         """
         Returns the difference between the maximum and minimum values.
         """
@@ -150,7 +149,7 @@ def nth_max_positions(array: np.ndarray,
                       minimum: float | np.floating | None = None,
                       maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array
+    Finds the positions in the array to the left of
     where the value is crossing the nth maximum value relative to the minimum.
 
     Parameters
@@ -182,7 +181,7 @@ def nth_max_positions(array: np.ndarray,
     gte_half_maximum = array >= half_maximum
     lt_half_maximum = array < half_maximum
     mask = ((lt_half_maximum & np.roll(gte_half_maximum, -1))
-            | (lt_half_maximum & np.roll(gte_half_maximum, 1)))
+            | (np.roll(lt_half_maximum, -1) & gte_half_maximum))
 
     return mask.nonzero()[0]
 
@@ -192,7 +191,7 @@ def nth_max_up_positions(array: np.ndarray,
                          minimum: float | np.floating | None = None,
                          maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array
+    Finds the positions in the array to the left of
     where the value is increasing and crosses the nth maximum value relative to the minimum.
 
     Parameters
@@ -233,7 +232,7 @@ def nth_max_down_positions(array: np.ndarray,
                            minimum: float | np.floating | None = None,
                            maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array
+    Finds the positions in the array to the left of
     where the value is decreasing and crosses the nth maximum value relative to the minimum.
 
     Parameters
@@ -264,7 +263,7 @@ def nth_max_down_positions(array: np.ndarray,
     half_maximum = (maximum + minimum) / divisor
     gte_half_maximum = array >= half_maximum
     lt_half_maximum = array < half_maximum
-    mask = lt_half_maximum & np.roll(gte_half_maximum, 1)
+    mask = np.roll(lt_half_maximum, -1) & gte_half_maximum
 
     return mask.nonzero()[0]
 
@@ -272,9 +271,9 @@ def nth_max_down_positions(array: np.ndarray,
 def nth_max_bounds(array: np.ndarray,
                    divisor: float,
                    minimum: float | np.floating | None = None,
-                   maximum: float | np.floating | None = None) -> MinMaxPix:
+                   maximum: float | np.floating | None = None) -> MinMax:
     """
-    Finds the minimum and maximum pixel locations of the nth maximum value in the array.
+    Finds the minimum and maximum locations of the nth maximum value in the array.
 
     Parameters
     ----------
@@ -294,14 +293,32 @@ def nth_max_bounds(array: np.ndarray,
     MinMaxPix
         The bounds of the nth maximum value in the array.
     """
+    if minimum is None:
+        minimum = np.min(array)
+    if maximum is None:
+        maximum = np.max(array)
+
     nm_positions = nth_max_positions(array, divisor, minimum, maximum)
-    return MinMaxPix(min(nm_positions), max(nm_positions))
+
+    p_min = min(nm_positions)
+    p_max = max(nm_positions)
+
+    half_val = (maximum + minimum) / divisor
+    l_val = array[p_min]
+    r_val = array[p_min + 1]
+    new_min = p_min + abs((half_val - l_val) / (r_val - l_val))
+
+    l_val = array[p_max]
+    r_val = array[p_max + 1]
+    new_max = p_max + abs((half_val - l_val) / (r_val - l_val))
+
+    return MinMax(new_min, new_max)
 
 
 def nth_max_peaks(array: np.ndarray,
                   divisor: float,
                   minimum: float | np.floating | None = None,
-                  maximum: float | np.floating | None = None) -> Iterable[MinMaxPix]:
+                  maximum: float | np.floating | None = None) -> list[MinMax]:
     """
     Finds the nth maximum positions for peaks in the array.
 
@@ -320,9 +337,14 @@ def nth_max_peaks(array: np.ndarray,
 
     Returns
     -------
-    Iterable[MinMaxPix]
+    list[MinMax]
         The peaks of the nth maximum value in the array.
     """
+    if minimum is None:
+        minimum = np.min(array)
+    if maximum is None:
+        maximum = np.max(array)
+
     nm_ups = nth_max_up_positions(array, divisor, minimum, maximum)
     nm_downs = nth_max_down_positions(array, divisor, minimum, maximum)
 
@@ -343,13 +365,26 @@ def nth_max_peaks(array: np.ndarray,
         i_down += 1
         i_up += 1
 
-    return peaks
+    half_val = (maximum + minimum) / divisor
+    corr_peaks: list[MinMax] = []
+    for peak in peaks:
+        l_val = array[peak.minimum]
+        r_val = array[peak.minimum + 1]
+        new_min = peak.minimum + abs((half_val - l_val) / (r_val - l_val))
+
+        l_val = array[peak.maximum]
+        r_val = array[peak.maximum + 1]
+        new_max = peak.maximum + abs((half_val - l_val) / (r_val - l_val))
+
+        corr_peaks.append(MinMax(new_min, new_max))
+
+    return corr_peaks
 
 
 def nth_max_widest_peak(array: np.ndarray,
                         divisor: float,
                         minimum: float | np.floating | None = None,
-                        maximum: float | np.floating | None = None) -> MinMaxPix:
+                        maximum: float | np.floating | None = None) -> MinMax:
     """
     Finds the nth maximum positions for the widest peak in the array.
 
@@ -372,14 +407,14 @@ def nth_max_widest_peak(array: np.ndarray,
         The widest peak of the nth maximum value in the array.
     """
     peaks = nth_max_peaks(array, divisor, minimum, maximum)
-    bounds: MinMaxPix = max(peaks, key=lambda x: x.difference)  # type:ignore
+    bounds: MinMax = max(peaks, key=lambda x: x.difference)  # type: ignore
     return bounds
 
 
 def nth_max_troughs(array: np.ndarray,
                     divisor: float,
                     minimum: float | np.floating | None = None,
-                    maximum: float | np.floating | None = None) -> Iterable[MinMaxPix]:
+                    maximum: float | np.floating | None = None) -> list[MinMax]:
     """
     Finds the nth maximum positions for troughs in the array.
 
@@ -398,9 +433,13 @@ def nth_max_troughs(array: np.ndarray,
 
     Returns
     -------
-    Iterable[MinMaxPix]
+    list[MinMaxPix]
         The troughs of the nth maximum value in the array.
     """
+    if minimum is None:
+        minimum = np.min(array)
+    if maximum is None:
+        maximum = np.max(array)
     nm_ups = nth_max_up_positions(array, divisor, minimum, maximum)
     nm_downs = nth_max_down_positions(array, divisor, minimum, maximum)
 
@@ -422,13 +461,26 @@ def nth_max_troughs(array: np.ndarray,
         i_down += 1
         i_up += 1
 
-    return troughs
+    half_val = (maximum + minimum) / divisor
+    corr_peaks: list[MinMax] = []
+    for trough in troughs:
+        l_val = array[trough.minimum]
+        r_val = array[trough.minimum + 1]
+        new_min = trough.minimum + abs((half_val - l_val) / (r_val - l_val))
+
+        l_val = array[trough.maximum]
+        r_val = array[trough.maximum + 1]
+        new_max = trough.maximum + abs((half_val - l_val) / (r_val - l_val))
+
+        corr_peaks.append(MinMax(new_min, new_max))
+
+    return corr_peaks
 
 
 def nth_max_widest_trough(array: np.ndarray,
                           divisor: float,
                           minimum: float | np.floating | None = None,
-                          maximum: float | np.floating | None = None) -> MinMaxPix:
+                          maximum: float | np.floating | None = None) -> MinMax:
     """
     Finds the nth maximum positions for the widest trough in the array.
 
@@ -451,7 +503,7 @@ def nth_max_widest_trough(array: np.ndarray,
         The widest trough of the nth maximum value in the array.
     """
     troughs = nth_max_troughs(array, divisor, minimum, maximum)
-    bounds: MinMaxPix = max(troughs, key=lambda x: x.difference)  # type:ignore
+    bounds: MinMax = max(troughs, key=lambda x: x.difference)  # type: ignore
     return bounds
 
 
@@ -459,7 +511,7 @@ def half_max_positions(array: np.ndarray,
                        minimum: float | np.floating | None = None,
                        maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array
+    Finds the positions in the array to the left of
     where the value is crossing the half maximum value relative to the minimum.
 
     Parameters
@@ -483,9 +535,9 @@ def half_max_positions(array: np.ndarray,
 
 def half_max_bounds(array: np.ndarray,
                     minimum: float | np.floating | None = None,
-                    maximum: float | np.floating | None = None) -> MinMaxPix:
+                    maximum: float | np.floating | None = None) -> MinMax:
     """
-    Finds the minimum and maximum of half the maximum value in the array.
+    Finds the minimum and maximum positions half the maximum value in the array.
 
     Parameters
     ----------
@@ -510,7 +562,7 @@ def tenth_max_positions(array: np.ndarray,
                         minimum: float | np.floating | None = None,
                         maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array
+    Finds the positions in the array to the left of
     where the value is crossing the tenth maximum value relative to the minimum.
 
     Parameters
@@ -534,9 +586,9 @@ def tenth_max_positions(array: np.ndarray,
 
 def tenth_max_bounds(array: np.ndarray,
                      minimum: float | np.floating | None = None,
-                     maximum: float | np.floating | None = None) -> MinMaxPix:
+                     maximum: float | np.floating | None = None) -> MinMax:
     """
-    Finds the maximum and minimum position of one-tenth the maximum value in the array.
+    Finds the maximum and minimum positions of one-tenth the maximum value in the array.
 
     Parameters
     ----------
