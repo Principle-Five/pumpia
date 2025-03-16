@@ -17,7 +17,8 @@ from pumpia.image_handling.image_structures import ArrayImage
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.widgets.context_managers import (BaseContextManager,
                                              BaseContextManagerGenerator,
-                                             SimpleContextManagerGenerator)
+                                             SimpleContextManagerGenerator,
+                                             PhantomContextManager)
 from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.module_handling.in_outs.simple import BaseIO
@@ -493,11 +494,18 @@ class BaseCollection(ABC, ttk.Frame):
         self.output_frame_count += 1
 
         self.context_frame = ScrolledWindow(self.main_window)
+        self.context_buttons_frame = ttk.Frame(self.context_frame)
+        self.context_buttons_frame.grid(column=0, row=0, sticky="nsew")
         self.context_manager: BaseContextManager = self.context_manager_generator(
             self.context_frame,
             self.manager)
-        self.context_manager.grid(column=0, row=0, sticky="nsew")
+        self.context_manager.grid(column=0, row=1, sticky="nsew")
         self.main_window.add(self.context_frame.outer_frame, text="Context")
+
+        self.get_context_button = ttk.Button(self.context_buttons_frame,
+                                             text="Get Context",
+                                             command=self.get_context)
+        self.get_context_button.grid(column=0, row=0, sticky="nsew")
 
         for k, v in self.__class__.__dict__.items():
             if k[:2] != "__" or k[-2:] != "__":
@@ -550,6 +558,31 @@ class BaseCollection(ABC, ttk.Frame):
         self.create_and_run_button = ttk.Button(self.button_frame,
                                                 text="Create and Run",
                                                 command=self.create_and_run)
+
+        if (self.main_viewer is not None
+                and isinstance(self.context_manager, PhantomContextManager)):
+
+            def bbox_command():
+                if (self.main_viewer is not None
+                    and isinstance(self.main_viewer.image, ArrayImage)
+                        and isinstance(self.context_manager, PhantomContextManager)):
+                    self.context_manager.get_bound_box_roi(self.main_viewer.image)
+
+            bbox_button = ttk.Button(self.context_buttons_frame,
+                                     command=bbox_command,
+                                     text="Draw Phantom Boundbox")
+            bbox_button.grid(column=0, row=1, sticky="nsew")
+
+            def boundary_command():
+                if (self.main_viewer is not None
+                    and isinstance(self.main_viewer.image, ArrayImage)
+                        and isinstance(self.context_manager, PhantomContextManager)):
+                    self.context_manager.get_boundary_roi(self.main_viewer.image)
+
+            boundary_button = ttk.Button(self.context_buttons_frame,
+                                         command=boundary_command,
+                                         text="Draw Phantom Boundary")
+            boundary_button.grid(column=0, row=2, sticky="nsew")
 
         if self.direction == "horizontal":
             self.rois_button.grid(column=0, row=self.command_buttons_count, sticky="nsew")
