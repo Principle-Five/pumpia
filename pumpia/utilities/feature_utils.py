@@ -1,5 +1,7 @@
 """
 Functions:
+ * flat_top_gauss
+ * flat_top_gauss_integral
  * ellipse_eq
  * ellipse_eq_min_max
  * phantom_boundary_automatic
@@ -15,6 +17,70 @@ from pumpia.utilities.array_utils import nth_max_widest_peak, nth_max_bounds, Mi
 from pumpia.utilities.typing import SideType
 
 from pumpia.module_handling.context import BoundBoxContext, PhantomContext, PhantomShapes
+
+
+def flat_top_gauss(pos: np.ndarray, a: float, b: float, c: float, amp: float) -> np.ndarray:
+    """
+    Returns an array of values for a flat top gaussian.
+
+    Parameters
+    ----------
+    pos : np.ndarray
+        1 dimensional array of positions
+    a : float
+        left position of the top of the curve
+    b : float
+        right position of the top of the curve
+    c : float
+        half width of gaussian part
+    amp : float
+        amplitude of the curve
+    """
+    if pos.ndim != 1:
+        raise ValueError("pos should be a 1 dimensional array of positions")
+    if a > b:
+        a, b = b, a
+    ret_array = np.zeros(pos.shape)
+    ret_array[pos <= a] = amp * np.exp(-0.5 * np.square((pos[pos <= a] - a) / c))
+    ret_array[pos >= b] = amp * np.exp(-0.5 * np.square((pos[pos >= b] - b) / c))
+    ret_array[(pos > a) & (pos < b)] = amp
+
+    return ret_array
+
+
+def flat_top_gauss_integral(pos: np.ndarray,
+                            a: float,
+                            b: float,
+                            c: float,
+                            amp: float,
+                            baseline: float) -> np.ndarray:
+    """
+    Returns an array of values for the integral of a flat top gaussian.
+    Integrates accross `flat_top_gauss` and adds `baseline`
+
+    Parameters
+    ----------
+    pos : np.ndarray
+        1 dimensional array of positions
+    a : float
+        left position of the top of the curve
+    b : float
+        right position of the top of the curve
+    c : float
+        half width of gaussian part
+    amp : float
+        amplitude of the curve
+    baseline : float
+        baseline to be added onto the integral
+
+    Returns
+    -------
+    np.ndarray
+        1 dimensional array, 1 shorter that pos
+    """
+    if pos.ndim != 1:
+        raise ValueError("pos should be a 1 dimensional array of positions")
+    return np.cumsum(flat_top_gauss(pos, a, b, c, amp)) + baseline
 
 
 def ellipse_eq(pos: np.ndarray,
