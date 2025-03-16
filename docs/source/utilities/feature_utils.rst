@@ -1,6 +1,10 @@
 Feature Utilities
 =================
 
+.. autofunction:: pumpia.utilities.feature_utils.flat_top_gauss
+
+.. autofunction:: pumpia.utilities.feature_utils.flat_top_gauss_integral
+
 .. autofunction:: pumpia.utilities.feature_utils.ellipse_eq
 
 .. autofunction:: pumpia.utilities.feature_utils.ellipse_eq_min_max
