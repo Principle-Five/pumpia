@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools >= 61.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "pumpia"
-version = "0.1.11"
+version = "0.1.10"
 authors = [{ name = "Zack Ravetz et al." }]
 description = "A simple to use framework for making user interfaces for image analysis."
 readme = "README.md"
@@ -35,6 +35,3 @@ license-files = ["LICENSE"]
 Homepage = "https://principle-five.github.io/pumpia/index.html"
 Source = "https://github.com/Principle-Five/PumpIA"
 Issues = "https://github.com/Principle-Five/PumpIA/issues"
-
-[tool.setuptools.packages.find]
-include = ["pumpia*"]
