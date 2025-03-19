@@ -2289,15 +2289,18 @@ class LineROI(BaseROI):
             x_frac = (self.x2 - self.x1) / self.length
             y_frac = (self.y2 - self.y1) / self.length
         if self.image.is_multisample:
-            pixel_array = np.empty((1, num_points, array.shape[-1]))
+            pixel_array = np.zeros((1, num_points, array.shape[-1]))
         else:
-            pixel_array = np.empty((1, num_points,))
-        pixel_value_list: list[int | float | list[float]] = []
+            pixel_array = np.zeros((1, num_points,))
+        xmax = array.shape[1]
+        ymax = array.shape[0]
         for d in range(num_points):
             x = round(self.x1 + d * x_frac)
             y = round(self.y1 + d * y_frac)
-            pixel_array[0, d] = array[y, x]
-            pixel_value_list.append(array[y, x])
+            if (x>=0 and x<xmax and y>=0 and y<ymax):
+                pixel_array[0, d] = array[y, x]
+
+        pixel_value_list = list(pixel_array[0])
 
         if len(pixel_value_list) == 0:
             if self.image.is_rgb:
