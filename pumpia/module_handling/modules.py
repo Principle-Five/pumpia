@@ -180,6 +180,9 @@ class BaseModule(ABC, ttk.Frame):
         self.command_buttons_count: int = 0
         self._start_manual_draw: bool = False
 
+        self.inputs:list[BaseInput] = []
+        self.outputs:list[BaseOutput] = []
+
         if self.manager is not None and self.parent is not None:
             self.setup()
 
@@ -308,6 +311,7 @@ class BaseModule(ABC, ttk.Frame):
                             attr.verbose_name = k.replace("_", " ").title()
                         if isinstance(attr, BaseInput):
                             attr.set_parent(self.input_frame)
+                            self.inputs.append(attr)
                             if not attr.hidden:
                                 if self.direction == "horizontal":
                                     attr.label.grid(column=0,
@@ -326,6 +330,7 @@ class BaseModule(ABC, ttk.Frame):
                             self.input_count += 1
                         elif isinstance(attr, BaseOutput):
                             attr.set_parent(self.output_frame)
+                            self.outputs.append(attr)
                             if not attr.hidden:
                                 if self.direction == "horizontal":
                                     attr.label.grid(column=0,
@@ -694,6 +699,8 @@ class BaseModule(ABC, ttk.Frame):
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
         if self.rois_loaded:
+            for output in self.outputs:
+                output.reset_value()
             self.analyse(batch)
             self.analysed = True
 
