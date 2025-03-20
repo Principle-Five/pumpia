@@ -60,6 +60,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         self._var: TkVarT | None = None
         self._var_trace: str = ""
         self.hidden: bool = hidden
+        self._initial_value: ValT | Callable[[], ValT] = initial_value
 
     @property
     def verbose_name(self) -> str | None:
@@ -164,6 +165,15 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
             self._parent = parent
         else:
             raise ValueError("Parent already set")
+
+    def reset_value(self):
+        """
+        Resets the IO to the initial value.
+        """
+        if callable(self._initial_value):
+            self.value = self._initial_value() # type: ignore
+        else:
+            self.value = self._initial_value
 
     @abstractmethod
     def _value_var_setter(self):

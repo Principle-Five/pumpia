@@ -6,6 +6,8 @@ Classes:
 """
 
 from abc import ABC
+import warnings
+import traceback
 import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self, Any
@@ -768,8 +770,20 @@ class BaseCollection(ABC, ttk.Frame):
         """
         By default this calls the `run_analysis` method for each module.
         """
+        filters = warnings.filters
         for module in self.modules:
-            module.run_analysis(batch=True)
+            warnings.simplefilter("error")
+            try:
+                module.run_analysis(batch=True)
+            # pylint: disable-next=broad-exception-caught
+            except Exception as exc:
+                warning = UserWarning(f"{module.verbose_name} module had an error.")
+                warning.with_traceback(exc.__traceback__)
+                traceback.print_exc()
+                warnings.simplefilter("always")
+                warnings.warn(warning, stacklevel=2)
+        warnings.filters = filters
+
 
     def create_and_run(self) -> None:
         """
