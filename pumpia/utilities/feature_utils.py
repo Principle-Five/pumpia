@@ -31,15 +31,17 @@ def flat_top_gauss(pos: np.ndarray,
     Parameters
     ----------
     pos : np.ndarray
-        1 dimensional array of positions
+        1 dimensional array of positions.
     a : float
-        left position of the top of the curve
+        left position of the top of the curve.
     b : float
-        right position of the top of the curve
+        right position of the top of the curve.
     c : float
-        half width of gaussian part
+        half width of gaussian part.
     amp : float
-        amplitude of the curve
+        amplitude of the curve.
+    offset : float, optional
+        base offset added to the curve (default is 0).
     """
     if pos.ndim != 1:
         raise ValueError("pos should be a 1 dimensional array of positions")
