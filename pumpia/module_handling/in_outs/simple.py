@@ -573,11 +573,13 @@ class StringOutput(BaseOutput[str, tk.StringVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
+                 reset_on_analysis:bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          val_label_style=val_label_style,
+                         reset_on_analysis=reset_on_analysis,
                          hidden=hidden)
 
 
@@ -594,11 +596,13 @@ class IntOutput(BaseOutput[int, tk.IntVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
+                 reset_on_analysis:bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          val_label_style=val_label_style,
+                         reset_on_analysis=reset_on_analysis,
                          hidden=hidden)
 
 
@@ -615,11 +619,13 @@ class FloatOutput(BaseOutput[float, tk.DoubleVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
+                 reset_on_analysis:bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          val_label_style=val_label_style,
+                         reset_on_analysis=reset_on_analysis,
                          hidden=hidden)
 
 
@@ -636,9 +642,11 @@ class DateOutput(BaseOutput[date, DateVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
+                 reset_on_analysis:bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          val_label_style=val_label_style,
+                         reset_on_analysis=reset_on_analysis,
                          hidden=hidden)
