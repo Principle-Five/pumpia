@@ -926,10 +926,11 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         """
         Handles window/level events when dragging mouse.
         """
-        level_delta = event.x - self.mouse_x
-        window_delta = self.mouse_y - event.y
-        self._set_mouse_loc(event)
-        self.window_level(window_delta, level_delta)
+        if not self._updating:
+            level_delta = event.x - self.mouse_x
+            window_delta = self.mouse_y - event.y
+            self._set_mouse_loc(event)
+            self.window_level(window_delta, level_delta)
 
     def window_level(self, window_delta: float, level_delta: float):
         """
@@ -1383,10 +1384,11 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         """
         Handles moving the image in the viewer using the mouse.
         """
-        delta_x = event.x - self.mouse_x
-        delta_y = event.y - self.mouse_y
-        self._set_mouse_loc(event)
-        self.move_image(delta_x, delta_y)
+        if not self._updating:
+            delta_x = event.x - self.mouse_x
+            delta_y = event.y - self.mouse_y
+            self._set_mouse_loc(event)
+            self.move_image(delta_x, delta_y)
 
     def move_image(self, delta_x: float, delta_y: float):
         """
