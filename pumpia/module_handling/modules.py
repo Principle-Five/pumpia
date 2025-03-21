@@ -700,7 +700,8 @@ class BaseModule(ABC, ttk.Frame):
         """
         if self.rois_loaded:
             for output in self.outputs:
-                output.reset_value()
+                if output.reset_on_analysis:
+                    output.reset_value()
             self.analyse(batch)
             self.analysed = True
 

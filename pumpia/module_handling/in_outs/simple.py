@@ -268,6 +268,7 @@ class BaseOutput[ValT, TkVarT](
                  verbose_name: str | None = None,
                  label_style: str | None = None,
                  val_label_style: str | None = None,
+                 reset_on_analysis:bool = True,
                  hidden: bool = False):
         BaseIO.__init__(self,
                         initial_value,
@@ -276,6 +277,7 @@ class BaseOutput[ValT, TkVarT](
                         hidden=hidden)
         self._val_label_style: str | None = val_label_style
         self._val_label: ttk.Label | None = None
+        self.reset_on_analysis:bool = reset_on_analysis
 
     @property
     def value_label(self) -> ttk.Label:
