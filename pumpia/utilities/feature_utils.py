@@ -19,7 +19,12 @@ from pumpia.utilities.typing import SideType
 from pumpia.module_handling.context import BoundBoxContext, PhantomContext, PhantomShapes
 
 
-def flat_top_gauss(pos: np.ndarray, a: float, b: float, c: float, amp: float) -> np.ndarray:
+def flat_top_gauss(pos: np.ndarray,
+                   a: float,
+                   b: float,
+                   c: float,
+                   amp: float,
+                   offset:float = 0) -> np.ndarray:
     """
     Returns an array of values for a flat top gaussian.
 
@@ -45,7 +50,7 @@ def flat_top_gauss(pos: np.ndarray, a: float, b: float, c: float, amp: float) ->
     ret_array[pos >= b] = amp * np.exp(-0.5 * np.square((pos[pos >= b] - b) / c))
     ret_array[(pos > a) & (pos < b)] = amp
 
-    return ret_array
+    return ret_array + offset
 
 
 def flat_top_gauss_integral(pos: np.ndarray,
