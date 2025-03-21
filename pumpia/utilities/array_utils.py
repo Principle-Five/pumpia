@@ -149,7 +149,7 @@ def nth_max_positions(array: np.ndarray,
                       minimum: float | np.floating | None = None,
                       maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array to the left of
+    Finds the interpolated positions in the array
     where the value is crossing the nth maximum value relative to the minimum.
 
     Parameters
@@ -183,7 +183,14 @@ def nth_max_positions(array: np.ndarray,
     mask = ((lt_half_maximum & np.roll(gte_half_maximum, -1))
             | (np.roll(lt_half_maximum, -1) & gte_half_maximum))
 
-    return mask[:-1].nonzero()[0]
+    indices = mask[:-1].nonzero()[0]
+    corr_locs:list[float] = []
+    for ind in indices:
+        l_val = array[ind]
+        r_val = array[ind + 1]
+        corr_locs.append(ind + abs((half_maximum - l_val) / (r_val - l_val)))
+
+    return corr_locs
 
 
 def nth_max_up_positions(array: np.ndarray,
@@ -191,7 +198,7 @@ def nth_max_up_positions(array: np.ndarray,
                          minimum: float | np.floating | None = None,
                          maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array to the left of
+    Finds the interpolated positions in the array to the left of
     where the value is increasing and crosses the nth maximum value relative to the minimum.
 
     Parameters
@@ -224,7 +231,14 @@ def nth_max_up_positions(array: np.ndarray,
     lt_half_maximum = array < half_maximum
     mask = lt_half_maximum & np.roll(gte_half_maximum, -1)
 
-    return mask[:-1].nonzero()[0]
+    indices = mask[:-1].nonzero()[0]
+    corr_locs:list[float] = []
+    for ind in indices:
+        l_val = array[ind]
+        r_val = array[ind + 1]
+        corr_locs.append(ind + abs((half_maximum - l_val) / (r_val - l_val)))
+
+    return corr_locs
 
 
 def nth_max_down_positions(array: np.ndarray,
@@ -232,7 +246,7 @@ def nth_max_down_positions(array: np.ndarray,
                            minimum: float | np.floating | None = None,
                            maximum: float | np.floating | None = None):
     """
-    Finds the positions in the array to the left of
+    Finds the interpolated positions in the array to the left of
     where the value is decreasing and crosses the nth maximum value relative to the minimum.
 
     Parameters
@@ -265,7 +279,14 @@ def nth_max_down_positions(array: np.ndarray,
     lt_half_maximum = array < half_maximum
     mask = np.roll(lt_half_maximum, -1) & gte_half_maximum
 
-    return mask[:-1].nonzero()[0]
+    indices = mask[:-1].nonzero()[0]
+    corr_locs:list[float] = []
+    for ind in indices:
+        l_val = array[ind]
+        r_val = array[ind + 1]
+        corr_locs.append(ind + abs((half_maximum - l_val) / (r_val - l_val)))
+
+    return corr_locs
 
 
 def nth_max_bounds(array: np.ndarray,
@@ -303,16 +324,7 @@ def nth_max_bounds(array: np.ndarray,
     p_min = min(nm_positions)
     p_max = max(nm_positions)
 
-    half_val = (maximum + minimum) / divisor
-    l_val = array[p_min]
-    r_val = array[p_min + 1]
-    new_min = p_min + abs((half_val - l_val) / (r_val - l_val))
-
-    l_val = array[p_max]
-    r_val = array[p_max + 1]
-    new_max = p_max + abs((half_val - l_val) / (r_val - l_val))
-
-    return MinMax(new_min, new_max)
+    return MinMax(p_min, p_max)
 
 
 def nth_max_peaks(array: np.ndarray,
@@ -348,12 +360,12 @@ def nth_max_peaks(array: np.ndarray,
     nm_ups = nth_max_up_positions(array, divisor, minimum, maximum)
     nm_downs = nth_max_down_positions(array, divisor, minimum, maximum)
 
-    n_ups: int = np.size(nm_ups, 0)
-    n_downs: int = np.size(nm_downs, 0)
+    n_ups: int = len(nm_ups)
+    n_downs: int = len(nm_downs)
     i_down: int = 0
     i_up: int = 0
 
-    peaks: list[MinMaxPix] = []
+    peaks: list[MinMax] = []
 
     while i_up < n_ups and i_down < n_downs:
         while i_down < n_downs and nm_downs[i_down] < nm_ups[i_up]:
@@ -361,24 +373,11 @@ def nth_max_peaks(array: np.ndarray,
         while i_up + 1 < n_ups and nm_ups[i_up + 1] < nm_downs[i_down]:
             i_up += 1
         if nm_downs[i_down] > nm_ups[i_up]:
-            peaks.append(MinMaxPix(nm_ups[i_up], nm_downs[i_down]))
+            peaks.append(MinMax(nm_ups[i_up], nm_downs[i_down]))
         i_down += 1
         i_up += 1
 
-    half_val = (maximum + minimum) / divisor
-    corr_peaks: list[MinMax] = []
-    for peak in peaks:
-        l_val = array[peak.minimum]
-        r_val = array[peak.minimum + 1]
-        new_min = peak.minimum + abs((half_val - l_val) / (r_val - l_val))
-
-        l_val = array[peak.maximum]
-        r_val = array[peak.maximum + 1]
-        new_max = peak.maximum + abs((half_val - l_val) / (r_val - l_val))
-
-        corr_peaks.append(MinMax(new_min, new_max))
-
-    return corr_peaks
+    return peaks
 
 
 def nth_max_widest_peak(array: np.ndarray,
@@ -443,12 +442,12 @@ def nth_max_troughs(array: np.ndarray,
     nm_ups = nth_max_up_positions(array, divisor, minimum, maximum)
     nm_downs = nth_max_down_positions(array, divisor, minimum, maximum)
 
-    n_ups: int = np.size(nm_ups, 0)
-    n_downs: int = np.size(nm_downs, 0)
+    n_ups: int = len(nm_ups)
+    n_downs: int = len(nm_downs)
     i_down: int = 0
     i_up: int = 0
 
-    troughs: list[MinMaxPix] = []
+    troughs: list[MinMax] = []
 
     while i_up < n_ups and i_down < n_downs:
         while i_up < n_ups and nm_ups[i_up] < nm_downs[i_down]:
@@ -457,24 +456,11 @@ def nth_max_troughs(array: np.ndarray,
             i_down += 1
 
         if nm_ups[i_up] > nm_downs[i_down]:
-            troughs.append(MinMaxPix(nm_ups[i_up], nm_downs[i_down]))
+            troughs.append(MinMax(nm_ups[i_up], nm_downs[i_down]))
         i_down += 1
         i_up += 1
 
-    half_val = (maximum + minimum) / divisor
-    corr_peaks: list[MinMax] = []
-    for trough in troughs:
-        l_val = array[trough.minimum]
-        r_val = array[trough.minimum + 1]
-        new_min = trough.minimum + abs((half_val - l_val) / (r_val - l_val))
-
-        l_val = array[trough.maximum]
-        r_val = array[trough.maximum + 1]
-        new_max = trough.maximum + abs((half_val - l_val) / (r_val - l_val))
-
-        corr_peaks.append(MinMax(new_min, new_max))
-
-    return corr_peaks
+    return troughs
 
 
 def nth_max_widest_trough(array: np.ndarray,
