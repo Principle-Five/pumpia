@@ -171,7 +171,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         Resets the IO to the initial value.
         """
         if callable(self._initial_value):
-            self.value = self._initial_value() # type: ignore
+            self.value = self._initial_value()  # type: ignore
         else:
             self.value = self._initial_value
 
@@ -268,7 +268,7 @@ class BaseOutput[ValT, TkVarT](
                  verbose_name: str | None = None,
                  label_style: str | None = None,
                  val_label_style: str | None = None,
-                 reset_on_analysis:bool = True,
+                 reset_on_analysis: bool = True,
                  hidden: bool = False):
         BaseIO.__init__(self,
                         initial_value,
@@ -277,7 +277,7 @@ class BaseOutput[ValT, TkVarT](
                         hidden=hidden)
         self._val_label_style: str | None = val_label_style
         self._val_label: ttk.Label | None = None
-        self.reset_on_analysis:bool = reset_on_analysis
+        self.reset_on_analysis: bool = reset_on_analysis
 
     @property
     def value_label(self) -> ttk.Label:
@@ -428,6 +428,10 @@ class BoolInput(BaseInput[bool, tk.BooleanVar]):
                          hidden=hidden)
         self._entry: ttk.Checkbutton | None = None
 
+    def _value_var_setter(self):
+        if self._entry is not None:
+            self._entry.configure(variable=self.value_var)
+
     @property
     def entry(self) -> ttk.Checkbutton:
         """
@@ -573,7 +577,7 @@ class StringOutput(BaseOutput[str, tk.StringVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis:bool = True,
+                 reset_on_analysis: bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
@@ -596,7 +600,7 @@ class IntOutput(BaseOutput[int, tk.IntVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis:bool = True,
+                 reset_on_analysis: bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
@@ -619,7 +623,7 @@ class FloatOutput(BaseOutput[float, tk.DoubleVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis:bool = True,
+                 reset_on_analysis: bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
@@ -642,7 +646,7 @@ class DateOutput(BaseOutput[date, DateVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis:bool = True,
+                 reset_on_analysis: bool = True,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
