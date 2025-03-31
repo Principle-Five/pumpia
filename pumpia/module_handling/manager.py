@@ -216,13 +216,9 @@ class Manager:
         if not add:
             self.focus = None
             self.selected = []
-            patients = list(self.patients)
             self.patients = set()
             for viewer in self.viewers:
                 viewer.unload_images()
-            for _ in range(len(patients)):
-                patients[0].unload()
-                del patients[0]
             gc.collect()
 
         if tk_parent is not None:

@@ -82,13 +82,6 @@ class Patient:
         This is the patient ID and name."""
         return self.patient_id + ": " + self.name
 
-    def unload(self):
-        studies = list(self._studies)
-        self._studies = set()
-        for _ in range(len(studies)):
-            studies[0].unload()
-            del studies[0]
-
     @property
     def id_string(self) -> str:
         """Returns the ID string of the patient. This is "DICOM : `patient_id`"."""
@@ -197,14 +190,6 @@ class Study:
     def __str__(self) -> str:
         """Returns the string representation of the study."""
         return self.study_date.strftime("%d/%m/%Y") + ": " + self.study_description
-
-    def unload(self):
-        series = list(self._series)
-        self._series = set()
-        for _ in range(len(series)):
-            series[0].unload()
-            del series[0]
-        del self.patient
 
     @property
     def id_string(self) -> str:
@@ -357,15 +342,6 @@ class Series(ImageCollection):
         # from docs: A class that overrides __eq__() and does not define __hash__()
         # will have its __hash__() implicitly set to None.
         return super().__hash__()
-
-    def unload(self):
-        images = list(self._image_set)
-        self._image_set = set()
-        for _ in range(len(images)):
-            images[0].unload()
-            del images[0]
-        del self.study
-        del self._dicom
 
     @property
     def id_string(self) -> str:
@@ -764,11 +740,6 @@ class Instance(FileImageSet):
         # from docs: A class that overrides __eq__() and does not define __hash__()
         # will have its __hash__() implicitly set to None.
         return super().__hash__()
-
-    def unload(self):
-        super().unload()
-        del self.series
-        del self._dicom
 
     @property
     def id_string(self) -> str:
