@@ -180,8 +180,8 @@ class BaseModule(ABC, ttk.Frame):
         self.command_buttons_count: int = 0
         self._start_manual_draw: bool = False
 
-        self.inputs:list[BaseInput] = []
-        self.outputs:list[BaseOutput] = []
+        self.inputs: list[BaseInput] = []
+        self.outputs: list[BaseOutput] = []
 
         if self.manager is not None and self.parent is not None:
             self.setup()

@@ -392,7 +392,7 @@ class Manager:
                     if ins == instance_id_str:
                         instance = ins
             else:
-                instance = Instance(series, instance_number, file, False)
+                instance = Instance(series, instance_number, file, False, open_dicom=open_dicom)
                 try:
                     series.add_instance(instance)
                 except ValueError:

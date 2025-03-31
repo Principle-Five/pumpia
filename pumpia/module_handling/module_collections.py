@@ -784,7 +784,6 @@ class BaseCollection(ABC, ttk.Frame):
                 warnings.warn(warning, stacklevel=2)
         warnings.filters = filters
 
-
     def create_and_run(self) -> None:
         """
         Calls the `create_rois` and `run_analysis` methods.

@@ -67,10 +67,10 @@ class ArrayImage(BaseImageSet):
     ----------
     shape : tuple[int, ...]
         The shape of the image.
-    is_multisample : bool
-        Whether the image is multisample. i.e. has more than one sample per pixel, such as RGB.
-    is_rgb : bool
-        Whether the image is RGB.
+    num_samples: int
+        Number of samples in the image (default is 1).
+    mode: str | None
+        Mode of the image e.g. RGB (default is None)
 
     Attributes
     ----------
@@ -84,10 +84,12 @@ class ArrayImage(BaseImageSet):
         The rotation of the image on a Viewer.
     shape : tuple[int, ...]
         The shape of the image.
+    num_samples: int
+        Number of samples in the image.
+    mode: str | None
+        Mode of the image e.g. RGB
     is_multisample : bool
-        Whether the image is multisample. i.e. has more than one sample per pixel, such as RGB.
     is_rgb : bool
-        Whether the image is RGB.
     current_slice : int
     location : tuple[float, float]
     num_slices : int
@@ -122,39 +124,39 @@ class ArrayImage(BaseImageSet):
     @overload
     def __init__(self,
                  shape: tuple[int, int, int, int],
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
     @overload
     def __init__(self,
                  shape: tuple[int, int, int],
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
     @overload
     def __init__(self,
                  shape: tuple[int, int],
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
     @overload
     def __init__(self,
                  shape: tuple[int, ...],
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
     def __init__(self,
                  shape: tuple[int, ...],
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         self._current_slice: int = 0
         self._rois: set['BaseROI'] = set()
@@ -164,26 +166,32 @@ class ArrayImage(BaseImageSet):
         self.rotation: float = 0
         self._user_window: float | None = None
         self._user_level: float | None = None
-        self.is_multisample: bool = False
+        self.num_samples: int = num_samples
+        self.mode: str | None = mode
 
         if len(shape) == 4:
             self.shape: tuple[int, int, int] = shape[:-1]
-            self.is_multisample = is_multisample
-            self.is_rgb = is_rgb
-        elif len(shape) == 3 and not is_multisample:
+            self.num_samples = shape[-1]
+        elif len(shape) == 3 and not self.is_multisample:
             self.shape: tuple[int, int, int] = shape
-            self.is_multisample = False
-            self.is_rgb = False
-        elif len(shape) == 3 and is_multisample:
+        elif len(shape) == 3 and self.is_multisample:
             self.shape: tuple[int, int, int] = (1, shape[0], shape[1])
-            self.is_multisample = True
-            self.is_rgb = is_rgb
+            self.num_samples = shape[-1]
         elif len(shape) == 2:
             self.shape: tuple[int, int, int] = (1, shape[0], shape[1])
-            self.is_multisample = False
-            self.is_rgb = False
         else:
             raise ValueError("wrong dimensions for array")
+
+    @property
+    def is_multisample(self) -> bool:
+        """Whether the image is multisample.
+        i.e. has more than one sample per pixel, such as RGB."""
+        return self.num_samples > 1
+
+    @property
+    def is_colour(self) -> bool:
+        """Whether the image is RGB."""
+        return (not self.mode is None) and self.is_multisample
 
     @property
     def current_slice(self) -> int:
@@ -211,6 +219,20 @@ class ArrayImage(BaseImageSet):
         return self.shape[0]
 
     @property
+    def height(self) -> int:
+        """
+        The height of the image
+        """
+        return self.shape[1]
+
+    @property
+    def width(self) -> int:
+        """
+        The width of the image
+        """
+        return self.shape[2]
+
+    @property
     @abstractmethod
     def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """
@@ -230,7 +252,7 @@ class ArrayImage(BaseImageSet):
         """
         The maximum value of the current slice, None if the image is multi-sample.
         """
-        if not self.is_multisample:
+        if not self.is_colour:
             return float(np.max(self.current_slice_array))
         else:
             return None
@@ -240,7 +262,7 @@ class ArrayImage(BaseImageSet):
         """
         The minimum value of the current slice, None if the image is multi-sample.
         """
-        if not self.is_multisample:
+        if not self.is_colour:
             return float(np.min(self.current_slice_array))
         else:
             return None
@@ -437,10 +459,10 @@ class FileImageSet(ArrayImage):
         The shape of the image.
     filepath : Path
         The file path of the image.
-    is_multisample : bool
-        Whether the image is multisample.
-    is_rgb : bool
-        Whether the image is RGB.
+    num_samples: int
+        Number of samples in the image (default is 1).
+    mode: str | None
+        Mode of the image e.g. RGB (default is None)
 
     Attributes
     ----------
@@ -452,8 +474,8 @@ class FileImageSet(ArrayImage):
     def __init__(self,
                  shape: tuple[int, int, int, int],
                  filepath: Path,
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
@@ -461,8 +483,8 @@ class FileImageSet(ArrayImage):
     def __init__(self,
                  shape: tuple[int, int, int],
                  filepath: Path,
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
@@ -470,18 +492,18 @@ class FileImageSet(ArrayImage):
     def __init__(self,
                  shape: tuple[int, int],
                  filepath: Path,
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
     def __init__(self,
                  shape: tuple[int, ...],
                  filepath: Path,
-                 is_multisample: bool,
-                 is_rgb: bool
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
-        super().__init__(shape, is_multisample, is_rgb)
+        super().__init__(shape, num_samples, mode)
         self._filepath: Path = copy(filepath)
 
     @property
@@ -509,10 +531,10 @@ class ImageCollection(ArrayImage):
     ----------
     shape : tuple[int, ...]
         The shape of the image.
-    is_multisample : bool
-        Whether the image is multisample.
-    is_rgb : bool
-        Whether the image is RGB.
+    num_samples: int
+        Number of samples in the image (default is 1).
+    mode: str | None
+        Mode of the image e.g. RGB (default is None)
 
     Attributes
     ----------
@@ -528,20 +550,28 @@ class ImageCollection(ArrayImage):
     """
 
     @overload
-    def __init__(self, shape: tuple[int, int, int, int], is_multisample: bool, is_rgb: bool
+    def __init__(self, shape: tuple[int, int, int, int],
+                 num_samples: int = 1,
+                 mode: str | None = None
                  ) -> None:
         ...
 
     @overload
-    def __init__(self, shape: tuple[int, int, int], is_multisample: bool, is_rgb: bool) -> None:
+    def __init__(self, shape: tuple[int, int, int],
+                 num_samples: int = 1,
+                 mode: str | None = None) -> None:
         ...
 
     @overload
-    def __init__(self, shape: tuple[int, int], is_multisample: bool, is_rgb: bool) -> None:
+    def __init__(self, shape: tuple[int, int],
+                 num_samples: int = 1,
+                 mode: str | None = None) -> None:
         ...
 
-    def __init__(self, shape: tuple[int, ...], is_multisample: bool, is_rgb: bool) -> None:
-        super().__init__(shape, is_multisample, is_rgb)
+    def __init__(self, shape: tuple[int, ...],
+                 num_samples: int = 1,
+                 mode: str | None = None) -> None:
+        super().__init__(shape, num_samples, mode)
         self._image_set: list[ArrayImage] = []
 
     @property
@@ -571,14 +601,14 @@ class ImageCollection(ArrayImage):
 
     @property
     def vmax(self) -> float | None:
-        if not self.is_rgb:
+        if not self.is_colour:
             return float(np.max(self.current_slice_array))
         else:
             return None
 
     @property
     def vmin(self) -> float | None:
-        if not self.is_rgb:
+        if not self.is_colour:
             return float(np.min(self.current_slice_array))
         else:
             return None
@@ -655,14 +685,14 @@ class ImageCollection(ArrayImage):
         if (self.num_slices == 0
             or (self.shape[1] == image.shape[1]
                 and self.shape[2] == image.shape[2]
-                and self.is_rgb == image.is_rgb
-                and self.is_multisample == image.is_multisample)):
+                and self.num_samples == image.num_samples
+                and self.mode == image.mode)):
             self._image_set.append(image)
             self.shape = (len(self._image_set),
                           image.shape[1],
                           image.shape[2])
-            self.is_multisample = image.is_multisample  # for if num_slices == 0
-            self.is_rgb = image.is_rgb  # for if num_slices == 0
+            self.num_samples = image.num_samples  # for if num_slices == 0
+            self.mode = image.mode  # for if num_slices == 0
         else:
             raise ValueError("Image incompatible with Collection")
 
