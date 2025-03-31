@@ -3,6 +3,7 @@ Classes:
  * Manager
 """
 
+import gc
 import datetime
 import typing
 from typing import TYPE_CHECKING, Literal
@@ -213,9 +214,16 @@ class Manager:
             The direction of the loading information (default is "Vertical").
         """
         if not add:
-            self.patients: set[Patient] = set()
+            self.focus = None
+            self.selected = []
+            patients = list(self.patients)
+            self.patients = set()
             for viewer in self.viewers:
                 viewer.unload_images()
+            for _ in range(len(patients)):
+                patients[0].unload()
+                del patients[0]
+            gc.collect()
 
         if tk_parent is not None:
             file_count = 0

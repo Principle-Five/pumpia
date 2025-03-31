@@ -221,6 +221,10 @@ class BaseROI(ABC):
         """
         return self.name
 
+    def unload(self):
+        self.delete_cache()
+        del self.image
+
     def delete_cache(self):
         """
         Deletes the cached values of the ROI.

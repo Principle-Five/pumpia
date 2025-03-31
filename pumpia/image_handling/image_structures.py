@@ -182,6 +182,13 @@ class ArrayImage(BaseImageSet):
         else:
             raise ValueError("wrong dimensions for array")
 
+    def unload(self):
+        rois = list(self._rois)
+        self._rois = set()
+        for _ in range(len(rois)):
+            rois[0].unload()
+            del rois[0]
+
     @property
     def is_multisample(self) -> bool:
         """Whether the image is multisample.
@@ -573,6 +580,13 @@ class ImageCollection(ArrayImage):
                  mode: str | None = None) -> None:
         super().__init__(shape, num_samples, mode)
         self._image_set: list[ArrayImage] = []
+
+    def unload(self):
+        images = list(self._image_set)
+        self._image_set = []
+        for _ in range(len(images)):
+            images[0].unload()
+            del images[0]
 
     @property
     def image_set(self) -> list[ArrayImage]:

@@ -82,6 +82,13 @@ class Patient:
         This is the patient ID and name."""
         return self.patient_id + ": " + self.name
 
+    def unload(self):
+        studies = list(self._studies)
+        self._studies = set()
+        for _ in range(len(studies)):
+            studies[0].unload()
+            del studies[0]
+
     @property
     def id_string(self) -> str:
         """Returns the ID string of the patient. This is "DICOM : `patient_id`"."""
@@ -191,6 +198,14 @@ class Study:
         """Returns the string representation of the study."""
         return self.study_date.strftime("%d/%m/%Y") + ": " + self.study_description
 
+    def unload(self):
+        series = list(self._series)
+        self._series = set()
+        for _ in range(len(series)):
+            series[0].unload()
+            del series[0]
+        del self.patient
+
     @property
     def id_string(self) -> str:
         """Returns the ID string of the study."""
@@ -271,10 +286,6 @@ class Series(ImageCollection):
     -------
     add_instance(instance: 'Instance')
         Adds an instance to the series.
-    load()
-        Loads the series from the series filepath.
-    unload()
-        Unloads the series.
     get_tags(tag: Tag) -> list
         Gets the values of a dicom tag for all instances in the series.
     get_tag(tag: Tag, instance_number: int)
@@ -298,8 +309,6 @@ class Series(ImageCollection):
         self.is_stack: bool = is_stack
 
         self._filepath: Path | None = copy(filepath)
-        self.loaded: bool = False
-        self._dicom: pydicom.Dataset | None = None
 
         if self.is_stack:
             if self._filepath is None:
@@ -326,6 +335,7 @@ class Series(ImageCollection):
         else:
             super().__init__((0, 0, 0))
 
+        self._dicom: pydicom.Dataset | None = open_dicom
         self._image_set: set[Instance] = set()
 
     def __eq__(self, value: object) -> bool:
@@ -347,6 +357,15 @@ class Series(ImageCollection):
         # from docs: A class that overrides __eq__() and does not define __hash__()
         # will have its __hash__() implicitly set to None.
         return super().__hash__()
+
+    def unload(self):
+        images = list(self._image_set)
+        self._image_set = set()
+        for _ in range(len(images)):
+            images[0].unload()
+            del images[0]
+        del self.study
+        del self._dicom
 
     @property
     def id_string(self) -> str:
@@ -387,8 +406,6 @@ class Series(ImageCollection):
                                   np.dtype]:
         """Returns the raw array of the series as stored in the dicom file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        if not self.loaded:
-            self.load()
         if self.is_stack and self._dicom is not None:
             return self._dicom.pixel_array
         else:
@@ -403,8 +420,6 @@ class Series(ImageCollection):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if not self.loaded:
-            self.load()
         if self.is_stack:
             raw_array = np.astype(self.raw_array, float)
             if self.get_tag(DicomTags.SamplesPerPixel, self.current_slice) == 1:
@@ -556,17 +571,10 @@ class Series(ImageCollection):
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
         """Returns the pydicom dataset of the series."""
-        load_stat = self.loaded
-        if not self.loaded:
-            self.load()
-
         if self.is_stack:
             dcm = self._dicom
         else:
             dcm = self.instances[self.current_slice].dicom_dataset
-
-        if not load_stat:
-            self.unload()
 
         return dcm
 
@@ -599,32 +607,6 @@ class Series(ImageCollection):
         else:
             raise ValueError("Image must be an Instance")
 
-    def load(self):
-        """Loads the series from the series filepath."""
-        if not self.loaded:
-            if self.is_stack:
-                if self.filepath is None:
-                    raise FileNotFoundError("No valid filepath found")
-                self._dicom = dcmread(self.filepath)
-                for instance in self.instances:
-                    instance.loaded = True
-            else:
-                for instance in self.instances:
-                    instance.load()
-            self.loaded = True
-
-    def unload(self):
-        """Unloads the series."""
-        if self.loaded:
-            if self.is_stack:
-                self._dicom = None
-                for instance in self.instances:
-                    instance.loaded = False
-            else:
-                for instance in self.instances:
-                    instance.unload()
-            self.loaded = False
-
     def get_tags(self, tag: Tag) -> list:
         """
         Gets the values of a DICOM tag for all instances in the series.
@@ -639,16 +621,9 @@ class Series(ImageCollection):
         list
             The list of values for the tag.
         """
-        load_stat = self.loaded
-        if not self.loaded:
-            self.load()
-
         values = []
         for instance in self.instances:
             values.append(instance.get_tag(tag))
-
-        if not load_stat:
-            self.unload()
 
         return values
 
@@ -712,10 +687,6 @@ class Instance(FileImageSet):
 
     Methods
     -------
-    load()
-        Loads the instance from the instance filepath.
-    unload()
-        Unloads the instance.
     get_tag(tag: Tag)
         Gets the value of a tag for the instance.
     """
@@ -728,19 +699,18 @@ class Instance(FileImageSet):
                  frame_number: int | None = None,
                  dimension_index_values: list | tuple | None = None,
                  open_dicom: pydicom.Dataset | None = None,) -> None:
-        self.series = series
-        self.instance_number = instance_number
+        self.series: Series = series
+        self.instance_number: int = instance_number
 
-        self.is_frame = is_frame
-        self.frame_number = frame_number
+        self.is_frame: bool = is_frame
+        self.frame_number: int | None = frame_number
 
         if isinstance(dimension_index_values, list):
             self.dimension_index_values = tuple(dimension_index_values)
         else:
             self.dimension_index_values = dimension_index_values
 
-        self.loaded = False
-        self._dicom: pydicom.Dataset | None = None
+        self.loaded: bool = False
 
         if self.is_frame:
             if series.filepath is None:
@@ -772,6 +742,8 @@ class Instance(FileImageSet):
             else:
                 super().__init__(open_dicom.pixel_array.shape, filepath, num_samples)
 
+        self._dicom: pydicom.Dataset | None = open_dicom
+
     def __eq__(self, value: object) -> bool:
         if isinstance(value, Instance):
             return hash(self) == hash(value)
@@ -792,6 +764,11 @@ class Instance(FileImageSet):
         # from docs: A class that overrides __eq__() and does not define __hash__()
         # will have its __hash__() implicitly set to None.
         return super().__hash__()
+
+    def unload(self):
+        super().unload()
+        del self.series
+        del self._dicom
 
     @property
     def id_string(self) -> str:
@@ -816,8 +793,6 @@ class Instance(FileImageSet):
                                   np.dtype]:
         """Returns the raw array of the instance as stored in the dicom file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        if not self.loaded:
-            self.load()
         if self.is_frame and self.frame_number is not None:
             return np.array([self.series.raw_array[self.frame_number - 1]])  # type: ignore
         elif self._dicom is not None:
@@ -834,8 +809,6 @@ class Instance(FileImageSet):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if not self.loaded:
-            self.load()
         if self.is_frame and self.frame_number is not None:
             return np.array([self.series.array[self.frame_number - 1]])  # type: ignore
         else:
@@ -963,37 +936,12 @@ class Instance(FileImageSet):
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
         """Returns the pydicom dataset of the instance."""
-        load_stat = self.loaded
-        if not self.loaded:
-            self.load()
-
         if self.is_frame:
             dcm = self.series.dicom_dataset
         else:
             dcm = self._dicom
 
-        if not load_stat:
-            self.unload()
-
         return dcm
-
-    def load(self):
-        """Loads the instance from the instance filepath."""
-        if not self.loaded:
-            if self.is_frame:
-                self.series.load()
-            else:
-                self._dicom = dcmread(self.filepath)
-            self.loaded = True
-
-    def unload(self):
-        """Unloads the instance."""
-        if self.loaded:
-            if self.is_frame:
-                self.series.unload()
-            else:
-                self._dicom = None
-            self.loaded = False
 
     def get_tag(self, tag: Tag):
         """
@@ -1008,10 +956,6 @@ class Instance(FileImageSet):
         -------
         The value of the tag.
         """
-        load_stat = self.loaded
-        if not self.loaded:
-            self.load()
-
         value = None
         if self.is_frame and self.frame_number is not None:
             dataset = self.series.dicom_dataset
@@ -1025,8 +969,5 @@ class Instance(FileImageSet):
                 value = get_tag(dataset, tag).value
             else:
                 value = None
-
-        if not load_stat:
-            self.unload()
 
         return value
