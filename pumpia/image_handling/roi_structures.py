@@ -470,7 +470,7 @@ class BaseROI(ABC):
 
         if len(pixel_value_list) == 0:
             if self.image.is_multisample:
-                self._pixel_values = [list(np.zeros(array.shape[-1]))]
+                self._pixel_values = [[0 for _ in range(self.image.num_samples)]]
             else:
                 self._pixel_values = [0]
         else:
@@ -2297,14 +2297,14 @@ class LineROI(BaseROI):
         for d in range(num_points):
             x = round(self.x1 + d * x_frac)
             y = round(self.y1 + d * y_frac)
-            if (x>=0 and x<xmax and y>=0 and y<ymax):
+            if (x >= 0 and x < xmax and y >= 0 and y < ymax):
                 pixel_array[0, d] = array[y, x]
 
         pixel_value_list = list(pixel_array[0])
 
         if len(pixel_value_list) == 0:
-            if self.image.is_rgb:
-                self._pixel_values = [[0, 0, 0]]
+            if self.image.is_multisample:
+                self._pixel_values = [[0 for _ in range(self.image.num_samples)]]
             else:
                 self._pixel_values = [0]
         else:

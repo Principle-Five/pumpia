@@ -443,8 +443,8 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
 
         # pylint: disable-next=undefined-variable
         self.image: ImageT | None = None
-        self._axes_array: np.ndarray = np.empty((0, 0))
-        self.pil_image: Image.Image = Image.fromarray(self._axes_array)
+        axes_array: np.ndarray = np.empty((0, 0))
+        self.pil_image: Image.Image = Image.fromarray(axes_array)
         self.pil_tkimage: ImageTk.PhotoImage = ImageTk.PhotoImage(
             self.pil_image)
         self._image_id: int = self.create_image(self.center.tuple,
@@ -599,8 +599,8 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         Updates the viewer with the current image.
         """
         if self.image is None:
-            self._axes_array: np.ndarray = np.empty((0, 0))
-            self.pil_image: Image.Image = Image.fromarray(self._axes_array)
+            axes_array: np.ndarray = np.empty((0, 0))
+            self.pil_image: Image.Image = Image.fromarray(axes_array)
             self.pil_tkimage: ImageTk.PhotoImage = ImageTk.PhotoImage(
                 self.pil_image)
             self.itemconfigure(
@@ -623,7 +623,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
 
             if orig_width < 1 or orig_height < 1:
                 new_width = new_height = 1
-                self._axes_array = self.image.array[self.current_slice]
+                axes_array = self.image.array[self.current_slice]
             else:
                 lower_w = math.floor(
                     (orig_width / 2 - self.center.x - self._x) / self.zoom_factor)
@@ -651,14 +651,14 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                         lower_h = self.image.shape[1] - 1
                     upper_h = lower_h + 1
 
-                self._axes_array = self.image.array[self.current_slice,
-                                                    lower_h:upper_h,
-                                                    lower_w:upper_w]
+                self.image.current_slice = self.current_slice
+                axes_array = self.image.current_slice_array[lower_h:upper_h,
+                                                            lower_w:upper_w]
 
                 new_width = math.floor(
-                    self._axes_array.shape[1] * self.zoom_factor)
+                    axes_array.shape[1] * self.zoom_factor)
                 new_height = math.floor(
-                    self._axes_array.shape[0] * self.zoom_factor * self.image.aspect)
+                    axes_array.shape[0] * self.zoom_factor * self.image.aspect)
 
                 if new_width < 1 or new_height < 1:
                     new_width = new_height = 1
@@ -670,22 +670,22 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                 ix = -(orig_width - new_width) / 2
                 iy = -(orig_height - new_height) / 2
 
-            if self._axes_array.ndim == 2:
+            if axes_array.ndim == 2:
                 if (self._user_level is not None
                         and self._user_window is not None):
                     mult = 255 / self._user_window
                     intercept = (self._user_level
                                  - (self._user_window / 2))
-                    array_to_show = (self._axes_array - intercept) * mult
+                    array_to_show = (axes_array - intercept) * mult
                     array_to_show[array_to_show > 255] = 255
                     array_to_show[array_to_show < 0] = 0
                     array_to_show = array_to_show.astype(np.uint8)
 
                     self.pil_image = Image.fromarray(array_to_show, mode='L')
 
-            elif self._axes_array.ndim == 3 and self.image.is_rgb:
+            elif self.image.is_colour:
                 self.pil_image = Image.fromarray(
-                    self._axes_array, mode='RGB')
+                    axes_array.astype(np.uint8), mode=self.image.mode)
 
             self.pil_image = self.pil_image.resize((new_width, new_height),
                                                    resample=Image.Resampling.NEAREST)
@@ -1492,4 +1492,4 @@ class MonochromeDicomViewer(BaseViewer[Series | Instance]):
     def can_show_image(cls, image: BaseImageSet) -> TypeGuard[Series | Instance]:
         return (_showable_array_image(image)
                 and isinstance(image, cls.image_type)
-                and not image.is_rgb)
+                and not image.is_colour)

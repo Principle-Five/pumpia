@@ -311,17 +311,20 @@ class Series(ImageCollection):
                 except InvalidDicomError as exc:
                     raise InvalidDicomError(
                         "filepath must be a valid DICOM file") from exc
-                if get_tag(open_dicom, DicomTags.SamplesPerPixel).value == 1:
-                    super().__init__(open_dicom.pixel_array.shape, False, False)
-                else:
-                    super().__init__(open_dicom.pixel_array.shape, True, True)
+            num_samples = get_tag(open_dicom, DicomTags.SamplesPerPixel).value
+            try:
+                photo_interp = get_tag(open_dicom, DicomTags.PhotometricInterpretation).value
+            except KeyError:
+                photo_interp = None
+            if num_samples == 1:
+                super().__init__(open_dicom.pixel_array.shape)
+            elif isinstance(photo_interp, str):
+                super().__init__(open_dicom.pixel_array.shape, num_samples, "RGB")
             else:
-                if get_tag(open_dicom, DicomTags.SamplesPerPixel).value == 1:
-                    super().__init__(open_dicom.pixel_array.shape, False, False)
-                else:
-                    super().__init__(open_dicom.pixel_array.shape, True, True)
+                super().__init__(open_dicom.pixel_array.shape, num_samples)
+
         else:
-            super().__init__((0, 0, 0), False, False)
+            super().__init__((0, 0, 0))
 
         self._image_set: set[Instance] = set()
 
@@ -355,6 +358,9 @@ class Series(ImageCollection):
 
     @property
     def filepath(self) -> Path:
+        """
+        The file path of the current image for the series.
+        """
         if self._filepath is None:
             return self.current_image.filepath
         else:
@@ -401,28 +407,48 @@ class Series(ImageCollection):
             self.load()
         if self.is_stack:
             raw_array = np.astype(self.raw_array, float)
-            if self.get_tag(DicomTags.SamplesPerPixel, 0) == 1:
+            if self.get_tag(DicomTags.SamplesPerPixel, self.current_slice) == 1:
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope, 0)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept, 0)
+                    slope = self.get_tag(DicomTags.RescaleSlope, self.current_slice)
+                    intercept = self.get_tag(DicomTags.RescaleIntercept, self.current_slice)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
             else:
                 try:
                     photo_interp = self.get_tag(
-                        DicomTags.PhotometricInterpretation, 0)
+                        DicomTags.PhotometricInterpretation, self.current_slice)
                     if isinstance(photo_interp, str):
-                        return np.astype(convert_color_space(self.raw_array,
-                                                             photo_interp,
-                                                             'RGB'),
-                                         float)
+                        if photo_interp != "RGB":
+                            return np.astype(convert_color_space(self.raw_array,
+                                                                 photo_interp,
+                                                                 'RGB'),
+                                             float)
+                        else:
+                            return raw_array
                     else:
-                        return raw_array
+                        try:
+                            slope = self.get_tag(DicomTags.RescaleSlope, self.current_slice)
+                            intercept = self.get_tag(DicomTags.RescaleIntercept, self.current_slice)
+                            return raw_array * slope + intercept
+                        except KeyError:
+                            return raw_array
                 except (KeyError, NotImplementedError):
-                    return raw_array
+                    try:
+                        slope = self.get_tag(DicomTags.RescaleSlope, self.current_slice)
+                        intercept = self.get_tag(DicomTags.RescaleIntercept, self.current_slice)
+                        return raw_array * slope + intercept
+                    except KeyError:
+                        return raw_array
         else:
             return np.concatenate([a.array for a in self.instances])  # type: ignore
+
+    @property
+    def current_slice_array(self) -> np.ndarray[tuple[int, int, int] | tuple[int, int], np.dtype]:
+        """
+        The array representation of the current slice.
+        """
+        return self.instances[self.current_slice].current_slice_array
 
     @property
     def vmax(self) -> float | None:
@@ -556,14 +582,14 @@ class Series(ImageCollection):
         if (self.num_slices == 0
             or (self.shape[1] == instance.shape[1]
                 and self.shape[2] == instance.shape[2]
-                and self.is_multisample == instance.is_multisample
-                and self.is_rgb == instance.is_rgb)):
+                and self.num_samples == instance.num_samples
+                and self.mode == instance.mode)):
             self._image_set.add(instance)  # this line is different to parent
             self.shape = (len(self._image_set),
                           instance.shape[1],
                           instance.shape[2])
-            self.is_multisample = instance.is_multisample  # for if num_slices == 0
-            self.is_rgb = instance.is_rgb  # for if num_slices == 0
+            self.num_samples = instance.num_samples  # for if num_slices == 0
+            self.mode = instance.mode  # for if num_slices == 0
         else:
             raise ValueError("Instance incompatible with Series")
 
@@ -700,7 +726,8 @@ class Instance(FileImageSet):
                  filepath: Path | None = None,
                  is_frame: bool = False,
                  frame_number: int | None = None,
-                 dimension_index_values: list | tuple | None = None) -> None:
+                 dimension_index_values: list | tuple | None = None,
+                 open_dicom: pydicom.Dataset | None = None,) -> None:
         self.series = series
         self.instance_number = instance_number
 
@@ -722,20 +749,28 @@ class Instance(FileImageSet):
             super().__init__(
                 (series.shape[1], series.shape[2]),
                 series.filepath,
-                series.is_multisample,
-                series.is_rgb)
+                series.num_samples,
+                series.mode)
         else:
             if filepath is None:
                 raise FileNotFoundError("A valid filepath must be provided")
+            if open_dicom is None:
+                try:
+                    open_dicom = dcmread(filepath)
+                except InvalidDicomError as exc:
+                    raise InvalidDicomError(
+                        "filepath must be a valid DICOM file") from exc
+            num_samples = get_tag(open_dicom, DicomTags.SamplesPerPixel).value
             try:
-                open_dicom = dcmread(filepath)
-            except InvalidDicomError as exc:
-                raise InvalidDicomError(
-                    "filepath must be a valid DICOM file") from exc
-            if get_tag(open_dicom, DicomTags.SamplesPerPixel).value == 1:
-                super().__init__(open_dicom.pixel_array.shape, filepath, False, False)
+                photo_interp = get_tag(open_dicom, DicomTags.PhotometricInterpretation).value
+            except KeyError:
+                photo_interp = None
+            if num_samples == 1:
+                super().__init__(open_dicom.pixel_array.shape, filepath)
+            elif isinstance(photo_interp, str):
+                super().__init__(open_dicom.pixel_array.shape, filepath, num_samples, "RGB")
             else:
-                super().__init__(open_dicom.pixel_array.shape, filepath, True, True)
+                super().__init__(open_dicom.pixel_array.shape, filepath, num_samples)
 
     def __eq__(self, value: object) -> bool:
         if isinstance(value, Instance):
@@ -817,14 +852,26 @@ class Instance(FileImageSet):
                     photo_interp = self.get_tag(
                         DicomTags.PhotometricInterpretation)
                     if isinstance(photo_interp, str):
-                        return np.astype(convert_color_space(self.raw_array,
-                                                             photo_interp,
-                                                             'RGB'),
-                                         float)
+                        if photo_interp != "RGB":
+                            return np.astype(convert_color_space(self.raw_array,
+                                                                 photo_interp,
+                                                                 'RGB'), float)
+                        else:
+                            return raw_array
                     else:
-                        return raw_array
+                        try:
+                            slope = self.get_tag(DicomTags.RescaleSlope)
+                            intercept = self.get_tag(DicomTags.RescaleIntercept)
+                            return raw_array * slope + intercept
+                        except KeyError:
+                            return raw_array
                 except (KeyError, NotImplementedError):
-                    return raw_array
+                    try:
+                        slope = self.get_tag(DicomTags.RescaleSlope)
+                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        return raw_array * slope + intercept
+                    except KeyError:
+                        return raw_array
 
     @property
     def vmax(self) -> float | None:

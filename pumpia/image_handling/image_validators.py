@@ -21,4 +21,4 @@ def not_rgb(image: BaseImageSet) -> TypeGuard[ArrayImage]:
     bool
         True if the image is not an RGB image, False otherwise.
     """
-    return isinstance(image, ArrayImage) and not image.is_rgb
+    return isinstance(image, ArrayImage) and not image.is_colour
