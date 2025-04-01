@@ -623,7 +623,12 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
 
             if orig_width < 1 or orig_height < 1:
                 new_width = new_height = 1
-                axes_array = self.image.array[self.current_slice]
+                lower_w = 0
+                upper_w = self.image.shape[2]
+                lower_h = 0
+                upper_h = self.image.shape[1]
+                ix = -(orig_width - new_width) / 2
+                iy = -(orig_height - new_height) / 2
             else:
                 lower_w = math.floor(
                     (orig_width / 2 - self.center.x - self._x) / self.zoom_factor)
@@ -651,41 +656,39 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                         lower_h = self.image.shape[1] - 1
                     upper_h = lower_h + 1
 
-                self.image.current_slice = self.current_slice
-                axes_array = self.image.current_slice_array[lower_h:upper_h,
-                                                            lower_w:upper_w]
-
                 new_width = math.floor(
-                    axes_array.shape[1] * self.zoom_factor)
+                    (upper_w - lower_w) * self.zoom_factor)
                 new_height = math.floor(
-                    axes_array.shape[0] * self.zoom_factor * self.image.aspect)
+                    (upper_h - lower_h) * self.zoom_factor * self.image.aspect)
 
                 if new_width < 1 or new_height < 1:
                     new_width = new_height = 1
 
-            try:
                 ix = lower_w * self.zoom_factor - (orig_width - new_width) / 2
                 iy = lower_h * self.zoom_factor - (orig_height - new_height) / 2
-            except UnboundLocalError:
-                ix = -(orig_width - new_width) / 2
-                iy = -(orig_height - new_height) / 2
 
-            if axes_array.ndim == 2:
-                if (self._user_level is not None
-                        and self._user_window is not None):
-                    mult = 255 / self._user_window
-                    intercept = (self._user_level
-                                 - (self._user_window / 2))
-                    array_to_show = (axes_array - intercept) * mult
-                    array_to_show[array_to_show > 255] = 255
-                    array_to_show[array_to_show < 0] = 0
-                    array_to_show = array_to_show.astype(np.uint8)
+            self.image.current_slice = self.current_slice
 
-                    self.pil_image = Image.fromarray(array_to_show, mode='L')
+            if isinstance(self.image, (Series, Instance)):
+                axes_array = self.image.current_slice_array[lower_h:upper_h,
+                                                            lower_w:upper_w]
 
-            elif self.image.is_colour:
-                self.pil_image = Image.fromarray(
-                    axes_array.astype(np.uint8), mode=self.image.mode)
+                if axes_array.ndim == 2:
+                    if (self._user_level is not None
+                            and self._user_window is not None):
+                        mult = 255 / self._user_window
+                        intercept = (self._user_level
+                                     - (self._user_window / 2))
+                        array_to_show = (axes_array - intercept) * mult
+                        array_to_show[array_to_show > 255] = 255
+                        array_to_show[array_to_show < 0] = 0
+                        array_to_show = array_to_show.astype(np.uint8)
+
+                        self.pil_image = Image.fromarray(array_to_show, mode='L')
+
+                elif self.image.is_colour:
+                    self.pil_image = Image.fromarray(
+                        axes_array.astype(np.uint8), mode="RGB")
 
             self.pil_image = self.pil_image.resize((new_width, new_height),
                                                    resample=Image.Resampling.NEAREST)
