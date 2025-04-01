@@ -398,17 +398,16 @@ class Series(ImageCollection):
         """
         if self.is_stack:
             raw_array = np.astype(self.raw_array, float)
-            if self.get_tag(DicomTags.SamplesPerPixel, self.current_slice) == 1:
+            if not self.is_colour:
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope, self.current_slice)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept, self.current_slice)
+                    slope = self.get_tag(DicomTags.RescaleSlope)
+                    intercept = self.get_tag(DicomTags.RescaleIntercept)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
             else:
                 try:
-                    photo_interp = self.get_tag(
-                        DicomTags.PhotometricInterpretation, self.current_slice)
+                    photo_interp = self.get_tag(DicomTags.PhotometricInterpretation)
                     if isinstance(photo_interp, str):
                         if photo_interp != "RGB":
                             return np.astype(convert_color_space(self.raw_array,
@@ -419,15 +418,15 @@ class Series(ImageCollection):
                             return raw_array
                     else:
                         try:
-                            slope = self.get_tag(DicomTags.RescaleSlope, self.current_slice)
-                            intercept = self.get_tag(DicomTags.RescaleIntercept, self.current_slice)
+                            slope = self.get_tag(DicomTags.RescaleSlope)
+                            intercept = self.get_tag(DicomTags.RescaleIntercept)
                             return raw_array * slope + intercept
                         except KeyError:
                             return raw_array
                 except (KeyError, NotImplementedError):
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope, self.current_slice)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept, self.current_slice)
+                        slope = self.get_tag(DicomTags.RescaleSlope)
+                        intercept = self.get_tag(DicomTags.RescaleIntercept)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
@@ -448,10 +447,8 @@ class Series(ImageCollection):
         This is **not** normally the maximum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(
-                DicomTags.WindowWidth, self.current_slice)
-            window_center = self.get_tag(
-                DicomTags.WindowCenter, self.current_slice)
+            window_width = self.get_tag(DicomTags.WindowWidth)
+            window_center = self.get_tag(DicomTags.WindowCenter)
             if window_center is not None and window_width is not None:
                 vmax = window_center + (window_width / 2)
             else:
@@ -469,10 +466,8 @@ class Series(ImageCollection):
         This is **not** normally the minimum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(
-                DicomTags.WindowWidth, self.current_slice)
-            window_center = self.get_tag(
-                DicomTags.WindowCenter, self.current_slice)
+            window_width = self.get_tag(DicomTags.WindowWidth)
+            window_center = self.get_tag(DicomTags.WindowCenter)
             if window_center is not None and window_width is not None:
                 vmin = window_center - (window_width / 2)
             else:
@@ -488,7 +483,7 @@ class Series(ImageCollection):
         """Returns the default window width from the window width tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            window = self.get_tag(DicomTags.WindowWidth, self.current_slice)
+            window = self.get_tag(DicomTags.WindowWidth)
             if window is not None:
                 return float(window)
             else:
@@ -505,7 +500,7 @@ class Series(ImageCollection):
         """Returns the default level (window centre) from the window center tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            level = self.get_tag(DicomTags.WindowCenter, self.current_slice)
+            level = self.get_tag(DicomTags.WindowCenter)
             if level is not None:
                 return float(level)
             else:
@@ -521,13 +516,11 @@ class Series(ImageCollection):
         (slice_thickness, row_spacing, column_spacing)
         """
         try:
-            pixel_spacing = self.get_tag(
-                DicomTags.PixelSpacing, self.current_slice)
+            pixel_spacing = self.get_tag(DicomTags.PixelSpacing)
         except KeyError:
             pixel_spacing = (1, 1)
         try:
-            slice_thickness = self.get_tag(
-                DicomTags.SliceThickness, self.current_slice)
+            slice_thickness = self.get_tag(DicomTags.SliceThickness)
         except KeyError:
             slice_thickness = 1
 
@@ -603,7 +596,7 @@ class Series(ImageCollection):
 
         return values
 
-    def get_tag(self, tag: Tag, instance_number: int):
+    def get_tag(self, tag: Tag, instance_number: int | None = None):
         """
         Gets the value of a DICOM tag for a specific instance in the series.
 
@@ -611,13 +604,16 @@ class Series(ImageCollection):
         ----------
         tag : Tag
             The tag to get the value for.
-        instance_number : int
+        instance_number : int | None
             The instance number to get the tag value for.
+            If None uses the current instance (default is None).
 
         Returns
         -------
         The value of the tag.
         """
+        if instance_number is None:
+            instance_number = self.current_slice
         if instance_number < self.num_slices:
             return self.instances[instance_number].get_tag(tag)
         else:

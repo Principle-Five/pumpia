@@ -68,7 +68,7 @@ class ArrayImage(BaseImageSet):
     shape : tuple[int, ...]
         The shape of the image.
     num_samples: int
-        Number of samples in the image (default is 1).
+        Number of samples in the image, `>1` for colour images, e.g. RGB is 3 (default is 1).
     mode: str | None
         Mode of the image e.g. RGB (default is None)
 
@@ -85,7 +85,7 @@ class ArrayImage(BaseImageSet):
     shape : tuple[int, ...]
         The shape of the image.
     num_samples: int
-        Number of samples in the image.
+        Number of samples in the image, >1 for colour images (e.g. RGB is 3)
     mode: str | None
         Mode of the image e.g. RGB
     is_multisample : bool
