@@ -23,6 +23,7 @@ from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet
 from pumpia.image_handling.roi_structures import BaseROI
 from pumpia.file_handling.dicom_tags import DicomTags, get_tag
 from pumpia.utilities.dicom_utils import show_dicom_tags
+from pumpia.utilities.file_utils import get_file_tree_dict, TreePathDict
 from pumpia.utilities.typing import DirectionType
 from pumpia.utilities.tkinter_utils import tk_copy
 
@@ -223,6 +224,7 @@ class Manager:
             self.focus = None
             self.selected = []
             self.patients = set()
+            self.general_images = set()
             for viewer in self.viewers:
                 viewer.unload_images()
             gc.collect()
@@ -426,15 +428,43 @@ class Manager:
             tree.delete(*tree.get_children())
             if len(self.general_images) > 0:
                 tree.insert('', 'end', iid='General', text="General", open=True)
-                for im in sorted(self.general_images, key=str):
-                    im_id = im.tag
-                    im_text = str(im)
-                    tree.insert("General",
-                                'end',
-                                iid=im_id,
-                                text=im_text,
-                                tags=('selected',
-                                      im.id_string))
+                tree_dict = get_file_tree_dict(list(self.general_images))
+
+                def add_general_dict(tree_dict: TreePathDict, current: str, tree: ttk.Treeview):
+                    try:
+                        tree_dict = dict(sorted(tree_dict.items()))
+                    except TypeError:
+                        pass
+
+                    for k, v in tree_dict.items():
+                        if isinstance(v, dict):
+                            ent_id = str(current / k)
+                            tree.insert(current,
+                                        'end',
+                                        iid=ent_id,
+                                        text=str(k))
+                            # pylint: disable-next=cell-var-from-loop
+                            add_general_dict(v, ent_id, tree)
+                        elif isinstance(v, GeneralImage):
+                            new_k = Path(k).parent
+                            if new_k != Path("."):
+                                ent_id = str(current / new_k)
+                                tree.insert(current,
+                                            'end',
+                                            iid=ent_id,
+                                            text=str(new_k))
+                            else:
+                                ent_id = current
+                            im_id = v.tag
+                            im_text = str(v.filepath.parts[-1])
+                            tree.insert(ent_id,
+                                        'end',
+                                        iid=im_id,
+                                        text=im_text,
+                                        tags=('selected',
+                                              v.id_string))
+                add_general_dict(tree_dict, "General", tree)
+
             if len(self.patients) > 0:
                 tree.insert('', 'end', iid='Dicoms', text="Dicoms", open=True)
                 for pt in sorted(self.patients, key=str):
