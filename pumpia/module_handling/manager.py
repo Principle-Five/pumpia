@@ -11,9 +11,14 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askdirectory
 from pathlib import Path
+
+import PIL
+from PIL import Image
 from pydicom import dcmread, FileDataset
 from pydicom.errors import InvalidDicomError
+
 from pumpia.file_handling.dicom_structures import Patient, Study, Series, Instance
+from pumpia.file_handling.general_structures import GeneralImage
 from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet
 from pumpia.image_handling.roi_structures import BaseROI
 from pumpia.file_handling.dicom_tags import DicomTags, get_tag
@@ -124,6 +129,7 @@ class Manager:
 
     def __init__(self) -> None:
         self.patients: set[Patient] = set()
+        self.general_images: set[GeneralImage] = set()
         self._treeviews: list[ttk.Treeview] = []
         self._current_action_vars: list[tk.StringVar] = []
         self._current_action_menus: list[ttk.Combobox] = []
@@ -247,7 +253,12 @@ class Manager:
             try:
                 open_dicom = dcmread(file)
             except InvalidDicomError:
-                pass
+                try:
+                    image = Image.open(file)
+                except PIL.UnidentifiedImageError:
+                    pass
+                else:
+                    self.general_images.add(GeneralImage(image, file))
             else:
                 try:
                     _ = open_dicom.pixel_array
@@ -413,6 +424,17 @@ class Manager:
         """
         for tree in self._treeviews:
             tree.delete(*tree.get_children())
+            if len(self.general_images) > 0:
+                tree.insert('', 'end', iid='General', text="General", open=True)
+                for im in sorted(self.general_images, key=str):
+                    im_id = im.tag
+                    im_text = str(im)
+                    tree.insert("General",
+                                'end',
+                                iid=im_id,
+                                text=im_text,
+                                tags=('selected',
+                                      im.id_string))
             if len(self.patients) > 0:
                 tree.insert('', 'end', iid='Dicoms', text="Dicoms", open=True)
                 for pt in sorted(self.patients, key=str):
@@ -495,35 +517,33 @@ class Manager:
         moving : bool, optional
             Whether the ROI is being moved (default is False).
         """
+        ins_id = roi.image.tag
+        ins_roi_id = roi.image.tag + "_rois"
+        roi_id = roi.tag
+        roi_text = str(roi)
+        if not moving:
+            roi_values = [roi.values_str]
+        else:
+            roi_values = ["Changing"]
         for tree in self._treeviews:
-
-            ins_id = roi.image.tag
-            ins_roi_id = roi.image.tag + "_rois"
             if ins_roi_id not in tree.get_children(ins_id):
                 tree.insert(ins_id,
                             'end',
                             iid=ins_roi_id,
                             text="ROIs",
                             open=True)
-            roi_id = roi.tag
-            roi_text = str(roi)
-            if not moving:
-                roi_values = [roi.values_str]
-            else:
-                roi_values = ["Changing"]
             try:
                 roi_index = tree.index(roi_id)
                 tree.delete(roi_id)
             except tk.TclError:
                 roi_index = 'end'
-            tree.insert(ins_roi_id,
-                        roi_index,
-                        iid=roi_id,
-                        text=roi_text,
-                        values=roi_values,
-                        tags=('selected',
-                              roi.id_string),)
-
+            tree.selection_set(tree.insert(ins_roi_id,
+                                           roi_index,
+                                           iid=roi_id,
+                                           text=roi_text,
+                                           values=roi_values,
+                                           tags=('selected',
+                                                 roi.id_string),))
         self.focus = roi
 
     def delete_current_roi(self):
@@ -616,7 +636,17 @@ class Manager:
         focus = None
         if tree.parent(tree.focus()) != "":
             focus_hashes = tree.item(tree.focus())["tags"][1].split(" : ")
-            if focus_hashes[0] == "DICOM":
+            if focus_hashes[0] == "GENERAL":
+                for im in self.general_images:
+                    if im == " : ".join(focus_hashes[: 2]):
+                        focus = im
+
+                if len(focus_hashes) >= 2 and isinstance(focus, GeneralImage):
+                    for roi in focus.get_rois():
+                        if roi == " : ".join(focus_hashes[:6]):
+                            focus = roi
+
+            elif focus_hashes[0] == "DICOM":
                 for pt in self.patients:
                     if pt == " : ".join(focus_hashes[: 2]):
                         focus = pt
@@ -649,7 +679,18 @@ class Manager:
             for selection in tree.selection():
                 selection_hashes = tree.item(selection)['tags'][1].split(" : ")
                 current_sel = None
-                if selection_hashes[0] == "DICOM":
+                if focus_hashes[0] == "GENERAL":
+                    for im in self.general_images:
+                        if im == " : ".join(focus_hashes[: 2]):
+                            current_sel = im
+
+                    if len(focus_hashes) >= 2 and isinstance(focus, GeneralImage):
+                        for roi in focus.get_rois():
+                            if roi == " : ".join(focus_hashes[:6]):
+                                current_sel = roi
+                                current_sel.active = True
+
+                elif selection_hashes[0] == "DICOM":
                     for pt in self.patients:
                         if pt == " : ".join(selection_hashes[:2]):
                             current_sel = pt

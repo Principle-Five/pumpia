@@ -35,6 +35,7 @@ from pumpia.image_handling.roi_structures import (BaseROI,
                                                   ROI_COLOUR,
                                                   ACTIVE_ROI_COLOUR)
 from pumpia.file_handling.dicom_structures import Series, Instance
+from pumpia.file_handling.general_structures import GeneralImage
 from pumpia.utilities.tkinter_utils import remove_state_persistents
 from pumpia.utilities.array_utils import Position
 
@@ -484,9 +485,8 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                                                  self._mouse_roi_move)
 
         if self.allow_drag_drop and self.manager.select_time == event.time:
-            image = self.manager.focus
-            if isinstance(image, self.image_type):
-                self.load_image(image)  # type: ignore
+            if isinstance(self.manager.focus, self.image_type):
+                self.load_image(self.manager.focus)  # type: ignore
 
     def _leaving(self, _):
         """
@@ -687,15 +687,19 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                         self.pil_image = Image.fromarray(array_to_show, mode='L')
 
                 elif self.image.is_colour:
-                    self.pil_image = Image.fromarray(
-                        axes_array.astype(np.uint8), mode="RGB")
+                    self.pil_image = Image.fromarray(axes_array.astype(np.uint8), mode="RGB")
+
+            elif isinstance(self.image, GeneralImage):
+                axes_array = self.image.raw_array[self.image.current_slice,
+                                                  lower_h:upper_h,
+                                                  lower_w:upper_w]
+                self.pil_image = Image.fromarray(axes_array, mode=self.image.mode)
 
             self.pil_image = self.pil_image.resize((new_width, new_height),
                                                    resample=Image.Resampling.NEAREST)
 
             self.pil_tkimage = ImageTk.PhotoImage(self.pil_image)
-            self.itemconfigure(
-                self._image_id, image=self.pil_tkimage)
+            self.itemconfigure(self._image_id, image=self.pil_tkimage)
 
             imw = self.pil_image.width
             imh = self.pil_image.height
