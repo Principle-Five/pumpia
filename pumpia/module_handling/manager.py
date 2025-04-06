@@ -78,6 +78,8 @@ class Manager:
     ----------
     patients : set[Patient]
         The set of patients.
+    general_images : set[GeneralImage]
+        The set of general images
     select_time : int
         The time of the last selection.
     focus : Patient | Study | BaseImageSet | BaseROI | None
@@ -94,6 +96,8 @@ class Manager:
     -------
     load_folder(add: bool = True, tk_parent: tk.Misc | None = None, counter_column: int = 0, counter_row: int = 0, counter_stack_direction: DirectionType = "Vertical") -> None
         Loads DICOM files from a folder.
+    load_image(filepath: Path, add: bool = True)
+        Loads an image given by filepath.
     load_images(files: list[Path], add: bool = True, tk_parent: tk.Misc | None = None, counter_column: int = 0, counter_row: int = 0, counter_stack_direction: DirectionType = "Vertical") -> None
         Loads images from a list of files.
     load_dicom(open_dicom: FileDataset, file: Path) -> Series | Instance
@@ -195,6 +199,48 @@ class Manager:
                              counter_row,
                              counter_stack_direction)
 
+    def load_image(self,
+                   filepath: Path,
+                   add: bool = True):
+        """
+        Loads an image from a given filepath
+
+        Parameters
+        ----------
+        filepath : Path
+            The file to load.
+        add : bool, optional
+            Whether to add to the existing data,
+            if False replaces currently loaded images (default is True).
+        """
+        if not add:
+            self.focus = None
+            self.selected = []
+            self.patients = set()
+            self.general_images = set()
+            for viewer in self.viewers:
+                viewer.unload_images()
+            gc.collect()
+
+        try:
+            open_dicom = dcmread(filepath)
+        except InvalidDicomError:
+            try:
+                image = Image.open(filepath)
+            except PIL.UnidentifiedImageError:
+                pass
+            else:
+                self.general_images.add(GeneralImage(image, filepath))
+        else:
+            try:
+                _ = open_dicom.pixel_array
+            except AttributeError:
+                pass
+            else:
+                self.load_dicom(open_dicom, filepath)
+
+        self.update_trees()
+
     def load_images(self,
                     files: list[Path],
                     add: bool = True,
@@ -210,7 +256,8 @@ class Manager:
         files : list[Path]
             The list of files.
         add : bool, optional
-            Whether to add to the existing data (default is True).
+            Whether to add to the existing data,
+            if False replaces currently loaded images (default is True).
         tk_parent : tk.Misc, optional
             The parent widget for the loading information (default is None) .
         counter_column : int, optional
