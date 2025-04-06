@@ -1055,13 +1055,13 @@ class PointROI(BaseROI):
     @property
     def values_str(self) -> str:
         if isinstance(self.mean, tuple):
-            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}], "
+            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}]"
         else:
-            mean_str = f"{self.mean:.1f}, "
+            mean_str = f"{self.mean:.1f}"
 
         return (f"x: {self.x}, "
                 + f"y: {self.y}, "
-                + f"Value: {mean_str}, ")
+                + f"Value: {mean_str}")
 
 
 class CircleROI(BaseROI):
@@ -1256,14 +1256,14 @@ class CircleROI(BaseROI):
     @property
     def values_str(self) -> str:
         if isinstance(self.mean, tuple):
-            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}], "
+            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}]"
         else:
-            mean_str = f"{self.mean:.1f}, "
+            mean_str = f"{self.mean:.1f}"
 
         if isinstance(self.std, tuple):
-            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}], "
+            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}]"
         else:
-            std_str = f"{self.std:.1f}, "
+            std_str = f"{self.std:.1f}"
 
         return (f"Area: {self.area:.1f}, "
                 + f"Perimeter: {self.perimeter:.1f}, "
@@ -1489,14 +1489,14 @@ class EllipseROI(BaseROI):
     @property
     def values_str(self) -> str:
         if isinstance(self.mean, tuple):
-            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}], "
+            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}]"
         else:
-            mean_str = f"{self.mean:.1f}, "
+            mean_str = f"{self.mean:.1f}"
 
         if isinstance(self.std, tuple):
-            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}], "
+            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}]"
         else:
-            std_str = f"{self.std:.1f}, "
+            std_str = f"{self.std:.1f}"
 
         return (f"Area: {self.area:.1f}, "
                 + f"Mean: {mean_str}, "
@@ -1754,14 +1754,14 @@ class SquareROI(BaseROI):
     @property
     def values_str(self) -> str:
         if isinstance(self.mean, tuple):
-            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}], "
+            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}]"
         else:
-            mean_str = f"{self.mean:.1f}, "
+            mean_str = f"{self.mean:.1f}"
 
         if isinstance(self.std, tuple):
-            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}], "
+            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}]"
         else:
-            std_str = f"{self.std:.1f}, "
+            std_str = f"{self.std:.1f}"
 
         return (f"Area: {self.area:.1f}, "
                 + f"Perimeter: {self.perimeter:.1f}, "
@@ -2063,14 +2063,14 @@ class RectangleROI(BaseROI):
     @property
     def values_str(self) -> str:
         if isinstance(self.mean, tuple):
-            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}], "
+            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}]"
         else:
-            mean_str = f"{self.mean:.1f}, "
+            mean_str = f"{self.mean:.1f}"
 
         if isinstance(self.std, tuple):
-            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}], "
+            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}]"
         else:
-            std_str = f"{self.std:.1f}, "
+            std_str = f"{self.std:.1f}"
 
         return (f"Area: {self.area:.1f}, "
                 + f"Perimeter: {self.perimeter:.1f}, "
@@ -2389,14 +2389,14 @@ class LineROI(BaseROI):
     @property
     def values_str(self) -> str:
         if isinstance(self.mean, tuple):
-            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}], "
+            mean_str = f"[{", ".join([f"{val:.1f}" for val in self.mean])}]"
         else:
-            mean_str = f"{self.mean:.1f}, "
+            mean_str = f"{self.mean:.1f}"
 
         if isinstance(self.std, tuple):
-            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}], "
+            std_str = f"[{", ".join([f"{val:.1f}" for val in self.std])}]"
         else:
-            std_str = f"{self.std:.1f}, "
+            std_str = f"{self.std:.1f}"
 
         return (f"Length: {self.length:.1f}, "
                 + f"x: {self.x_len}, "

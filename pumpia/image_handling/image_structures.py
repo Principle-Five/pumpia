@@ -506,6 +506,9 @@ class FileImageSet(ArrayImage):
         super().__init__(shape, num_samples, mode)
         self._filepath: Path = copy(filepath)
 
+    def __str__(self) -> str:
+        return str(self.filepath)
+
     @property
     def tag(self) -> str:
         return "FI" + self.id_string
@@ -519,7 +522,7 @@ class FileImageSet(ArrayImage):
 
     @property
     def id_string(self) -> str:
-        return str(self.filepath)
+        return "FILE : " + str(self.filepath)
 
 
 class ImageCollection(ArrayImage):
