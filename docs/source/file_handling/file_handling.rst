@@ -3,6 +3,12 @@ File Handling
 
 The :doc:`manager </components/manager>` is used to handle files and make sure all components have access to the loaded ones.
 
+:doc:`general_images`
+---------------------
+Loaded general images can be accessed through the ``general_images`` attribute of the manager.
+These are loaded in using Pillow, this means if Pillow can open the image then PumpIA should be able to as well.
+The Pillow Image object does is not stored anywhere.
+
 :doc:`dicoms`
 -------------
 Loaded DICOMS can be accessed through the ``patients`` attribute of the manager.
@@ -25,5 +31,6 @@ DICOM tag handling is different to pydicom to allow for the handling of classic 
 Contents
 --------
 .. toctree::
+    general_images
     dicoms
     dicom_tags

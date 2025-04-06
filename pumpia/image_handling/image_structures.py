@@ -87,7 +87,7 @@ class ArrayImage(BaseImageSet):
     num_samples: int
         Number of samples in the image, >1 for colour images (e.g. RGB is 3)
     mode: str | None
-        Mode of the image e.g. RGB
+        Mode of the image for viewing e.g. RGB (see Pillow modes for more)
     is_multisample : bool
     is_rgb : bool
     current_slice : int
