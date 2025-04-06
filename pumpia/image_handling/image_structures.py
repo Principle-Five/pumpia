@@ -111,7 +111,7 @@ class ArrayImage(BaseImageSet):
     -------
     get_rois(slice_num: int | Literal["All"] | None = None) -> set['BaseROI']
         Returns the set of ROIs in the image.
-    add_roi(roi: 'BaseROI', replace: bool = False)
+    add_roi(roi: 'BaseROI', replace: bool = True)
         Adds an ROI to the image.
     remove_roi(roi: 'BaseROI')
         Removes an ROI from the image.
@@ -350,7 +350,7 @@ class ArrayImage(BaseImageSet):
                 roi_set.add(roi)
         return roi_set
 
-    def add_roi(self, roi: 'BaseROI', replace: bool = False):
+    def add_roi(self, roi: 'BaseROI', replace: bool = True):
         """
         Adds an ROI to the image.
 
@@ -359,7 +359,7 @@ class ArrayImage(BaseImageSet):
         roi : BaseROI
             The ROI to add.
         replace : bool, optional
-            Whether to replace an existing ROI with the same name (default is False).
+            Whether to replace an existing ROI with the same name (default is True).
         """
         if roi in self.get_rois() and replace:
             self.remove_roi(roi)
@@ -721,7 +721,7 @@ class ImageCollection(ArrayImage):
         else:
             return self.image_set[slice_num].get_rois()
 
-    def add_roi(self, roi: 'BaseROI', replace: bool = False):
+    def add_roi(self, roi: 'BaseROI', replace: bool = True):
         """
         Adds an ROI to the image collection.
 
@@ -730,7 +730,7 @@ class ImageCollection(ArrayImage):
         roi : BaseROI
             The ROI to add.
         replace : bool, optional
-            Whether to replace an existing ROI with the same name (default is False).
+            Whether to replace an existing ROI with the same name (default is True).
         """
         roi.image = self.image_set[roi.slice_num]
         roi.slice_num = self.image_set[roi.slice_num].current_slice
