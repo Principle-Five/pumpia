@@ -41,7 +41,7 @@ class BaseROI(ABC):
     name : str, optional
         The name of the ROI (default is None).
     replace : bool, optional
-        Whether to replace an existing ROI with the same name (default is False).
+        Whether to replace an existing ROI with the same name (default is True).
     cache_values : bool, optional
         Whether to cache pixel values and calculated values (default is True).
     colour : str, optional
@@ -100,9 +100,9 @@ class BaseROI(ABC):
         Resizes the bounding box of the ROI.
     rotate(angle: float = 0)
         Rotates the ROI by the specified angle.
-    copy_to_image(image: ArrayImage, slice_num: int, name: str | None = None, replace: bool = False, cache_values: bool = True, colour: str = ROI_COLOUR, active_colour: str = ACTIVE_ROI_COLOUR) -> 'BaseROI'
+    copy_to_image(image: ArrayImage, slice_num: int, name: str | None = None, replace: bool = True, cache_values: bool = True, colour: str = ROI_COLOUR, active_colour: str = ACTIVE_ROI_COLOUR) -> 'BaseROI'
         Copies the ROI to another image.
-    move_to_image(image: ArrayImage, slice_num: int, name: str | None = None, replace: bool = False, cache_values: bool = True, colour: str = ROI_COLOUR, active_colour: str = ACTIVE_ROI_COLOUR) -> 'BaseROI'
+    move_to_image(image: ArrayImage, slice_num: int, name: str | None = None, replace: bool = True, cache_values: bool = True, colour: str = ROI_COLOUR, active_colour: str = ACTIVE_ROI_COLOUR) -> 'BaseROI'
         Moves the ROI to another image.
     """
 
@@ -111,7 +111,7 @@ class BaseROI(ABC):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR) -> None:
@@ -364,7 +364,7 @@ class BaseROI(ABC):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'BaseROI':
@@ -380,7 +380,7 @@ class BaseROI(ABC):
         name : str, optional
             The name of the new ROI. If not given the name of the current ROI is used.
         replace : bool, optional
-            Whether to replace an existing ROI with the same name (default is False).
+            Whether to replace an existing ROI with the same name (default is True).
         cache_values : bool, optional
             Whether to cache pixel values in the new ROI (default is True).
         colour : str, optional
@@ -398,7 +398,7 @@ class BaseROI(ABC):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR):
@@ -414,7 +414,7 @@ class BaseROI(ABC):
         name : str, optional
             The name of the new ROI. If not given the name of the current ROI is used.
         replace : bool, optional
-            Whether to replace an existing ROI with the same name (default is False).
+            Whether to replace an existing ROI with the same name (default is True).
         cache_values : bool, optional
             Whether to cache pixel values in the new ROI (default is True).
 
@@ -662,7 +662,7 @@ class Angle(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -763,7 +763,7 @@ class Angle(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'Angle':
@@ -921,7 +921,7 @@ class PointROI(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -1000,7 +1000,7 @@ class PointROI(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'PointROI':
@@ -1101,7 +1101,7 @@ class CircleROI(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -1192,7 +1192,7 @@ class CircleROI(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'CircleROI':
@@ -1308,7 +1308,7 @@ class EllipseROI(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -1423,7 +1423,7 @@ class EllipseROI(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'EllipseROI':
@@ -1549,7 +1549,7 @@ class SquareROI(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -1668,7 +1668,7 @@ class SquareROI(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'SquareROI':
@@ -1852,7 +1852,7 @@ class RectangleROI(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -1976,7 +1976,7 @@ class RectangleROI(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'RectangleROI':
@@ -2161,7 +2161,7 @@ class LineROI(BaseROI):
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
-                 replace: bool = False,
+                 replace: bool = True,
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
@@ -2261,7 +2261,7 @@ class LineROI(BaseROI):
                       image: 'ArrayImage',
                       slice_num: int,
                       name: str | None = None,
-                      replace: bool = False,
+                      replace: bool = True,
                       cache_values: bool = True,
                       colour: str = ROI_COLOUR,
                       active_colour: str = ACTIVE_ROI_COLOUR) -> 'LineROI':
