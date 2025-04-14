@@ -401,9 +401,17 @@ class Manager:
         except KeyError:
             is_stack = False
 
-        series_id_str = study.id_string + " : " + series_id + "-" + str(acquisition_number)
         instance_number = get_tag(open_dicom,
                                   DicomTags.InstanceNumber).value
+
+        if is_stack:
+            series_id_str = (study.id_string
+                             + " : " + series_id
+                             + "-" + str(acquisition_number)
+                             + "-" + str(instance_number))
+        else:
+            series_id_str = study.id_string + " : " + series_id + "-" + str(acquisition_number)
+
         if series_id_str in study.series:
             for sr in study.series:
                 if sr == series_id_str:
@@ -450,8 +458,6 @@ class Manager:
                     except ValueError:
                         pass
         else:
-            instance_number = get_tag(
-                open_dicom, DicomTags.InstanceNumber).value
             instance_id_str = series.id_string + " : " + str(instance_number)
             if instance_id_str in series.instances:
                 for ins in series.instances:

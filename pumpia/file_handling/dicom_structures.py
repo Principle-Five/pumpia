@@ -199,7 +199,7 @@ class Study:
     @property
     def series(self) -> list['Series']:
         """Returns the list of series for the study."""
-        return sorted(self._series, key=lambda x: (x.series_number, x.acquisition_number))
+        return sorted(self._series, key=lambda x: x.sort_value)
 
     @property
     def tag(self) -> str:
@@ -364,14 +364,26 @@ class Series(ImageCollection):
 
     @property
     def id_string(self) -> str:
-        return (self.study.id_string
-                + " : " + self.series_id
-                + "-" + str(self.acquisition_number)
-                + "-" + str(self.instance_number))
+        if self.is_stack:
+            return (self.study.id_string
+                    + " : " + self.series_id
+                    + "-" + str(self.acquisition_number)
+                    + "-" + str(self.instance_number))
+        else:
+            return (self.study.id_string
+                    + " : " + self.series_id
+                    + "-" + str(self.acquisition_number))
 
     @property
     def tag(self) -> str:
         return "SR" + self.id_string
+
+    @property
+    def sort_value(self) -> tuple[int, int] | tuple[int, int, int]:
+        if self.is_stack and self.instance_number is not None:
+            return (self.series_number, self.acquisition_number, self.instance_number)
+        else:
+            return (self.series_number, self.acquisition_number)
 
     @property
     def filepath(self) -> Path:
