@@ -234,12 +234,15 @@ class Series(ImageCollection):
         The study associated with the series.
     series_id : str
         The ID of the series.
+    series_description : str
+        The description of the series.
     series_number : int
         The number of the series.
     acquisition_number : int
         The acquisition number of the series.
-    series_description : str
-        The description of the series.
+    instance_number : int
+        The instance number of the series.
+        Required if series is a stack, ignored otherwise.
     is_stack : bool, optional
         Whether the series is a stack (default is False).
     open_dicom : pydicom.Dataset, optional
@@ -257,6 +260,9 @@ class Series(ImageCollection):
         The number of the series.
     acquisition_number : int
         The acquisition number of the series.
+    instance_number : int
+        The instance number of the series.
+        Int if series is a stack, None otherwise.
     series_description : str
         The description of the series.
     is_stack : bool
@@ -280,9 +286,10 @@ class Series(ImageCollection):
     def __init__(self,
                  study: Study,
                  series_id: str,
+                 series_description: str,
                  series_number: int,
                  acquisition_number: int,
-                 series_description: str,
+                 instance_number: int | None = None,
                  is_stack: bool = False,
                  open_dicom: pydicom.Dataset | None = None,
                  filepath: Path | None = None) -> None:
@@ -292,6 +299,13 @@ class Series(ImageCollection):
         self.acquisition_number: int = acquisition_number
         self.series_description: str = series_description
         self.is_stack: bool = is_stack
+
+        if self.is_stack:
+            if instance_number is None:
+                raise ValueError("instance number must be provided for stack")
+            self.instance_number: int | None = instance_number
+        else:
+            self.instance_number = None
 
         self._filepath: Path | None = copy(filepath)
 
@@ -334,6 +348,11 @@ class Series(ImageCollection):
             return False
 
     def __str__(self) -> str:
+        if self.is_stack:
+            return (str(self.series_number)
+                    + "-" + str(self.acquisition_number)
+                    + "-" + str(self.instance_number)
+                    + ":" + str(self.series_description))
         return (str(self.series_number)
                 + "-" + str(self.acquisition_number)
                 + ":" + str(self.series_description))
@@ -345,7 +364,10 @@ class Series(ImageCollection):
 
     @property
     def id_string(self) -> str:
-        return self.study.id_string + " : " + self.series_id + "-" + str(self.acquisition_number)
+        return (self.study.id_string
+                + " : " + self.series_id
+                + "-" + str(self.acquisition_number)
+                + "-" + str(self.instance_number))
 
     @property
     def tag(self) -> str:
@@ -622,21 +644,20 @@ class Series(ImageCollection):
 
 class Instance(FileImageSet):
     """
-    Represents a DICOM instance.
+    Represents a DICOM instance if file has 1 frame or a frame if file has multiple frames.
     Has the same attributes and methods as FileImageSet unless stated below.
 
     Parameters
     ----------
     series : Series
         The series associated with the instance.
-    instance_number : int
-        The number of the instance.
+    slice_number : int
+        The slice number of the instance.
+        For a frame this will be the frame number, otherwise this will be the instance number.
     filepath : Path, optional
         The file path of the instance (default is None).
     is_frame : bool, optional
         Whether the instance is a frame (default is False).
-    frame_number : int, optional
-        The frame number of the instance (default is None).
     dimension_index_values : list or tuple, optional
         The dimension index values of the instance (default is None).
 
@@ -644,12 +665,10 @@ class Instance(FileImageSet):
     ----------
     series : Series
         The series associated with the instance.
-    instance_number : int
-        The number of the instance.
+    slice_number : int
+        The slice number of the instance.
     is_frame : bool
         Whether the instance is a frame.
-    frame_number : int | None
-        The frame number of the instance.
     dimension_index_values : tuple | None
         The dimension index values of the instance.
     loaded : bool
@@ -665,17 +684,16 @@ class Instance(FileImageSet):
 
     def __init__(self,
                  series: Series,
-                 instance_number: int,
+                 slice_number: int,
                  filepath: Path | None = None,
                  is_frame: bool = False,
-                 frame_number: int | None = None,
                  dimension_index_values: list | tuple | None = None,
                  open_dicom: pydicom.Dataset | None = None,) -> None:
         self.series: Series = series
-        self.instance_number: int = instance_number
 
         self.is_frame: bool = is_frame
-        self.frame_number: int | None = frame_number
+
+        self.slice_number: int = slice_number
 
         if isinstance(dimension_index_values, list):
             self.dimension_index_values = tuple(dimension_index_values)
@@ -727,10 +745,7 @@ class Instance(FileImageSet):
             return False
 
     def __str__(self) -> str:
-        if self.is_frame:
-            return str(self.frame_number)
-        else:
-            return str(self.instance_number)
+        return str(self.slice_number)
 
     def __hash__(self) -> int:
         # from docs: A class that overrides __eq__() and does not define __hash__()
@@ -748,10 +763,7 @@ class Instance(FileImageSet):
     @property
     def sort_value(self) -> int:
         """Returns the sort value of the instance."""
-        if self.is_frame and self.frame_number is not None:
-            return self.frame_number
-        else:
-            return self.instance_number
+        return self.slice_number
 
     @property
     def raw_array(self
@@ -760,12 +772,12 @@ class Instance(FileImageSet):
                                   np.dtype]:
         """Returns the raw array of the instance as stored in the dicom file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        if self.is_frame and self.frame_number is not None:
-            return np.array([self.series.raw_array[self.frame_number - 1]])  # type: ignore
+        if self.is_frame:
+            return np.array([self.series.raw_array[self.slice_number - 1]])  # type: ignore
         elif self._dicom is not None:
             return np.array([self._dicom.pixel_array])  # type: ignore
         else:
-            return np.zeros((1, 1, 1))
+            return np.zeros((1, 1, 1), dtype=np.uint8)
 
     @property
     def array(self
@@ -776,8 +788,8 @@ class Instance(FileImageSet):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if self.is_frame and self.frame_number is not None:
-            return np.array([self.series.array[self.frame_number - 1]])  # type: ignore
+        if self.is_frame:
+            return np.array([self.series.array[self.slice_number - 1]])  # type: ignore
         else:
             raw_array = np.astype(self.raw_array, float)
             if self.get_tag(DicomTags.SamplesPerPixel) == 1:
@@ -924,10 +936,10 @@ class Instance(FileImageSet):
         The value of the tag.
         """
         value = None
-        if self.is_frame and self.frame_number is not None:
+        if self.is_frame:
             dataset = self.series.dicom_dataset
             if dataset is not None:
-                value = get_tag(dataset, tag, self.frame_number).value
+                value = get_tag(dataset, tag, self.slice_number).value
             else:
                 value = None
         else:
