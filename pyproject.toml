@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pumpia"
-version = "0.2.0"
+version = "0.2.1"
 authors = [{ name = "Zack Ravetz et al." }]
 description = "A simple to use framework for making user interfaces for image analysis."
 readme = "README.md"
