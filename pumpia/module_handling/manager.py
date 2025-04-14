@@ -351,7 +351,7 @@ class Manager:
                     patient = pt
         else:
             patient_name = get_tag(open_dicom, DicomTags.PatientName).value
-            patient = Patient(patient_id, patient_name)
+            patient = Patient(patient_id=patient_id, name=patient_name)
             self.patients.add(patient)
 
         # load study
@@ -371,7 +371,10 @@ class Manager:
             study_date = datetime.date(int(study_date[:4]),
                                        int(study_date[4:6]),
                                        int(study_date[6:]))
-            study = Study(patient, study_id, study_date, study_desc)
+            study = Study(patient=patient,
+                          study_id=study_id,
+                          study_date=study_date,
+                          study_desc=study_desc)
             patient.add_study(study)
 
         # load series
@@ -399,27 +402,30 @@ class Manager:
             is_stack = False
 
         series_id_str = study.id_string + " : " + series_id + "-" + str(acquisition_number)
+        instance_number = get_tag(open_dicom,
+                                  DicomTags.InstanceNumber).value
         if series_id_str in study.series:
             for sr in study.series:
                 if sr == series_id_str:
                     series = sr
         else:
             if is_stack:
-                series = Series(study,
-                                series_id,
-                                series_number,
-                                acquisition_number,
-                                series_description,
-                                is_stack,
-                                open_dicom,
-                                file)
+                series = Series(study=study,
+                                series_id=series_id,
+                                series_description=series_description,
+                                series_number=series_number,
+                                acquisition_number=acquisition_number,
+                                instance_number=instance_number,
+                                is_stack=is_stack,
+                                open_dicom=open_dicom,
+                                filepath=file)
             else:
-                series = Series(study,
-                                series_id,
-                                series_number,
-                                acquisition_number,
-                                series_description,
-                                is_stack)
+                series = Series(study=study,
+                                series_id=series_id,
+                                series_description=series_description,
+                                series_number=series_number,
+                                acquisition_number=acquisition_number,
+                                is_stack=is_stack)
             study.add_series(series)
 
         # load instance
@@ -431,18 +437,14 @@ class Manager:
                         if ins == instance_id_str:
                             instance = ins
                 else:
-                    instance_number = get_tag(open_dicom,
-                                              DicomTags.InstanceNumber,
-                                              frame_number).value
                     dimension_index_values = get_tag(open_dicom,
                                                      DicomTags.DimensionIndexValues,
                                                      frame_number).value
-                    instance = Instance(series,
-                                        instance_number,
-                                        file,
-                                        True,
-                                        frame_number,
-                                        dimension_index_values)
+                    instance = Instance(series=series,
+                                        slice_number=frame_number,
+                                        filepath=file,
+                                        is_frame=True,
+                                        dimension_index_values=dimension_index_values)
                     try:
                         series.add_instance(instance)
                     except ValueError:
@@ -456,7 +458,11 @@ class Manager:
                     if ins == instance_id_str:
                         instance = ins
             else:
-                instance = Instance(series, instance_number, file, False, open_dicom=open_dicom)
+                instance = Instance(series=series,
+                                    slice_number=instance_number,
+                                    filepath=file,
+                                    is_frame=False,
+                                    open_dicom=open_dicom)
                 try:
                     series.add_instance(instance)
                 except ValueError:
