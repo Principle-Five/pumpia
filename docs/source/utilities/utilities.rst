@@ -19,7 +19,7 @@ This contains validators for strings, such as to check if a string is an integer
 -------------------
 This contains utilities related to Tkinter such as ``tk_copy``.
 
-:doc:`file_utilities`
+:doc:`file_utils`
 ---------------------
 This contains utilities which may be useful for file images
 
@@ -30,4 +30,4 @@ Contents
     feature_utils
     string_validators
     tk_utilities
-    file_utilities
+    file_utils
