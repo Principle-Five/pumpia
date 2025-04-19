@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pumpia"
-version = "0.2.2"
+version = "0.3.0"
 authors = [{ name = "Zack Ravetz et al." }]
 description = "A simple to use framework for making user interfaces for image analysis."
 readme = "README.md"
@@ -30,6 +30,9 @@ classifiers = [
 
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
+
+[project.optional-dependencies]
+docs = ["sphinx", "sphinx_rtd_theme"]
 
 [project.urls]
 Homepage = "https://principle-five.github.io/pumpia/index.html"
