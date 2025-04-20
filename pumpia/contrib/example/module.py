@@ -19,13 +19,16 @@ class ExampleModule(BaseModule):
     The analysis calculates the average pixel value within the ellipse,
     or the root sum of squares of the means if a multisample image.
     """
+    show_draw_rois_button = True
+    show_analyse_button = True
+
     viewer = ArrayViewerIO(row=0, column=0)
     size = PercInput(80, verbose_name="Size (%)")
     ellipse_roi = InputEllipseROI("Ellipse ROI")
 
     width = IntOutput(verbose_name="Width (px)")
     height = IntOutput(verbose_name="Height (px)")
-    average = FloatOutput()
+    average = FloatOutput(reset_on_analysis=True)
 
     def link_rois_viewers(self):
         self.ellipse_roi.viewer = self.viewer

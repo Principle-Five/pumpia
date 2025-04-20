@@ -4,7 +4,7 @@ Classes:
  * PhantomModule
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 import tkinter as tk
 from tkinter import ttk
 from copy import copy
@@ -113,6 +113,8 @@ class BaseModule(ABC, ttk.Frame):
         Class method which runs the module independently.
     """
     context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
+    show_draw_rois_button: bool = False
+    show_analyse_button: bool = False
 
     @overload
     def __init__(
@@ -251,8 +253,37 @@ class BaseModule(ABC, ttk.Frame):
 
             self.viewer_frame = ttk.Frame(self.paned_window)
             self.paned_window.add(self.viewer_frame, weight=1)
-            self.io_frame = ScrolledWindow(self.paned_window)
-            self.paned_window.add(self.io_frame.outer_frame)
+
+            if self.context_manager is None:
+                self.main_window = ttk.Notebook(self.paned_window)
+                self.paned_window.add(self.main_window)
+                self.io_frame = ScrolledWindow(self.main_window)
+                self.main_window.add(self.io_frame.outer_frame, text="Main")
+                self.context_frame = ScrolledWindow(self.main_window)
+
+                self.context_buttons_frame = ttk.Frame(self.context_frame)
+                self.context_buttons_frame.grid(column=0, row=0, sticky="nsew")
+
+                self.get_context_button = ttk.Button(self.context_buttons_frame,
+                                                     text="Get Context",
+                                                     command=self.get_context)
+                self.get_context_button.grid(column=0, row=0, sticky="nsew")
+
+                if self.direction == "horizontal":
+                    self.context_manager = self.context_manager_generator(self.context_frame,
+                                                                          self.manager)
+                else:
+                    self.context_manager = self.context_manager_generator(self.context_frame,
+                                                                          self.manager,
+                                                                          direction="H")
+                self.context_manager.grid(column=0, row=1, sticky="nsew")  # type: ignore
+
+                self.main_window.add(self.context_frame.outer_frame, text="Context")
+                add_context_buttons = True
+            else:
+                self.io_frame = ScrolledWindow(self.paned_window)
+                self.paned_window.add(self.io_frame.outer_frame)
+                add_context_buttons = False
 
             self.input_frame = ttk.Labelframe(self.io_frame, text="Inputs")
             self.output_frame = ttk.Labelframe(self.io_frame, text="Outputs")
@@ -283,24 +314,70 @@ class BaseModule(ABC, ttk.Frame):
                                                     text="Create and Run",
                                                     command=self.create_and_run)
             if self.direction == "horizontal":
-                self.rois_button.grid(column=0, row=self.command_buttons_count, sticky="nsew")
-                self.analyse_button.grid(column=1, row=self.command_buttons_count, sticky="nsew")
-                self.command_buttons_count += 1
-                self.create_and_run_button.grid(column=0,
-                                                row=self.command_buttons_count,
-                                                columnspan=2,
-                                                sticky="nsew")
-                self.command_buttons_count += 1
+                if self.show_draw_rois_button:
+                    if self.show_analyse_button:
+                        self.rois_button.grid(column=0,
+                                              row=self.command_buttons_count,
+                                              sticky="nsew")
+                    else:
+                        self.rois_button.grid(column=0,
+                                              row=self.command_buttons_count,
+                                              columnspan=2,
+                                              sticky="nsew")
+
+                if self.show_analyse_button:
+                    if self.show_draw_rois_button:
+                        self.analyse_button.grid(column=1,
+                                                 row=self.command_buttons_count,
+                                                 sticky="nsew")
+                    else:
+                        self.analyse_button.grid(column=0,
+                                                 row=self.command_buttons_count,
+                                                 columnspan=2,
+                                                 sticky="nsew")
+
+                if self.show_analyse_button or self.show_draw_rois_button:
+                    self.command_buttons_count += 1
+
+                if self.show_analyse_button and self.show_draw_rois_button:
+                    self.create_and_run_button.grid(column=0,
+                                                    row=self.command_buttons_count,
+                                                    columnspan=2,
+                                                    sticky="nsew")
+                    self.command_buttons_count += 1
 
             else:
-                self.rois_button.grid(column=self.command_buttons_count, row=0, sticky="nsew")
-                self.analyse_button.grid(column=self.command_buttons_count, row=1, sticky="nsew")
-                self.command_buttons_count += 1
-                self.create_and_run_button.grid(column=self.command_buttons_count,
-                                                row=0,
-                                                rowspan=2,
-                                                sticky="nsew")
-                self.command_buttons_count += 1
+                if self.show_draw_rois_button:
+                    if self.show_analyse_button:
+                        self.rois_button.grid(column=self.command_buttons_count,
+                                              row=0,
+                                              sticky="nsew")
+                    else:
+                        self.rois_button.grid(column=self.command_buttons_count,
+                                              row=0,
+                                              rowspan=2,
+                                              sticky="nsew")
+
+                if self.show_analyse_button:
+                    if self.show_draw_rois_button:
+                        self.analyse_button.grid(column=self.command_buttons_count,
+                                                 row=1,
+                                                 sticky="nsew")
+                    else:
+                        self.analyse_button.grid(column=self.command_buttons_count,
+                                                 row=0,
+                                                 rowspan=2,
+                                                 sticky="nsew")
+
+                if self.show_analyse_button or self.show_draw_rois_button:
+                    self.command_buttons_count += 1
+
+                if self.show_analyse_button and self.show_draw_rois_button:
+                    self.create_and_run_button.grid(column=self.command_buttons_count,
+                                                    row=0,
+                                                    rowspan=2,
+                                                    sticky="nsew")
+                    self.command_buttons_count += 1
 
             for k, v in self.__class__.__dict__.items():
                 if k[:2] != "__" or k[-2:] != "__":
@@ -394,6 +471,33 @@ class BaseModule(ABC, ttk.Frame):
                                                       row=0,
                                                       sticky="nsew")
                         self.roi_count += 1
+
+            if add_context_buttons:
+                if (self.main_viewer is not None
+                        and isinstance(self.context_manager, PhantomContextManager)):
+
+                    def bbox_command():
+                        if (self.main_viewer is not None
+                            and isinstance(self.main_viewer.image, ArrayImage)
+                                and isinstance(self.context_manager, PhantomContextManager)):
+                            self.context_manager.get_bound_box_roi(self.main_viewer.image)
+
+                    bbox_button = ttk.Button(self.context_buttons_frame,
+                                             command=bbox_command,
+                                             text="Draw Phantom Boundbox")
+                    bbox_button.grid(column=0, row=1, sticky="nsew")
+
+                    def boundary_command():
+                        if (self.main_viewer is not None
+                            and isinstance(self.main_viewer.image, ArrayImage)
+                                and isinstance(self.context_manager, PhantomContextManager)):
+                            self.context_manager.get_boundary_roi(self.main_viewer.image)
+
+                    boundary_button = ttk.Button(self.context_buttons_frame,
+                                                 command=boundary_command,
+                                                 text="Draw Phantom Boundary")
+                    boundary_button.grid(column=0, row=2, sticky="nsew")
+
             self.link_rois_viewers()
             self.load_commands()
             self._is_setup = True
@@ -442,12 +546,7 @@ class BaseModule(ABC, ttk.Frame):
         roi_options = man.get_roi_options_frame(options_frame, "h")
         roi_options.grid(column=2, row=0, sticky="nsew")
 
-        context_frame = ScrolledWindow(frame)
-        context_options = cls.context_manager_generator(context_frame, man, direction="H")
-        context_options.grid(column=0, row=0, sticky="nsew")
-        frame.add(context_frame.outer_frame)
-
-        module = cls(frame, man, context_manager=context_options, direction=direction)
+        module = cls(frame, man, direction=direction)
         frame.add(module, weight=1)
 
     @classmethod
@@ -608,7 +707,6 @@ class BaseModule(ABC, ttk.Frame):
         if not batch:
             self.manual_roi_draw()
 
-    @abstractmethod
     def analyse(self, batch: bool = False):
         """
         User should override this method to handle analysing the ROIs.
