@@ -188,7 +188,7 @@ class PhantomContextManager(BaseContextManager):
                          secondary_images: None | list[ArrayImage] = None,
                          name: str = "Phantom Bound Box") -> RectangleROI:
         """
-        Shows the boundbox or rectangle boundary for the phantom as an ROI on the image.
+        Shows the bounding box or rectangle boundary for the phantom as an ROI on the image.
 
         Parameters
         ----------
@@ -265,14 +265,14 @@ class PhantomContextManager(BaseContextManager):
                           secondary_images: None | list[ArrayImage] = None,
                           ) -> RectangleROI:
         """
-        Gets the bound box ROI for the given image.
+        Gets the bounding box ROI for the given image.
 
         Parameters
         ----------
         image : ArrayImage
-            The image to get the bound box ROI for.
+            The image to get the bounding box ROI for.
         secondary_images : list of ArrayImage or None, optional
-            The secondary images to get the bound box ROI for (default is None).
+            The secondary images to get the bounding box ROI for (default is None).
         """
         bounds = self.get_context(image)
         roi = self._show_rectangles(bounds, image, secondary_images, "Phantom Bound Box")
@@ -307,7 +307,7 @@ class PhantomContextManager(BaseContextManager):
 
 class ManualPhantomManager(PhantomContextManager):
     """
-    Context manager for phantom images, user inputs shape and boundbox manually.
+    Context manager for phantom images, user inputs shape and bounding box manually.
     Has the same parameters as BaseContextManager unless stated below.
 
     Parameters
@@ -699,7 +699,7 @@ class AutoPhantomManager(PhantomContextManager):
 
     def _manual_bound_box(self, image: ArrayImage) -> PhantomContext:
         """
-        Gets the bound box for the image using `phantom_boundbox_manual`.
+        Gets the bounding box for the image using `phantom_boundbox_manual`.
         """
         array = image.current_slice_array
         sensitivity = self.sensitivity_var.get()
@@ -724,7 +724,7 @@ class AutoPhantomManager(PhantomContextManager):
 
     def _auto_bound_box(self, image: ArrayImage) -> PhantomContext:
         """
-        Gets the bound box for the image using `phantom_boundary_automatic`.
+        Gets the bounding box for the image using `phantom_boundary_automatic`.
         """
         array = image.current_slice_array
         sensitivity = self.sensitivity_var.get()

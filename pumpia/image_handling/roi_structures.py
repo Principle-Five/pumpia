@@ -497,7 +497,7 @@ class BaseROI(ABC):
     def pixel_array(self) -> np.ndarray[tuple[int, int] | tuple[int, int, int], np.dtype]:
         """
         The array of pixel values in the ROI.
-        Array has the same shape as the boundbox of the ROI.
+        Array has the same shape as the bounding box of the ROI.
         """
         if self._pixel_array.shape[:2] == (0, 0) or not self.cache_values:
             self._load_pixels()

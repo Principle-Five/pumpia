@@ -15,7 +15,7 @@ There is typically only one manager per program.
 --------------
 These are the widgets which show the images.
 There are a few different kinds depending on if the image loaded should be limited.
-Viewers have multiple shortcuts to make it easier for the end user.
+Viewers have multiple shortcuts to make it easier for the end user, see :doc:`user interface </usage/user_interface>`.
 
 :doc:`images`
 -------------
