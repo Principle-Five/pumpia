@@ -268,7 +268,7 @@ class BaseOutput[ValT, TkVarT](
                  verbose_name: str | None = None,
                  label_style: str | None = None,
                  val_label_style: str | None = None,
-                 reset_on_analysis: bool = True,
+                 reset_on_analysis: bool = False,
                  hidden: bool = False):
         BaseIO.__init__(self,
                         initial_value,
@@ -577,7 +577,7 @@ class StringOutput(BaseOutput[str, tk.StringVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis: bool = True,
+                 reset_on_analysis: bool = False,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
@@ -600,7 +600,7 @@ class IntOutput(BaseOutput[int, tk.IntVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis: bool = True,
+                 reset_on_analysis: bool = False,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
@@ -623,7 +623,7 @@ class FloatOutput(BaseOutput[float, tk.DoubleVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis: bool = True,
+                 reset_on_analysis: bool = False,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,
@@ -646,7 +646,7 @@ class DateOutput(BaseOutput[date, DateVar]):
                  verbose_name: str | None = None,
                  label_style=None,
                  val_label_style=None,
-                 reset_on_analysis: bool = True,
+                 reset_on_analysis: bool = False,
                  hidden: bool = False):
         super().__init__(initial_value,
                          verbose_name=verbose_name,

@@ -586,25 +586,8 @@ class BaseCollection(ABC, ttk.Frame):
                                          text="Draw Phantom Boundary")
             boundary_button.grid(column=0, row=2, sticky="nsew")
 
-        if self.direction == "horizontal":
-            self.rois_button.grid(column=0, row=self.command_buttons_count, sticky="nsew")
-            self.analyse_button.grid(column=1, row=self.command_buttons_count, sticky="nsew")
-            self.command_buttons_count += 1
-            self.create_and_run_button.grid(column=0,
-                                            row=self.command_buttons_count,
-                                            columnspan=2,
-                                            sticky="nsew")
-            self.command_buttons_count += 1
-
-        else:
-            self.rois_button.grid(column=self.command_buttons_count, row=0, sticky="nsew")
-            self.analyse_button.grid(column=self.command_buttons_count, row=1, sticky="nsew")
-            self.command_buttons_count += 1
-            self.create_and_run_button.grid(column=self.command_buttons_count,
-                                            row=0,
-                                            rowspan=2,
-                                            sticky="nsew")
-            self.command_buttons_count += 1
+        show_draw_rois_button: bool = False
+        show_analyse_button: bool = False
 
         for k, v in self.__class__.__dict__.items():
             if k[:2] != "__" or k[-2:] != "__":
@@ -612,9 +595,12 @@ class BaseCollection(ABC, ttk.Frame):
                     attr = copy(v)
                     setattr(self, k, attr)
                     self.modules.append(attr)
+                    show_draw_rois_button = show_draw_rois_button or attr.show_draw_rois_button
+                    show_analyse_button = show_analyse_button or attr.show_analyse_button
                     if attr.verbose_name is None:
                         attr.verbose_name = k.replace("_", " ").title()
                     found = False
+
                     for window, modules in self._module_groups.items():
                         if v in modules:
                             window.modules[window.modules.index(v)] = attr
@@ -628,12 +614,79 @@ class BaseCollection(ABC, ttk.Frame):
                             window.add(lf, weight=1)
                             found = True
                             break
+
                     if not found:
                         attr.setup(parent=self.notebook,
                                    manager=self.manager,
                                    context_manager=self.context_manager)
                         self.notebook.add(attr, text=attr.verbose_name)
                         self._tab_change_calls[self.notebook.tabs()[-1]] = attr.on_tab_select
+
+        if self.direction == "horizontal":
+            if show_draw_rois_button:
+                if show_analyse_button:
+                    self.rois_button.grid(column=0,
+                                          row=self.command_buttons_count,
+                                          sticky="nsew")
+                else:
+                    self.rois_button.grid(column=0,
+                                          row=self.command_buttons_count,
+                                          columnspan=2,
+                                          sticky="nsew")
+
+            if show_analyse_button:
+                if show_draw_rois_button:
+                    self.analyse_button.grid(column=1,
+                                             row=self.command_buttons_count,
+                                             sticky="nsew")
+                else:
+                    self.analyse_button.grid(column=0,
+                                             row=self.command_buttons_count,
+                                             columnspan=2,
+                                             sticky="nsew")
+
+            if show_analyse_button or show_draw_rois_button:
+                self.command_buttons_count += 1
+
+            if show_analyse_button and show_draw_rois_button:
+                self.create_and_run_button.grid(column=0,
+                                                row=self.command_buttons_count,
+                                                columnspan=2,
+                                                sticky="nsew")
+                self.command_buttons_count += 1
+
+        else:
+            if show_draw_rois_button:
+                if show_analyse_button:
+                    self.rois_button.grid(column=self.command_buttons_count,
+                                          row=0,
+                                          sticky="nsew")
+                else:
+                    self.rois_button.grid(column=self.command_buttons_count,
+                                          row=0,
+                                          rowspan=2,
+                                          sticky="nsew")
+
+            if show_analyse_button:
+                if show_draw_rois_button:
+                    self.analyse_button.grid(column=self.command_buttons_count,
+                                             row=1,
+                                             sticky="nsew")
+                else:
+                    self.analyse_button.grid(column=self.command_buttons_count,
+                                             row=0,
+                                             rowspan=2,
+                                             sticky="nsew")
+
+            if show_analyse_button or show_draw_rois_button:
+                self.command_buttons_count += 1
+
+            if show_analyse_button and show_draw_rois_button:
+                self.create_and_run_button.grid(column=self.command_buttons_count,
+                                                row=0,
+                                                rowspan=2,
+                                                sticky="nsew")
+                self.command_buttons_count += 1
 
         self.load_outputs()
         self.load_commands()

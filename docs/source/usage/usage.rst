@@ -7,8 +7,9 @@ See :doc:`example` for an implementation of the below.
 --------------
 This is how most people will write analysis programs using PumpIA.
 Modules automatically handle the user interface aspect of the program.
-When subclassing one of the provided modules the user must overwrite :py:meth:`analyse <pumpia.module_handling.modules.BaseModule.analyse>`, however the following are also designed to be replaced or extended:
+When subclassing one of the provided modules the following are designed to be replaced or extended:
 
+    * :py:meth:`analyse <pumpia.module_handling.modules.BaseModule.analyse>`
     * :py:meth:`draw_rois <pumpia.module_handling.modules.BaseModule.draw_rois>`
     * :py:meth:`load_commands <pumpia.module_handling.modules.BaseModule.load_commands>`
     * :py:meth:`link_rois_viewers <pumpia.module_handling.modules.BaseModule.link_rois_viewers>`
@@ -16,6 +17,10 @@ When subclassing one of the provided modules the user must overwrite :py:meth:`a
     * :py:meth:`on_image_load <pumpia.module_handling.modules.BaseModule.on_image_load>`
 
 The class method :py:meth:`run <pumpia.module_handling.modules.BaseModule.run>` is used to run the module as a stand alone.
+
+If the class attribute ``show_draw_rois_button`` is set to ``True`` then a button to draw ROIs is shown.
+If the class attribute ``show_analyse_button`` is set to ``True`` then a button to analyse the image is shown.
+If both are set to ``True`` then a button to do both is also shown.
 
 :doc:`module_ios/module_ios`
 ----------------------------
