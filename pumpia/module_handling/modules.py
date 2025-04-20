@@ -824,7 +824,7 @@ class PhantomModule(BaseModule):
 
     Uses `ManualPhantomManagerGenerator` as the default `context_manager_generator`.
 
-    Adds two buttons for showing the phantom boundary and boundbox compared with `BaseModule`.
+    Adds two buttons for showing the phantom boundary and bounding box compared with `BaseModule`.
     """
     context_manager_generator: PhantomContextManagerGenerator = ManualPhantomManagerGenerator()
 

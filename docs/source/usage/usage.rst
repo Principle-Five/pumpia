@@ -74,3 +74,4 @@ Contents
     module_ios/module_ios
     collections
     context
+    user_interface

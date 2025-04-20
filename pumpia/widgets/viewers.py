@@ -288,10 +288,11 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
     `Manager` treeview into the viewer to load it.
 
     The following shortcuts are provided for user interaction:
-    - Mouse wheel: Scroll through image slices.
-    - Control + Mouse wheel: Zoom in/out.
-    - Mouse wheel button + drag: Adjust window/level.
-    - Control + r: Reset image viewing parameters.
+
+        * Mouse wheel: Scroll through image slices.
+        * Control + Mouse wheel: Zoom in/out.
+        * Mouse wheel button + drag: Adjust window/level.
+        * Control + R: Reset image viewing parameters.
 
     Parameters
     ----------
