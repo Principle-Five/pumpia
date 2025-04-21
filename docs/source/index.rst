@@ -31,6 +31,14 @@ To use PumpIA, install it using pip:
 
    (.venv) $ pip install pumpia
 
+Usage
+-----
+See the sections :doc:`usage </usage/usage>` for creating a module and collection, and :doc:`user interface </usage/user_interface>` for how to use the user interface.
+
+An :doc:`example </usage/example>` is provided, this is shown below.
+
+.. figure::  images/Example.png
+
 Contents
 --------
 
