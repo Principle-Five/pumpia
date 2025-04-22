@@ -26,8 +26,18 @@ class GeneralImage(FileImageSet):
     """
 
     def __init__(self, image: Image.Image, path: Path):
-        self._array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-            np.array([np.array(frame) for frame in ImageSequence.Iterator(image)]))  # type: ignore
+        frame_list = [np.array(frame) for frame in ImageSequence.Iterator(image)]
+
+        try:
+            self._array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
+                np.array(frame_list))  # type: ignore
+        except ValueError as exc:
+            if image.format == "GIF":
+                self._array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
+                    np.array(frame_list[1:]))  # type: ignore
+            else:
+                raise exc
+
         self.format = image.format
         super().__init__(self._array.shape, path, mode=image.mode)
 
