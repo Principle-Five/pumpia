@@ -12,6 +12,7 @@ from pathlib import Path
 from copy import copy
 from typing import TYPE_CHECKING, overload, Literal
 import numpy as np
+import matplotlib.pyplot as plt
 
 if TYPE_CHECKING:
     from pumpia.image_handling.roi_structures import BaseROI
@@ -446,6 +447,27 @@ class ArrayImage(BaseImageSet):
         self.rotation = 0
         self._user_window = None
         self._user_level = None
+
+    def plot_z_profile(self):
+        """
+        Plots the z profile of the image in a new window.
+        """
+        plt.clf()
+        plt.plot(self.z_profile, ".-")
+        try:
+            name = str(f"{self} z profile")
+            plt.title(f"Vertical Profile for {name}")
+        except NotImplementedError:
+            plt.title("Vertical Profile")
+        plt.xlabel("Position (Pixels)")
+        plt.ylabel("Value")
+        plt.show()
+
+    @property
+    def menu_options(self) -> list[tuple[str, Callable[[], None]]]:
+        options = super().menu_options
+        options.extend([("Plot z Profile", self.plot_z_profile)])
+        return options
 
 
 class FileImageSet(ArrayImage):
