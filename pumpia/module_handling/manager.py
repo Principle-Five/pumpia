@@ -3,6 +3,8 @@ Classes:
  * Manager
 """
 
+import warnings
+import traceback
 import gc
 import datetime
 import typing
@@ -222,23 +224,38 @@ class Manager:
                 viewer.unload_images()
             gc.collect()
 
+        filters = warnings.filters
+        warnings.simplefilter("error")
         try:
-            open_dicom = dcmread(filepath)
-        except InvalidDicomError:
             try:
-                image = Image.open(filepath)
-            except PIL.UnidentifiedImageError:
-                pass
+                open_dicom = dcmread(filepath)
+            except InvalidDicomError:
+                try:
+                    image = Image.open(filepath)
+                except PIL.UnidentifiedImageError:
+                    pass
+                else:
+                    self.general_images.add(GeneralImage(image, filepath))
+                finally:
+                    try:
+                        image.close()
+                    except UnboundLocalError:
+                        pass
             else:
-                self.general_images.add(GeneralImage(image, filepath))
-        else:
-            try:
-                _ = open_dicom.pixel_array
-            except AttributeError:
-                pass
-            else:
-                self.load_dicom(open_dicom, filepath)
-
+                try:
+                    _ = open_dicom.pixel_array
+                except AttributeError:
+                    pass
+                else:
+                    self.load_dicom(open_dicom, filepath)
+        # pylint: disable-next=broad-exception-caught
+        except Exception as exc:
+            warning = UserWarning(f"{filepath} failed to load.")
+            warning.with_traceback(exc.__traceback__)
+            traceback.print_exc()
+            warnings.simplefilter("always")
+            warnings.warn(warning, stacklevel=2)
+        warnings.filters = filters
         self.update_trees()
 
     def load_images(self,
@@ -298,29 +315,46 @@ class Manager:
 
             tk_parent.update()
 
+        filters = warnings.filters
         for file in files:
+            warnings.simplefilter("error")
             try:
-                open_dicom = dcmread(file)
-            except InvalidDicomError:
                 try:
-                    image = Image.open(file)
-                except PIL.UnidentifiedImageError:
-                    pass
+                    open_dicom = dcmread(file)
+                except InvalidDicomError:
+                    try:
+                        image = Image.open(file)
+                    except PIL.UnidentifiedImageError:
+                        pass
+                    else:
+                        self.general_images.add(GeneralImage(image, file))
+                    finally:
+                        try:
+                            image.close()
+                        except UnboundLocalError:
+                            pass
                 else:
-                    self.general_images.add(GeneralImage(image, file))
-            else:
-                try:
-                    _ = open_dicom.pixel_array
-                except AttributeError:
-                    pass
-                else:
-                    self.load_dicom(open_dicom, file)
+                    try:
+                        _ = open_dicom.pixel_array
+                    except AttributeError:
+                        pass
+                    else:
+                        self.load_dicom(open_dicom, file)
+            # pylint: disable-next=broad-exception-caught
+            except Exception as exc:
+                warning = UserWarning(f"{file} failed to load.")
+                warning.with_traceback(exc.__traceback__)
+                traceback.print_exc()
+                warnings.simplefilter("always")
+                warnings.warn(warning, stacklevel=2)
 
             if tk_parent is not None:
                 file_count += 1
                 count_label["text"] = f"{file_count}/{total_files}"
                 count_bar.step(1)
                 tk_parent.update()
+
+        warnings.filters = filters
 
         if tk_parent is not None:
             count_frame.destroy()
@@ -520,6 +554,7 @@ class Manager:
                                         'end',
                                         iid=im_id,
                                         text=im_text,
+                                        values=[f"shape={v.shape}"],
                                         tags=('selected',
                                               v.id_string))
                 add_general_dict(tree_dict, "General", tree)
@@ -556,7 +591,7 @@ class Manager:
                                         'end',
                                         iid=sr_id,
                                         text=sr_text,
-                                        values=[sr_filepath],
+                                        values=[f"shape={sr.shape}", sr_filepath],
                                         tags=('selected',
                                               sr.id_string))
                             for ins in sr.instances:
@@ -570,7 +605,7 @@ class Manager:
                                             'end',
                                             iid=ins_id,
                                             text=ins_text,
-                                            values=[ins_filepath],
+                                            values=[f"shape={ins.shape}", ins_filepath],
                                             tags=('selected',
                                                   ins.id_string))
 
@@ -847,8 +882,9 @@ class Manager:
                               '<<TreeviewSelect>>',
                               lambda event: self._set_selected(current_tree, event))
         current_tree.bind("<ButtonRelease-1>", self._set_select_time)
-        current_tree['columns'] = ['measurements']
+        current_tree['columns'] = ['measurements', 'file']
         current_tree.heading('measurements', text='Measurements')
+        current_tree.heading('file', text='File')
         current_tree.grid(row=0, column=0, sticky='nsew')
 
         yscrollbar = ttk.Scrollbar(
