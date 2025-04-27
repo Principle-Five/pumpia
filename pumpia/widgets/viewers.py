@@ -394,9 +394,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                  allow_drag_drop: bool = True,
                  allow_drawing_rois: bool = True,
                  allow_changing_rois: bool = True,
-                 # pylint: disable-next=undefined-variable
                  validation_command: Callable[[ImageT], bool] | None = None,
-                 # pylint: disable-next=undefined-variable
                  preload_command: Callable[[Self, ImageT], ImageT] | None = None) -> None:
         super().__init__(tk_parent, background="black", highlightthickness=0, bd=0)
         self.manager: Manager = manager
@@ -404,9 +402,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         self.allow_drag_drop: bool = allow_drag_drop
         self.allow_drawing_rois: bool = allow_drawing_rois
         self.allow_changing_rois: bool = allow_changing_rois
-        # pylint: disable-next=undefined-variable
         self.validation_command: Callable[[ImageT], bool] | None = validation_command
-        # pylint: disable-next=undefined-variable
         self.preload_command: Callable[[Self, ImageT], ImageT] | None = preload_command
         self.mouse_x: float = 0
         self.mouse_y: float = 0
@@ -443,7 +439,6 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         self.bind('<Leave>', self._leaving)
         self.bind('<Configure>', self._configure_window)
 
-        # pylint: disable-next=undefined-variable
         self.image: ImageT | None = None
         axes_array: np.ndarray = np.empty((0, 0))
         self.pil_image: Image.Image = Image.fromarray(axes_array)
@@ -459,7 +454,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         """
         return 2**self._zoom
 
-    @property  # pylint: disable-next=undefined-variable
+    @property
     def current_image(self) -> ImageT | None:
         """
         The current image showing on the Viewer.
@@ -516,7 +511,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         self._load_traces.remove(func)
 
     @classmethod
-    @abstractmethod  # pylint: disable-next=undefined-variable
+    @abstractmethod
     def can_show_image(cls, image: ImageT) -> bool:
         """
         Checks if the viewer can show the image.
@@ -530,7 +525,6 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         self.image = None
         self.update()
 
-    # pylint: disable-next=undefined-variable
     def load_image(self, image: ImageT):
         """
         Loads an image into the viewer.
