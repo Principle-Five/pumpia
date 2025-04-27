@@ -18,60 +18,6 @@ class BaseContext:
     """
 
 
-class PhantomContext(BaseContext):
-    """
-    Context for phantom shapes.
-
-    Parameters
-    ----------
-    xmin : int
-        The minimum x-coordinate.
-    xmax : int
-        The maximum x-coordinate.
-    ymin : int
-        The minimum y-coordinate.
-    ymax : int
-        The maximum y-coordinate.
-    shape : PhantomShape
-        The shape of the phantom.
-    """
-
-    def __init__(self, xmin: int, xmax: int, ymin: int, ymax: int, shape: PhantomShape):
-        self.xmin: int = xmin
-        self.xmax: int = xmax
-        self.ymin: int = ymin
-        self.ymax: int = ymax
-        self.shape: PhantomShape = shape
-
-    @property
-    def xcent(self) -> float:
-        """
-        The x co-ordinate of the center of the phantom.
-        """
-        return (self.xmax + self.xmin) / 2
-
-    @property
-    def ycent(self) -> float:
-        """
-        The y co-ordinate of the center of the phantom.
-        """
-        return (self.ymax + self.ymin) / 2
-
-    @property
-    def y_length(self) -> int:
-        """
-        Returns the y-length of the phantom.
-        """
-        return self.ymax - self.ymin
-
-    @property
-    def x_length(self) -> int:
-        """
-        Returns the x-length of the phantom.
-        """
-        return self.xmax - self.xmin
-
-
 class BoundBoxContext(BaseContext):
     """
     Context for bounding box.
@@ -93,6 +39,57 @@ class BoundBoxContext(BaseContext):
         self.xmax: int = xmax
         self.ymin: int = ymin
         self.ymax: int = ymax
+
+    @property
+    def xcent(self) -> float:
+        """
+        The x co-ordinate of the center of the context.
+        """
+        return (self.xmax + self.xmin) / 2
+
+    @property
+    def ycent(self) -> float:
+        """
+        The y co-ordinate of the center of the context.
+        """
+        return (self.ymax + self.ymin) / 2
+
+    @property
+    def y_length(self) -> int:
+        """
+        Returns the y-length of the context.
+        """
+        return self.ymax - self.ymin
+
+    @property
+    def x_length(self) -> int:
+        """
+        Returns the x-length of the context.
+        """
+        return self.xmax - self.xmin
+
+
+class PhantomContext(BoundBoxContext):
+    """
+    Context for phantom shapes.
+
+    Parameters
+    ----------
+    xmin : int
+        The minimum x-coordinate.
+    xmax : int
+        The maximum x-coordinate.
+    ymin : int
+        The minimum y-coordinate.
+    ymax : int
+        The maximum y-coordinate.
+    shape : PhantomShape
+        The shape of the phantom.
+    """
+
+    def __init__(self, xmin: int, xmax: int, ymin: int, ymax: int, shape: PhantomShape):
+        super().__init__(xmin, xmax, ymin, ymax)
+        self.shape: PhantomShape = shape
 
 
 class SimpleContext(BaseContext):

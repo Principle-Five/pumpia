@@ -204,8 +204,8 @@ class PhantomContextManager(BaseContextManager):
         roi = RectangleROI(image,
                            bounds.xmin,
                            bounds.ymin,
-                           bounds.xmax,
-                           bounds.ymax,
+                           bounds.x_length,
+                           bounds.y_length,
                            slice_num=image.current_slice,
                            name=name,
                            replace=True)

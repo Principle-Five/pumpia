@@ -88,9 +88,9 @@ class BaseROI(ABC):
     -------
     delete_cache()
         Deletes the cached values of the ROI.
-    pixel_is_in(x: float, y: float) -> bool
+    point_is_in(x: float, y: float) -> bool
         Checks if a pixel is inside the ROI.
-    pixel_is_on(x: float, y: float, dist: float = 0) -> bool
+    point_is_on(x: float, y: float, dist: float = 0) -> bool
         Checks if a pixel is on the boundary of the ROI.
     move(x: int = 0, y: int = 0)
         Moves the ROI by the specified amount.
@@ -240,20 +240,19 @@ class BaseROI(ABC):
 
     @overload
     def pixel_is_in(self,
-                    x: float,
-                    y: float
+                    x: int,
+                    y: int
                     ) -> bool: ...
 
     @overload
     def pixel_is_in(self,
-                    x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
-                    y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
+                    x: np.ndarray[tuple[int, ...], np.dtype[np.integer]],
+                    y: np.ndarray[tuple[int, ...], np.dtype[np.integer]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    @abstractmethod
     def pixel_is_in(self,
-                    x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
-                    y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
+                    x: int | np.ndarray[tuple[int, ...], np.dtype[np.integer]],
+                    y: int | np.ndarray[tuple[int, ...], np.dtype[np.integer]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         """
         Checks if a pixel is inside the ROI.
@@ -270,29 +269,63 @@ class BaseROI(ABC):
         bool
             True if the pixel is inside the ROI, False otherwise.
         """
+        return self.point_is_in(x + 0.5, y + 0.5)  # type: ignore
 
     @overload
-    def pixel_is_on(self,
+    def point_is_in(self,
+                    x: float,
+                    y: float
+                    ) -> bool: ...
+
+    @overload
+    def point_is_in(self,
+                    x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
+                    y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
+                    ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
+
+    @abstractmethod
+    def point_is_in(self,
+                    x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
+                    y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
+                    ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
+        """
+        Checks if a point is inside the ROI.
+
+        Parameters
+        ----------
+        x : float
+            The x-coordinate of the pixel.
+        y : float
+            The y-coordinate of the pixel.
+
+        Returns
+        -------
+        bool
+            True if the pixel is inside the ROI, False otherwise.
+        """
+
+    @overload
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
     @abstractmethod
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         """
-        Checks if a pixel is on the boundary of the ROI.
+        Checks if a point is on the boundary of the ROI.
 
         Parameters
         ----------
@@ -449,20 +482,20 @@ class BaseROI(ABC):
 
         if self.image.is_multisample:
             pixel_array = np.zeros(
-                (self.ymax - self.ymin + 1, self.xmax - self.xmin + 1, array.shape[-1]))
+                (self.ymax - self.ymin, self.xmax - self.xmin, array.shape[-1]))
         else:
             pixel_array = np.zeros(
-                (self.ymax - self.ymin + 1, self.xmax - self.xmin + 1))
+                (self.ymax - self.ymin, self.xmax - self.xmin))
 
         xmin_i = max(0, self.xmin)
-        xmax_i = min(self.image.shape[2] - 1, self.xmax)
+        xmax_i = min(self.image.shape[2], self.xmax)
         ymin_i = max(0, self.ymin)
-        ymax_i = min(self.image.shape[1] - 1, self.ymax)
+        ymax_i = min(self.image.shape[1], self.ymax)
 
         if xmin_i < xmax_i and ymin_i < ymax_i:
-            i_array = masked_array[ymin_i:ymax_i + 1, xmin_i:xmax_i + 1]
-            pixel_array[ymin_i - self.ymin:ymax_i - self.ymin + 1,
-                        xmin_i - self.xmin:xmax_i - self.xmin + 1] = i_array
+            i_array = masked_array[ymin_i:ymax_i, xmin_i:xmax_i]
+            pixel_array[ymin_i - self.ymin:ymax_i - self.ymin,
+                        xmin_i - self.xmin:xmax_i - self.xmin] = i_array
 
         self._pixel_array = pixel_array
 
@@ -563,7 +596,7 @@ class BaseROI(ABC):
     @abstractmethod
     def xmax(self) -> int:
         """
-        The maximum x-coordinate of the ROI.
+        The maximum x-coordinate of the ROI, non-inclusive.
         """
 
     @property
@@ -577,7 +610,7 @@ class BaseROI(ABC):
     @abstractmethod
     def ymax(self) -> int:
         """
-        The maximum y-coordinate of the ROI.
+        The maximum y-coordinate of the ROI, non-inclusive.
         """
 
     @property
@@ -699,38 +732,38 @@ class Angle(BaseROI):
                 + " ; " + str(self.y2))
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         return False
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
@@ -943,38 +976,38 @@ class PointROI(BaseROI):
                 + " ; " + str(self.y))
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         return ((np.floor(x) == self.x) & (np.floor(y) == self.y))
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
@@ -1034,7 +1067,7 @@ class PointROI(BaseROI):
 
     @property
     def xmax(self) -> int:
-        return self.x
+        return self.x + 1
 
     @property
     def ymin(self) -> int:
@@ -1042,7 +1075,7 @@ class PointROI(BaseROI):
 
     @property
     def ymax(self) -> int:
-        return self.y
+        return self.y + 1
 
     @property
     def xcent(self) -> int:
@@ -1129,38 +1162,42 @@ class CircleROI(BaseROI):
                 + " ; " + str(self.r))
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
-        return (x - self.x)**2 + (y - self.y)**2 < self.r**2
+        return ((self.xmin <= x)
+                & (x < self.xmax)
+                & (self.ymin <= y)
+                & (y < self.ymax)
+                & ((x - self.x)**2 + (y - self.y)**2 <= self.r**2))
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
@@ -1265,7 +1302,8 @@ class CircleROI(BaseROI):
         else:
             std_str = f"{self.std:.1f}"
 
-        return (f"Area: {self.area:.1f}, "
+        return (f"Radius: {self.r}, "
+                + f"Area: {self.area:.1f}, "
                 + f"Perimeter: {self.perimeter:.1f}, "
                 + f"Mean: {mean_str}, "
                 + f"Std: {std_str}")
@@ -1283,9 +1321,9 @@ class EllipseROI(BaseROI):
     y : int
         The y-coordinate of the center of the ellipse.
     a : int
-        The semi-major axis of the ellipse.
+        The length of the horizontal axis of the ellipse.
     b : int
-        The semi-minor axis of the ellipse.
+        The length of the vertical axis of the ellipse.
 
     Attributes
     ----------
@@ -1294,9 +1332,9 @@ class EllipseROI(BaseROI):
     y : int
         The y-coordinate of the center of the ellipse.
     a : int
-        The semi-major axis of the ellipse.
+        The length of the horizontal axis of the ellipse.
     b : int
-        The semi-minor axis of the ellipse.
+        The length of the vertical axis of the ellipse.
     """
 
     def __init__(self,
@@ -1336,39 +1374,42 @@ class EllipseROI(BaseROI):
                 + " ; " + str(self.b))
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
-
-        return ((x - self.x) / self.a)**2 + ((y - self.y) / self.b)**2 < 1
+        return ((self.xmin <= x)
+                & (x < self.xmax)
+                & (self.ymin <= y)
+                & (y < self.ymax)
+                & (((x - self.x) / self.a)**2 + ((y - self.y) / self.b)**2 <= 1))
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
@@ -1498,7 +1539,9 @@ class EllipseROI(BaseROI):
         else:
             std_str = f"{self.std:.1f}"
 
-        return (f"Area: {self.area:.1f}, "
+        return (f"a: {self.a}, "
+                + f"b: {self.b}, "
+                + f"Area: {self.area:.1f}, "
                 + f"Mean: {mean_str}, "
                 + f"Std: {std_str}")
 
@@ -1584,41 +1627,41 @@ class SquareROI(BaseROI):
         self._v_profile = None
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         return ((self.xmin <= x)
-                & (x <= self.xmax)
+                & (x < self.xmax)
                 & (self.ymin <= y)
-                & (y <= self.ymax))
+                & (y < self.ymax))
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
@@ -1699,9 +1742,7 @@ class SquareROI(BaseROI):
 
     @property
     def xmin(self) -> int:
-        if self._xmin is None or not self.cache_values:
-            self._xmin = self.x
-        return self._xmin
+        return self.x
 
     @property
     def xmax(self) -> int:
@@ -1711,9 +1752,7 @@ class SquareROI(BaseROI):
 
     @property
     def ymin(self) -> int:
-        if self._ymin is None or not self.cache_values:
-            self._ymin = self.y
-        return self._ymin
+        return self.y
 
     @property
     def ymax(self) -> int:
@@ -1763,7 +1802,8 @@ class SquareROI(BaseROI):
         else:
             std_str = f"{self.std:.1f}"
 
-        return (f"Area: {self.area:.1f}, "
+        return (f"Side Length: {self.r}, "
+                + f"Area: {self.area:.1f}, "
                 + f"Perimeter: {self.perimeter:.1f}, "
                 + f"Mean: {mean_str}, "
                 + f"Std: {std_str}")
@@ -1817,10 +1857,10 @@ class RectangleROI(BaseROI):
         The minimum x-coordinate of the rectangle.
     ymin : int
         The minimum y-coordinate of the rectangle.
-    xmax : int
-        The maximum x-coordinate of the rectangle.
-    ymax : int
-        The maximum y-coordinate of the rectangle.
+    width : int
+        The width of the rectangle.
+    height : int
+        The height of the rectangle.
 
     Attributes
     ----------
@@ -1828,9 +1868,9 @@ class RectangleROI(BaseROI):
         The minimum x-coordinate of the rectangle.
     y : int
         The minimum y-coordinate of the rectangle.
-    a : int
+    width : int
         The width of the rectangle.
-    b : int
+    height : int
         The height of the rectangle.
     h_profile : np.ndarray
     v_profile : np.ndarray
@@ -1847,8 +1887,8 @@ class RectangleROI(BaseROI):
                  image: 'ArrayImage',
                  xmin: int,
                  ymin: int,
-                 xmax: int,
-                 ymax: int,
+                 width: int,
+                 height: int,
                  *,
                  slice_num: int = 0,
                  name: str | None = None,
@@ -1856,12 +1896,12 @@ class RectangleROI(BaseROI):
                  cache_values: bool = True,
                  colour: str = ROI_COLOUR,
                  active_colour: str = ACTIVE_ROI_COLOUR):
-        if xmin == xmax or ymin == ymax:
+        if width <= 0 or height <= 0:
             raise ValueError("Side lengths must be greater than 0")
-        self.x: int = min(xmin, xmax)
-        self.y: int = min(ymin, ymax)
-        self.a: int = max(xmax, xmin) - min(xmin, xmax)
-        self.b: int = max(ymax, ymin) - min(ymin, ymax)
+        self.x: int = xmin
+        self.y: int = ymin
+        self.width: int = width
+        self.height: int = height
         self._h_profile: np.ndarray[tuple[int] | tuple[int, int], np.dtype] | None = None
         self._v_profile: np.ndarray[tuple[int] | tuple[int, int], np.dtype] | None = None
         super().__init__(image,
@@ -1878,8 +1918,8 @@ class RectangleROI(BaseROI):
                 + " ; " + "Rectangle"
                 + " ; " + str(self.x)
                 + " ; " + str(self.y)
-                + " ; " + str(self.a)
-                + " ; " + str(self.b))
+                + " ; " + str(self.width)
+                + " ; " + str(self.height))
 
     def delete_cache(self):
         super().delete_cache()
@@ -1887,41 +1927,41 @@ class RectangleROI(BaseROI):
         self._v_profile = None
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         return ((self.xmin <= x)
-                & (x <= self.xmax)
+                & (x < self.xmax)
                 & (self.ymin <= y)
-                & (y <= self.ymax))
+                & (y < self.ymax))
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
@@ -1941,15 +1981,15 @@ class RectangleROI(BaseROI):
         self.delete_cache()
 
     def enlarge(self, x: float = 1, y: float = 1):
-        a = round(self.a * x)
-        b = round(self.b * y)
+        a = round(self.width * x)
+        b = round(self.height * y)
         if a < 0:
             self.x = self.xmax
-        self.a = abs(a)
+        self.width = abs(a)
 
         if b < 0:
             self.y = self.ymax
-        self.b = abs(b)
+        self.height = abs(b)
 
         self.delete_cache()
 
@@ -1958,11 +1998,11 @@ class RectangleROI(BaseROI):
         b = round(y)
         if a < 0:
             self.x = self.xmax
-        self.a = abs(a)
+        self.width = abs(a)
 
         if b < 0:
             self.y = self.ymax
-        self.b = abs(b)
+        self.height = abs(b)
 
         self.delete_cache()
 
@@ -1985,8 +2025,8 @@ class RectangleROI(BaseROI):
         return RectangleROI(image,
                             self.xmin,
                             self.ymin,
-                            self.xmax,
-                            self.ymax,
+                            self.width,
+                            self.height,
                             slice_num=slice_num,
                             name=name,
                             replace=replace,
@@ -2008,38 +2048,34 @@ class RectangleROI(BaseROI):
 
     @property
     def xmin(self) -> int:
-        if self._xmin is None or not self.cache_values:
-            self._xmin = self.x
-        return self._xmin
+        return self.x
 
     @property
     def xmax(self) -> int:
         if self._xmax is None or not self.cache_values:
-            self._xmax = self.x + self.a
+            self._xmax = self.x + self.width
         return self._xmax
 
     @property
     def ymin(self) -> int:
-        if self._ymin is None or not self.cache_values:
-            self._ymin = self.y
-        return self._ymin
+        return self.y
 
     @property
     def ymax(self) -> int:
         if self._ymax is None or not self.cache_values:
-            self._ymax = self.y + self.b
+            self._ymax = self.y + self.height
         return self._ymax
 
     @property
     def xcent(self) -> float:
         if self._xcent is None or not self.cache_values:
-            self._xcent = self.xmin + self.a / 2
+            self._xcent = self.xmin + self.width / 2
         return self._xcent
 
     @property
     def ycent(self) -> float:
         if self._ycent is None or not self.cache_values:
-            self._ycent = self.ymin + self.b / 2
+            self._ycent = self.ymin + self.height / 2
         return self._ycent
 
     @property
@@ -2072,7 +2108,9 @@ class RectangleROI(BaseROI):
         else:
             std_str = f"{self.std:.1f}"
 
-        return (f"Area: {self.area:.1f}, "
+        return (f"Width: {self.width}, "
+                + f"Height: {self.height}, "
+                + f"Area: {self.area:.1f}, "
                 + f"Perimeter: {self.perimeter:.1f}, "
                 + f"Mean: {mean_str}, "
                 + f"Std: {std_str}")
@@ -2190,38 +2228,38 @@ class LineROI(BaseROI):
                 + " ; " + str(self.y2))
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float,
                     y: float
                     ) -> bool: ...
 
     @overload
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_in(self,
+    def point_is_in(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]]
                     ) -> bool | np.ndarray[tuple[int, ...], np.dtype[np.bool]]:
         return False
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float,
                     y: float,
                     dist: float = 0
                     ) -> bool: ...
 
     @overload
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
                     ) -> np.ndarray[tuple[int, ...], np.dtype[np.bool]]: ...
 
-    def pixel_is_on(self,
+    def point_is_on(self,
                     x: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     y: float | np.ndarray[tuple[int, ...], np.dtype[np.floating]],
                     dist: float = 0
