@@ -60,7 +60,6 @@ class BaseInputROI[ROI:BaseROI]:
                  allow_manual_draw: bool = True,
                  button_style: str | None = None):
         self._name = name
-        # pylint: disable-next=undefined-variable
         self.roi: ROI | None = None
         self.default_type: ManualROIType = default_type
         self.viewer: BaseViewer | None = None
@@ -87,7 +86,6 @@ class BaseInputROI[ROI:BaseROI]:
         if self._label_var is not None:
             self._label_var.set(val)
 
-    # pylint: disable-next=undefined-variable
     def register_roi(self, roi: ROI | None):
         """
         Registers an ROI.

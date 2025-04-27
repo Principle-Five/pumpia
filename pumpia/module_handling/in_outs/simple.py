@@ -43,7 +43,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
     var_type: type[tk.Variable]
 
     def __init__(self,
-                 # pylint: disable-next=undefined-variable
+
                  initial_value: ValT | Callable[[], ValT],
                  *,
                  verbose_name: str | None,
@@ -51,12 +51,11 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
                  hidden: bool = False):
         self._name: str | None = verbose_name
         self._label_style: str | None = label_style
-        # pylint: disable-next=undefined-variable
+
         self._value: ValT | Callable[[], ValT] = initial_value
         self._parent: tk.Misc | None = None
         self._label: ttk.Label | None = None
         self._label_var: tk.StringVar | None = None
-        # pylint: disable-next=undefined-variable
         self._var: TkVarT | None = None
         self._var_trace: str = ""
         self.hidden: bool = hidden
@@ -76,9 +75,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
             self._label_var.set(val)
 
     @property
-    def value(self
-              # pylint: disable-next=undefined-variable
-              ) -> ValT:
+    def value(self) -> ValT:
         """
         The value of the input/output.
         """
@@ -89,13 +86,21 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         return self._value
 
     @value.setter
-    def value(self,
-              # pylint: disable-next=undefined-variable
-              val: ValT):
+    def value(self, val: ValT):
         if self._var is None:
             self._value = val
         else:
             self._var.set(val)
+
+    @property
+    def initial_value(self) -> ValT:
+        """
+        The initial value of the IO.
+        """
+        if callable(self._initial_value):
+            return self._initial_value()  # type: ignore
+        else:
+            return self._initial_value
 
     @property
     def label(self) -> ttk.Label:
@@ -126,23 +131,19 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         return self._label_var
 
     @property
-    def value_var(self
-                  # pylint: disable-next=undefined-variable
-                  ) -> TkVarT:
+    def value_var(self) -> TkVarT:
         """
         The tkinter variable related to `value`.
         """
         if self._parent is None:
             raise ValueError("Parent has not been set")
         if self._var is None:
-            self._var = self.var_type(self._parent, value=self.value)  # type: ignore
+            self._var = self.var_type(self._parent, value=self.initial_value)  # type: ignore
             self._var_trace = self._var.trace_add("write", self._var_to_val)  # type: ignore
         return self._var  # type: ignore
 
     @value_var.setter
-    def value_var(self,
-                  # pylint: disable-next=undefined-variable
-                  var: TkVarT):
+    def value_var(self, var: TkVarT):
         if self._parent is None:
             raise ValueError("Parent has not been set")
         if self._var is not None:
@@ -188,9 +189,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
             pass
 
 
-class BaseInput[ValT, TkVarT](
-        # pylint: disable-next=undefined-variable
-        BaseIO[ValT, TkVarT]):  # type: ignore
+class BaseInput[ValT, TkVarT](BaseIO[ValT, TkVarT]):  # type: ignore
     """
     Base class for input handling for modules.
     Has the same attributes and methods as BaseIO unless stated below.
@@ -207,9 +206,7 @@ class BaseInput[ValT, TkVarT](
 
     widget: type[ttk.Entry]
 
-    def __init__(self,
-                 # pylint: disable-next=undefined-variable
-                 initial_value: ValT | Callable[[], ValT],
+    def __init__(self, initial_value: ValT | Callable[[], ValT],
                  *,
                  verbose_name: str | None = None,
                  label_style: str | None = None,
@@ -244,9 +241,7 @@ class BaseInput[ValT, TkVarT](
             self._entry.configure(textvariable=self.value_var)
 
 
-class BaseOutput[ValT, TkVarT](
-        # pylint: disable-next=undefined-variable
-        BaseIO[ValT, TkVarT]):  # type: ignore
+class BaseOutput[ValT, TkVarT](BaseIO[ValT, TkVarT]):  # type: ignore
     """
     Base class for output handling.
     Has the same attributes and methods as BaseIO unless stated below.
@@ -261,9 +256,7 @@ class BaseOutput[ValT, TkVarT](
     value_label : ttk.Label
     """
 
-    def __init__(self,
-                 # pylint: disable-next=undefined-variable
-                 initial_value: ValT | Callable[[], ValT],
+    def __init__(self, initial_value: ValT | Callable[[], ValT],
                  *,
                  verbose_name: str | None = None,
                  label_style: str | None = None,
@@ -320,9 +313,7 @@ class OptionInput[DictValT](BaseInput[str, tk.StringVar]):
     widget: type[ttk.Combobox] = ttk.Combobox
     var_type = tk.StringVar
 
-    def __init__(self,
-                 # pylint: disable-next=undefined-variable
-                 options_map: dict[str, DictValT],
+    def __init__(self, options_map: dict[str, DictValT],
                  initial: str | Callable[[], str],
                  *,
                  verbose_name: str | None = None,
@@ -330,8 +321,6 @@ class OptionInput[DictValT](BaseInput[str, tk.StringVar]):
                  entry_style=None,
                  allow_inv_mapping: bool = False,
                  hidden: bool = False):
-        if initial not in options_map:
-            raise ValueError("initial must be option")
         super().__init__(initial,
                          verbose_name=verbose_name,
                          label_style=label_style,
@@ -340,11 +329,9 @@ class OptionInput[DictValT](BaseInput[str, tk.StringVar]):
         self._entry: ttk.Combobox | None = None
 
         self.allow_inv_mapping: bool = allow_inv_mapping
-        # pylint: disable-next=undefined-variable
         self.options_map: dict[str, DictValT] = options_map
 
         if self.allow_inv_mapping:
-            # pylint: disable-next=undefined-variable
             self._inv_map: dict[DictValT, str] = {v: k for k, v in self.options_map.items()}
 
         self.options = list(self.options_map.keys())
@@ -352,9 +339,7 @@ class OptionInput[DictValT](BaseInput[str, tk.StringVar]):
             raise ValueError("initial not in options")
 
     @property
-    def value(self
-              # pylint: disable-next=undefined-variable
-              ) -> DictValT:
+    def value(self) -> DictValT:
         """
         The object mapped to the option as given by `options_map`.
         Can be set by using the option string or, if `allow_inv_mapping` is True, the object.
@@ -365,9 +350,7 @@ class OptionInput[DictValT](BaseInput[str, tk.StringVar]):
         return self.options_map[self._value]
 
     @value.setter
-    def value(self,
-              # pylint: disable-next=undefined-variable
-              val: DictValT | str):
+    def value(self, val: DictValT | str):
         if val in self.options:
             if self._var is None:
                 self._value = val  # type: ignore
