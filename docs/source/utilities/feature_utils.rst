@@ -3,7 +3,9 @@ Feature Utilities
 
 .. autofunction:: pumpia.utilities.feature_utils.flat_top_gauss
 
-.. autofunction:: pumpia.utilities.feature_utils.flat_top_gauss_integral
+.. autofunction:: pumpia.utilities.feature_utils.split_gauss
+
+.. autofunction:: pumpia.utilities.feature_utils.split_gauss_integral
 
 .. autofunction:: pumpia.utilities.feature_utils.ellipse_eq
 

@@ -19,7 +19,7 @@ import math
 from abc import ABC, abstractmethod
 import tkinter as tk
 from collections.abc import Callable
-from typing import Any, Self, TypeGuard, Literal
+from typing import Any, Self, TypeGuard, Literal, overload
 import numpy as np
 from PIL import Image, ImageTk
 from pumpia.module_handling.manager import Manager, MouseOptionsType
@@ -567,31 +567,71 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         for func in self._load_traces:
             func()
 
+    @overload
     def viewer_to_image_pos(self, position: Position) -> Position:
+        ...
+
+    @overload
+    def viewer_to_image_pos(self, position: tuple[float, float]) -> tuple[float, float]:
+        ...
+
+    def viewer_to_image_pos(self, position: Position | tuple[float, float]
+                            ) -> Position | tuple[float, float]:
         """
         Converts viewer coordinates to image coordinates.
         """
         if isinstance(self.image, ArrayImage):
-            x_new = ((position.x - self.center.x - self.image.x)
+            if isinstance(position, Position):
+                old_x = position.x
+                old_y = position.y
+                is_pos = True
+            else:
+                old_x = position[0]
+                old_y = position[1]
+                is_pos = False
+            x_new = ((old_x - self.center.x - self.image.x)
                      / self.zoom_factor
                      + self.image.shape[2] / 2)
-            y_new = ((position.y - self.center.y - self.image.y)
+            y_new = ((old_y - self.center.y - self.image.y)
                      / (self.zoom_factor * self.image.aspect)
                      + self.image.shape[1] / 2)
-            return Position(x_new, y_new)
+            if is_pos:
+                return Position(x_new, y_new)
+            else:
+                return (x_new, y_new)
         else:
             return position
 
+    @overload
     def image_to_viewer_pos(self, position: Position) -> Position:
+        ...
+
+    @overload
+    def image_to_viewer_pos(self, position: tuple[float, float]) -> tuple[float, float]:
+        ...
+
+    def image_to_viewer_pos(self, position: Position | tuple[float, float]
+                            ) -> Position | tuple[float, float]:
         """
         Converts image coordinates to viewer coordinates.
         """
         if isinstance(self.image, ArrayImage):
-            x_new = ((position.x - self.image.shape[2] / 2) * self.zoom_factor
+            if isinstance(position, Position):
+                old_x = position.x
+                old_y = position.y
+                is_pos = True
+            else:
+                old_x = position[0]
+                old_y = position[1]
+                is_pos = False
+            x_new = ((old_x - self.image.shape[2] / 2) * self.zoom_factor
                      + self.center.x + self.image.x)
-            y_new = ((position.y - self.image.shape[1] / 2) * self.zoom_factor * self.image.aspect
+            y_new = ((old_y - self.image.shape[1] / 2) * self.zoom_factor * self.image.aspect
                      + self.center.y + self.image.y)
-            return Position(x_new, y_new)
+            if is_pos:
+                return Position(x_new, y_new)
+            else:
+                return (x_new, y_new)
         else:
             return position
 
@@ -711,53 +751,61 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                 round(self.center.y - imh / 2 + iy + self._y, 0))
             #####################################################
 
+            roi_objs: list[int] = []
             for roi in self.image.get_rois(self.current_slice):
                 if not roi.hidden:
                     if roi.active:
                         colour = roi.active_colour
                     else:
                         colour = roi.colour
-
+                    roi_obj = None
                     if isinstance(roi, (CircleROI, EllipseROI)):
                         min_point = self.image_to_viewer_pos(
-                            Position(roi.xmin, roi.ymin))
+                            (roi.xmin, roi.ymin))
                         max_point = self.image_to_viewer_pos(
-                            Position(roi.xmax + 1, roi.ymax + 1))
-                        self.create_oval(min_point.x, min_point.y,
-                                         max_point.x, max_point.y, outline=colour)
+                            (roi.xmax, roi.ymax))
+                        roi_obj = self.create_oval(min_point[0], min_point[1],
+                                                   max_point[0], max_point[1], outline=colour)
 
                     elif isinstance(roi, (SquareROI, RectangleROI)):
                         min_point = self.image_to_viewer_pos(
-                            Position(roi.xmin, roi.ymin))
+                            (roi.xmin, roi.ymin))
                         max_point = self.image_to_viewer_pos(
-                            Position(roi.xmax + 1, roi.ymax + 1))
-                        self.create_rectangle(min_point.x, min_point.y,
-                                              max_point.x, max_point.y, outline=colour)
+                            (roi.xmax, roi.ymax))
+                        roi_obj = self.create_rectangle(min_point[0], min_point[1],
+                                                        max_point[0], max_point[1], outline=colour)
 
                     elif isinstance(roi, Angle):
                         pos1 = self.image_to_viewer_pos(
-                            Position(roi.x1, roi.y1))
+                            (roi.x1 + 0.5, roi.y1 + 0.5))
                         posc = self.image_to_viewer_pos(
-                            Position(roi.x, roi.y))
+                            (roi.x + 0.5, roi.y + 0.5))
                         pos2 = self.image_to_viewer_pos(
-                            Position(roi.x2, roi.y2))
-                        self.create_line([(pos1.x, pos1.y), (posc.x, posc.y), (pos2.x, pos2.y)],
-                                         fill=colour)
+                            (roi.x2 + 0.5, roi.y2 + 0.5))
+                        roi_obj = self.create_line([(pos1[0], pos1[1]),
+                                                    (posc[0], posc[1]),
+                                                    (pos2[0], pos2[1])],
+                                                   fill=colour)
 
                     elif isinstance(roi, PointROI):
-                        pos = self.image_to_viewer_pos(Position(roi.x, roi.y))
+                        pos = self.image_to_viewer_pos((roi.x, roi.y))
                         pos1 = self.image_to_viewer_pos(
-                            Position(roi.x + 1, roi.y + 1))
-                        self.create_rectangle(pos.x, pos.y, pos1.x, pos1.y,
-                                              fill=colour, outline=colour)
+                            (roi.x + 1, roi.y + 1))
+                        roi_obj = self.create_rectangle(pos[0], pos[1], pos1[0], pos1[1],
+                                                        fill=colour, outline=colour)
 
                     elif isinstance(roi, LineROI):
                         pos1 = self.image_to_viewer_pos(
-                            Position(roi.x1, roi.y1))
+                            (roi.x1 + 0.5, roi.y1 + 0.5))
                         pos2 = self.image_to_viewer_pos(
-                            Position(roi.x2, roi.y2))
-                        self.create_line([(pos1.x, pos1.y), (pos2.x, pos2.y)],
-                                         fill=colour)
+                            (roi.x2 + 0.5, roi.y2 + 0.5))
+                        roi_obj = self.create_line([(pos1[0], pos1[1]), (pos2[0], pos2[1])],
+                                                   fill=colour)
+
+                    if roi.active and not roi_obj is None:
+                        roi_objs.append(roi_obj)
+            for obj in roi_objs:
+                self.tag_raise(obj)
 
     def update(self):
         """
@@ -1028,10 +1076,12 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                 and self.allow_changing_rois):
             if self.manager.focus.image == self.current_image:
                 im_pos = self.viewer_to_image_pos(
-                    Position(self.mouse_x, self.mouse_y))
+                    (self.mouse_x, self.mouse_y))
 
                 if self.manager.roi_action == "Move":
-                    if self.manager.focus.pixel_is_in(im_pos.x, im_pos.y):
+                    dist = RESIZE_DIST / self.zoom_factor
+                    if (self.manager.focus.point_is_in(im_pos[0], im_pos[1])
+                            or self.manager.focus.point_is_on(im_pos[0], im_pos[1], dist)):
                         if self._temp_move_roi is None:
                             self.bind("<ButtonRelease-1>", self._release_roi)
                             self._temp_move_roi = self.manager.focus
@@ -1043,12 +1093,12 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
 
                 elif self.manager.roi_action == "Resize":
                     dist = RESIZE_DIST / self.zoom_factor
-                    if self.manager.focus.pixel_is_on(im_pos.x, im_pos.y, dist):
+                    if self.manager.focus.point_is_on(im_pos[0], im_pos[1], dist):
                         if self._temp_move_roi is None:
                             self.bind("<ButtonRelease-1>", self._release_roi)
                             self._temp_move_roi = self.manager.focus
                         self._resize_roi(event)
-                    elif (not self.manager.focus.pixel_is_in(im_pos.x, im_pos.y)
+                    elif (not self.manager.focus.point_is_in(im_pos[0], im_pos[1])
                           and self._temp_move_roi is None):
                         self.manager.focus.active = False
                         self.manager.focus = None
@@ -1322,15 +1372,15 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                                         active_colour=self._manual_active_colour)
 
                 elif isinstance(self._temp_roi, TempRectangle):
-                    xmin = min(points[0].x, points[1].x)
-                    ymin = min(points[0].y, points[1].y)
-                    xmax = max(points[0].x, points[1].x)
-                    ymax = max(points[0].y, points[1].y)
+                    xmin = math.floor(min(points[0].x, points[1].x))
+                    ymin = math.floor(min(points[0].y, points[1].y))
+                    width = math.floor(max(points[0].x, points[1].x)) - xmin
+                    height = math.floor(max(points[0].y, points[1].y)) - ymin
                     new_roi = RectangleROI(self.current_image,
-                                           math.floor(xmin),
-                                           math.floor(ymin),
-                                           math.floor(xmax),
-                                           math.floor(ymax),
+                                           xmin,
+                                           ymin,
+                                           width,
+                                           height,
                                            slice_num=self.current_image.current_slice,
                                            name=self._roi_name,
                                            replace=self._roi_replace,
