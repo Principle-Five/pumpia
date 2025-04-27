@@ -1,7 +1,8 @@
 """
 Functions:
  * flat_top_gauss
- * flat_top_gauss_integral
+ * split_gauss
+ * split_gauss_integral
  * ellipse_eq
  * ellipse_eq_min_max
  * phantom_boundary_automatic
@@ -20,13 +21,46 @@ from pumpia.module_handling.context import BoundBoxContext, PhantomContext, Phan
 
 
 def flat_top_gauss(pos: np.ndarray,
-                   a: float,
-                   b: float,
-                   c: float,
+                   x0: float,
+                   sigma: float,
                    amp: float,
-                   offset:float = 0) -> np.ndarray:
+                   rank: float = 1,
+                   offset: float = 0) -> np.ndarray:
     """
-    Returns an array of values for a flat top gaussian.
+    Calculates the flat top gaussian given by:
+
+    .. math::
+
+        amp * exp\\bigg(-\\bigg(\\frac{(pos-x0)^2}{2sigma^2}\\bigg)^{rank}\\bigg) + offset
+
+    A rank of 1 is a standard gaussian.
+
+    Parameters
+    ----------
+    pos : np.ndarray
+    x0 : float
+    sigma : float
+    rank : float
+    amp : float
+        by default 1
+    offset : float, optional
+        by default 0
+
+    Returns
+    -------
+    np.ndarray
+    """
+    return amp * np.exp(- (((((pos - x0) / sigma) ** 2) / 2) ** rank)) + offset
+
+
+def split_gauss(pos: np.ndarray,
+                a: float,
+                b: float,
+                c: float,
+                amp: float,
+                offset: float = 0) -> np.ndarray:
+    """
+    Returns an array of values for a gaussian split down the middle and joined by a line.
 
     Parameters
     ----------
@@ -55,15 +89,14 @@ def flat_top_gauss(pos: np.ndarray,
     return ret_array + offset
 
 
-def flat_top_gauss_integral(pos: np.ndarray,
-                            a: float,
-                            b: float,
-                            c: float,
-                            amp: float,
-                            baseline: float) -> np.ndarray:
+def split_gauss_integral(pos: np.ndarray,
+                         a: float,
+                         b: float,
+                         c: float,
+                         amp: float,
+                         baseline: float) -> np.ndarray:
     """
-    Returns an array of values for the integral of a flat top gaussian.
-    Integrates accross `flat_top_gauss` and adds `baseline`
+    Integrates accross `split_gauss` and adds `baseline`
 
     Parameters
     ----------
@@ -87,7 +120,7 @@ def flat_top_gauss_integral(pos: np.ndarray,
     """
     if pos.ndim != 1:
         raise ValueError("pos should be a 1 dimensional array of positions")
-    return np.cumsum(flat_top_gauss(pos, a, b, c, amp)) + baseline
+    return np.cumsum(split_gauss(pos, a, b, c, amp)) + baseline
 
 
 def ellipse_eq(pos: np.ndarray,
