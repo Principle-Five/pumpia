@@ -2368,7 +2368,7 @@ class LineROI(BaseROI):
         return self._length
 
     @property
-    def profile(self) -> np.ndarray[tuple[int, int] | tuple[int, int, int], np.dtype]:
+    def profile(self) -> np.ndarray[tuple[int] | tuple[int, int], np.dtype]:
         """
         The profile of the line.
         """
