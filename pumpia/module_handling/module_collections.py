@@ -795,6 +795,15 @@ class BaseCollection(ABC, ttk.Frame):
                     roi.hidden = False
                 viewer.update()
 
+    def update_viewers(self):
+        """
+        Updates the viewers in the collection.
+        """
+        for module in self.modules:
+            module.update_viewers()
+        for viewer in self.viewers:
+            viewer.update()
+
     def _on_tab_change(self, event: tk.Event):
         """
         Handles the event when a tab is changed.
@@ -818,6 +827,7 @@ class BaseCollection(ABC, ttk.Frame):
         context = self.get_context()
         for module in self.modules:
             module.create_rois(context, batch=True)
+        self.update_viewers()
 
     def run_analysis(self) -> None:
         """

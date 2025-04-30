@@ -451,7 +451,7 @@ class BaseModule(ABC, ttk.Frame):
                         self.rois.append(attr)
                         attr.set_manager(self.manager)
                         attr.set_parent(self.roi_frame)
-                        attr.post_register_command = self.post_roi_register
+                        attr.post_register_command = self._post_roi_register_manual_wrapper
 
                         if self.direction == "horizontal":
                             attr.select_button.grid(column=0,
@@ -657,6 +657,18 @@ class BaseModule(ABC, ttk.Frame):
             for roi in self.rois:
                 roi.viewer = self.main_viewer
 
+    def update_viewers(self):
+        """
+        Updates the viewers in the module.
+        """
+        for viewer in self.viewers:
+            viewer.update()
+
+    def _post_roi_register_manual_wrapper(self, roi_input: BaseInputROI, manual_draw: bool = False):
+        self.post_roi_register(roi_input)
+        if manual_draw:
+            self.update_viewers()
+
     def post_roi_register(self, roi_input: BaseInputROI):
         """
         Command ran after an roi is registered with an input.
@@ -785,6 +797,8 @@ class BaseModule(ABC, ttk.Frame):
         if context is None:
             context = self.get_context()
         self.draw_rois(context, batch)
+        if batch is False:
+            self.update_viewers()
 
     def run_analysis(self, batch: bool = False) -> None:
         """
