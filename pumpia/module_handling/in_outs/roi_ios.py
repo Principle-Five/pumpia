@@ -87,7 +87,7 @@ class BaseInputROI[ROI:BaseROI]:
         if self._label_var is not None:
             self._label_var.set(val)
 
-    def register_roi(self, roi: ROI | None, manual_draw: bool = False):
+    def register_roi(self, roi: ROI | None, update_viewers: bool = False):
         """
         Registers an ROI.
         """
@@ -102,7 +102,7 @@ class BaseInputROI[ROI:BaseROI]:
             self.select_button.configure(state="disabled")
         self.roi = roi
         if self.post_register_command is not None:
-            self.post_register_command(self, manual_draw)
+            self.post_register_command(self, update_viewers)
 
     @property
     def label_var(self) -> tk.StringVar:

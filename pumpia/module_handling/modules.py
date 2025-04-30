@@ -664,10 +664,14 @@ class BaseModule(ABC, ttk.Frame):
         for viewer in self.viewers:
             viewer.update()
 
-    def _post_roi_register_manual_wrapper(self, roi_input: BaseInputROI, manual_draw: bool = False):
+    def _post_roi_register_manual_wrapper(self,
+                                          roi_input: BaseInputROI,
+                                          update_viewers: bool = False):
         self.post_roi_register(roi_input)
-        if manual_draw:
-            self.update_viewers()
+        if (update_viewers
+            and self.manager is not None
+                and roi_input.roi is not None):
+            self.manager.update_viewers(roi_input.roi.image)
 
     def post_roi_register(self, roi_input: BaseInputROI):
         """
