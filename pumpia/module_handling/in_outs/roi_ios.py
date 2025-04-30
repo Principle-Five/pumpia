@@ -35,8 +35,9 @@ class BaseInputROI[ROI:BaseROI]:
     ----------
     name: str | None
     roi: BaseROI | None
-    post_register_command: Callable[[BaseInputROI], Any]
-        Command called after ROI is registered
+    post_register_command: Callable[[BaseInputROI, bool|None], Any]
+        Command called after ROI is registered.
+        This should accept an ROI and a boolean indicating if it was a manual draw.
     label_var: tk.StringVar
     select_button: ttk.Button
     draw_button: ttk.Button
@@ -71,7 +72,7 @@ class BaseInputROI[ROI:BaseROI]:
         self._button_style: str | None = button_style
         self._manager: Manager | None = None
         self._postdraw_command: Callable[[BaseROI | None], Any] | None = None
-        self.post_register_command: Callable[[BaseInputROI], Any] | None = None
+        self.post_register_command: Callable[[BaseInputROI, bool], Any] | None = None
 
     @property
     def name(self) -> str | None:
@@ -86,7 +87,7 @@ class BaseInputROI[ROI:BaseROI]:
         if self._label_var is not None:
             self._label_var.set(val)
 
-    def register_roi(self, roi: ROI | None):
+    def register_roi(self, roi: ROI | None, manual_draw: bool = False):
         """
         Registers an ROI.
         """
@@ -101,7 +102,7 @@ class BaseInputROI[ROI:BaseROI]:
             self.select_button.configure(state="disabled")
         self.roi = roi
         if self.post_register_command is not None:
-            self.post_register_command(self)
+            self.post_register_command(self, manual_draw)
 
     @property
     def label_var(self) -> tk.StringVar:
@@ -183,7 +184,6 @@ class BaseInputROI[ROI:BaseROI]:
             raise ValueError("Manager has not been set")
         if self.roi is not None:
             self._manager.focus = self.roi
-            self._manager.update_viewers(self._manager.focus.image)
 
     def manual_draw(self, postdraw_command: Callable[[BaseROI | None], Any] | None = None):
         """
@@ -224,7 +224,7 @@ class BaseInputROI[ROI:BaseROI]:
         Ran after manual draw is completed.
         """
         self.draw_button.configure(text="Draw")
-        self.register_roi(roi)  # type: ignore
+        self.register_roi(roi, True)  # type: ignore
         if self._postdraw_command is not None:
             self._postdraw_command(roi)
             self._postdraw_command = None

@@ -630,7 +630,7 @@ class Manager:
                                                     tags=('selected',
                                                           roi.id_string))
 
-    def add_roi(self, roi: BaseROI, moving: bool = False):
+    def add_roi(self, roi: BaseROI, moving: bool = False, make_focus: bool = False):
         """
         Adds an ROI to the treeviews.
 
@@ -661,14 +661,16 @@ class Manager:
                 tree.delete(roi_id)
             except tk.TclError:
                 roi_index = 'end'
-            tree.selection_set(tree.insert(ins_roi_id,
-                                           roi_index,
-                                           iid=roi_id,
-                                           text=roi_text,
-                                           values=roi_values,
-                                           tags=('selected',
-                                                 roi.id_string),))
-        self.focus = roi
+            if make_focus:
+                tree.selection_set(tree.insert(ins_roi_id,
+                                               roi_index,
+                                               iid=roi_id,
+                                               text=roi_text,
+                                               values=roi_values,
+                                               tags=('selected',
+                                                     roi.id_string),))
+        if make_focus:
+            self.focus = roi
 
     def delete_current_roi(self):
         """
