@@ -209,12 +209,12 @@ class PhantomContextManager(BaseContextManager):
                            slice_num=image.current_slice,
                            name=name,
                            replace=True)
-        self.manager.add_roi(roi)
+        self.manager.add_roi(roi, update_viewers=True)
         if secondary_images is not None:
             for s_image in secondary_images:
                 if s_image != image:
                     copied_roi = roi.copy_to_image(s_image, s_image.current_slice, name, True)
-                    self.manager.add_roi(copied_roi)
+                    self.manager.add_roi(copied_roi, update_viewers=True)
         return roi
 
     def _show_ellipses(self,
@@ -249,7 +249,7 @@ class PhantomContextManager(BaseContextManager):
                          name=name,
                          replace=True)
 
-        self.manager.add_roi(roi)
+        self.manager.add_roi(roi, update_viewers=True)
         if secondary_images is not None:
             for s_image in secondary_images:
                 if s_image != image:
@@ -257,7 +257,7 @@ class PhantomContextManager(BaseContextManager):
                                                    s_image.current_slice,
                                                    name,
                                                    True)
-                    self.manager.add_roi(copied_roi)
+                    self.manager.add_roi(copied_roi, update_viewers=True)
         return roi
 
     def get_bound_box_roi(self,
