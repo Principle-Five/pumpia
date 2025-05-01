@@ -27,7 +27,7 @@ Step 3: Use IOD tables in part 3 to create modalities and link Functional Group 
 
 IOD (modality) tables:
 |IE|Module|Reference|Usage|
-|Functional Group Macro|Section|Usage| --- for Per-Frame Functional Groups Sequence
+|Functional Group Macro|Section|Usage| --- for Per-Frame and Shared Functional Groups Sequences
 
 Reference/Section contain a table each to be included in the relevant modality
 Functional Group Macros can be per frame

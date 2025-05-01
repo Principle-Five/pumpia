@@ -146,14 +146,15 @@ def section_tables(root: ET.Element, section_name: str) -> list[str]:
     return tables
 
 ############################################
-#STEP 1
+# STEP 1
+
 
 tags_xml = Path(__file__).parent / "part06.xml"
 
 tree = ET.parse(tags_xml)
 root = tree.getroot()
 namespace = root.tag[1:].split("}")[0]
-COLUMNS = ["Tag", "Name", "Keyword", "VR", "VM", ""] #for tables which define tags
+COLUMNS = ["Tag", "Name", "Keyword", "VR", "VM", ""]  # for tables which define tags
 
 tags: dict[tuple[int, int], Tag] = {}
 
@@ -202,7 +203,7 @@ for table in root.iter(f'{{{namespace}}}table'):
                 tags[init_tag] = Tag(vals[1], desc, init_tag[0], init_tag[1], alternative_tags=alt_tag)
 
 ###################################################
-#STEP 2
+# STEP 2
 
 tags_xml = Path(__file__).parent / "part03.xml"
 tree = ET.parse(tags_xml)
@@ -296,10 +297,10 @@ for table in root.iter(f'{{{namespace}}}table'):
                     levels[level] = current_row
 
 ##########################################
-#STEP 3
+# STEP 3
 
 IOD_COLUMNS = ["IE", "Module", "Reference", "Usage"]
-FUNC_GROUP_COLUMNS = ["Functional Group Macro", "Section", "Usage"]  # (5200,9230)
+FUNC_GROUP_COLUMNS = ["Functional Group Macro", "Section", "Usage"]
 
 MODALITY_TABLES = {
     "A.2-1": "XRAY",
@@ -384,6 +385,7 @@ for table in root.iter(f'{{{namespace}}}table'):
                                 for t in sect_tables:
                                     if t in tables:
                                         tables[t].add_parents((0x5200, 0x9230), True)
+                                        tables[t].add_parents((0x5200, 0x9229))
                                         if modality is not None:
                                             tables[t].add_modality(modality)
                             break
@@ -392,22 +394,22 @@ for _, t in tags.items():
     t.set_parent_modalities(tags, [])
 
 ##############################################
-#STEP 4
+# STEP 4
 
 
 current_folder = Path(__file__).resolve().parent / "dcm_tags"
 current_folder.mkdir(parents=True, exist_ok=True)
 
-git_file = open(current_folder / ".gitignore", "x")
+git_file = open(current_folder / ".gitignore", "w+")
 git_file.write("*")
 git_file.close()
 
-dcm_file = open(current_folder / "all_tags.py", "x")
-xray_file = open(current_folder / "xray_tags.py", "x")
-ct_file = open(current_folder / "ct_tags.py", "x")
-nuc_med_file = open(current_folder / "nuc_med_tags.py", "x")
-us_file = open(current_folder / "us_tags.py", "x")
-mri_file = open(current_folder / "mri_tags.py", "x")
+dcm_file = open(current_folder / "all_tags.py", "w+")
+xray_file = open(current_folder / "xray_tags.py", "w+")
+ct_file = open(current_folder / "ct_tags.py", "w+")
+nuc_med_file = open(current_folder / "nuc_med_tags.py", "w+")
+us_file = open(current_folder / "us_tags.py", "w+")
+mri_file = open(current_folder / "mri_tags.py", "w+")
 
 init_text = "from pumpia.file_handling.dicom_tags import Tag, TagLink\n\n"
 
