@@ -630,7 +630,11 @@ class Manager:
                                                     tags=('selected',
                                                           roi.id_string))
 
-    def add_roi(self, roi: BaseROI, moving: bool = False, make_focus: bool = False):
+    def add_roi(self, 
+                roi: BaseROI,
+                moving: bool = False,
+                make_focus: bool = False,
+                update_viewers: bool = False):
         """
         Adds an ROI to the treeviews.
 
@@ -640,6 +644,11 @@ class Manager:
             The ROI to add.
         moving : bool, optional
             Whether the ROI is being moved (default is False).
+        make_focus : bool, optional
+            Whether the ROI should be made the focus (default is False).
+        update_viewers : bool, optional
+            Whether viewers containing this ROI should be updated to show it.
+            Prevents unecessary updating of viewers when adding multiple ROIs (default is False).
         """
         ins_id = roi.image.tag
         ins_roi_id = roi.image.tag + "_rois"
@@ -671,6 +680,8 @@ class Manager:
                                                      roi.id_string),))
         if make_focus:
             self.focus = roi
+        elif update_viewers:
+            self.update_viewers(roi.image)
 
     def delete_current_roi(self):
         """
