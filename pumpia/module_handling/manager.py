@@ -670,14 +670,15 @@ class Manager:
                 tree.delete(roi_id)
             except tk.TclError:
                 roi_index = 'end'
+            roi_tree_id = tree.insert(ins_roi_id,
+                                      roi_index,
+                                      iid=roi_id,
+                                      text=roi_text,
+                                      values=roi_values,
+                                      tags=('selected',
+                                            roi.id_string),)
             if make_focus:
-                tree.selection_set(tree.insert(ins_roi_id,
-                                               roi_index,
-                                               iid=roi_id,
-                                               text=roi_text,
-                                               values=roi_values,
-                                               tags=('selected',
-                                                     roi.id_string),))
+                tree.selection_set(roi_tree_id)
         if make_focus:
             self.focus = roi
         elif update_viewers:
