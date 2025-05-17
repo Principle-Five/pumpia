@@ -597,14 +597,14 @@ class ImageCollection(ArrayImage):
                  num_samples: int = 1,
                  mode: str | None = None) -> None:
         super().__init__(shape, num_samples, mode)
-        self._image_set: list[ArrayImage] = []
+        self._image_set: set[ArrayImage] = set()
 
     @property
     def image_set(self) -> list[ArrayImage]:
         """
         The list of images in the collection.
         """
-        return self._image_set
+        return list(self._image_set)
 
     @property
     def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
@@ -712,7 +712,7 @@ class ImageCollection(ArrayImage):
                 and self.shape[2] == image.shape[2]
                 and self.num_samples == image.num_samples
                 and self.mode == image.mode)):
-            self._image_set.append(image)
+            self._image_set.add(image)
             self.shape = (len(self._image_set),
                           image.shape[1],
                           image.shape[2])
