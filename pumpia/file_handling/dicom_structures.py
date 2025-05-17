@@ -380,6 +380,7 @@ class Series(ImageCollection):
 
     @property
     def sort_value(self) -> tuple[int, int] | tuple[int, int, int]:
+        """Returns the sort value of the series."""
         if self.is_stack and self.instance_number is not None:
             return (self.series_number, self.acquisition_number, self.instance_number)
         else:

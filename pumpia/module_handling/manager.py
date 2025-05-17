@@ -21,7 +21,7 @@ from pydicom.errors import InvalidDicomError
 
 from pumpia.file_handling.dicom_structures import Patient, Study, Series, Instance
 from pumpia.file_handling.general_structures import GeneralImage
-from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet
+from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet, ImageCollection
 from pumpia.image_handling.roi_structures import BaseROI
 from pumpia.file_handling.dicom_tags import DicomTags, get_tag
 from pumpia.utilities.dicom_utils import show_dicom_tags
@@ -630,7 +630,7 @@ class Manager:
                                                     tags=('selected',
                                                           roi.id_string))
 
-    def add_roi(self, 
+    def add_roi(self,
                 roi: BaseROI,
                 moving: bool = False,
                 make_focus: bool = False,
@@ -756,7 +756,10 @@ class Manager:
         """
         if image is not None:
             for viewer in self.viewers:
-                if viewer.current_image is not None and viewer.current_image is image:
+                if (viewer.current_image is not None
+                    and (viewer.current_image is image
+                         or (isinstance(image, ImageCollection)
+                             and viewer.current_image in image.image_set))):
                     viewer.update()
         else:
             for viewer in self.viewers:
