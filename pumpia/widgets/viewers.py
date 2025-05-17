@@ -1112,7 +1112,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         Releases the ROI after moving or resizing.
         """
         if self._temp_move_roi is not None:
-            self.manager.add_roi(self._temp_move_roi)
+            self.manager.add_roi(self._temp_move_roi, update_viewers=True)
             self._temp_move_roi = None
         self.unbind_all("<ButtonRelease-1>")
 
@@ -1130,7 +1130,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
             self._temp_move_roi.move(delta_x, delta_y)
             self._set_mouse_loc(event)
             self.manager.add_roi(self._temp_move_roi, True)
-            self.manager.update_viewers()
+            self.update()
             self._updating = False
 
     def _resize_roi(self, event: tk.Event):
@@ -1274,7 +1274,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
 
             self._set_mouse_loc(event)
             self.manager.add_roi(self._temp_move_roi, True)
-            self.manager.update_viewers()
+            self.update()
             self._updating = False
 
     def _end_roi_draw(self):
@@ -1402,7 +1402,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                 if self.manual_override:
                     self.stop_manual_roi_draw(new_roi)
                 # This must be below lines above as add_roi updates viewer which ends manual draw
-                self.manager.add_roi(new_roi)
+                self.manager.add_roi(new_roi, update_viewers=True)
 
         self._temp_roi = None
         self.stop_manual_roi_draw()
