@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Region of Interest Inputs and Outputs &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Collections" href="../collections.html" />
+    <link rel="prev" title="Viewer Inputs and Outputs" href="viewer_ios.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../components/components.html">Core Components</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">Modules</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="module_ios.html">Module Inputs and Outputs</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="simple.html">Simple Inputs and Outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="groups.html">IO Groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html">Viewer Inputs and Outputs</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Region of Interest Inputs and Outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../collections.html">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context.html">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_interface.html">The User Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">Usage</a></li>
+          <li class="breadcrumb-item"><a href="module_ios.html">Module Inputs and Outputs</a></li>
+      <li class="breadcrumb-item active">Region of Interest Inputs and Outputs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/usage/module_ios/roi_ios.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="region-of-interest-inputs-and-outputs">
+<h1>Region of Interest Inputs and Outputs<a class="headerlink" href="#region-of-interest-inputs-and-outputs" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">BaseInputROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Angle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">point'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">circle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">ellipse'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">square'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">rectangle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">line'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ROI</span> <span class="pre">ellipse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI" title="Link to this definition"></a></dt>
+<dd><p>Base class for input handling of ROIs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the ROI(default is None).</p></li>
+<li><p><strong>show_button</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show the button to select the ROI as active(default is True).</p></li>
+<li><p><strong>button_style</strong> (<em>str</em><em>, </em><em>optional</em>) – The style of the <cite>show_button</cite> (default is None).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.name" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.roi">
+<span class="sig-name descname"><span class="pre">roi</span></span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.roi" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../components/rois.html#pumpia.image_handling.roi_structures.BaseROI" title="pumpia.image_handling.roi_structures.BaseROI">BaseROI</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.post_register_command">
+<span class="sig-name descname"><span class="pre">post_register_command</span></span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.post_register_command" title="Link to this definition"></a></dt>
+<dd><p>Command called after ROI is registered.
+This should accept an ROI and a boolean indicating if it was a manual draw.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[<a class="reference internal" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI" title="pumpia.module_handling.in_outs.roi_ios.BaseInputROI">BaseInputROI</a>, bool|None], Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.label_var">
+<span class="sig-name descname"><span class="pre">label_var</span></span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.label_var" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tk.StringVar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.select_button">
+<span class="sig-name descname"><span class="pre">select_button</span></span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.select_button" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ttk.Button</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.draw_button">
+<span class="sig-name descname"><span class="pre">draw_button</span></span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.draw_button" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ttk.Button</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.register_roi">
+<span class="sig-name descname"><span class="pre">register_roi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ROI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.register_roi" title="Link to this definition"></a></dt>
+<dd><p>Registers an ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_parent">
+<span class="sig-name descname"><span class="pre">set_parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tk.Misc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_parent" title="Link to this definition"></a></dt>
+<dd><p>Sets the parent of the ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_manager">
+<span class="sig-name descname"><span class="pre">set_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../components/manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_manager" title="Link to this definition"></a></dt>
+<dd><p>Sets the manager of the ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_as_active">
+<span class="sig-name descname"><span class="pre">set_as_active</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_as_active" title="Link to this definition"></a></dt>
+<dd><p>Sets the ROI as the active ROI.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.InputGeneralROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">InputGeneralROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Angle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">point'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">circle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">ellipse'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">square'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">rectangle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ROI</span> <span class="pre">line'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ROI</span> <span class="pre">ellipse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.InputGeneralROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a general ROI input.
+Has the same attributes and methods as BaseInputROI unless stated below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.InputRectangleROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">InputRectangleROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.InputRectangleROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a RectangleROI input.
+Has the same attributes and methods as BaseInputROI unless stated below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.InputEllipseROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">InputEllipseROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.InputEllipseROI" title="Link to this definition"></a></dt>
+<dd><p>Represents an EllipseROI input.
+Has the same attributes and methods as BaseInputROI unless stated below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.InputLineROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">InputLineROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.InputLineROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a LineROI input.
+Has the same attributes and methods as BaseInputROI unless stated below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.InputAngle">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">InputAngle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.InputAngle" title="Link to this definition"></a></dt>
+<dd><p>Represents an Angle ROI input.
+Has the same attributes and methods as BaseInputROI unless stated below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.in_outs.roi_ios.InputPointROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.in_outs.roi_ios.</span></span><span class="sig-name descname"><span class="pre">InputPointROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_manual_draw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.in_outs.roi_ios.InputPointROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a PointROI input.
+Has the same attributes and methods as BaseInputROI unless stated below.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="viewer_ios.html" class="btn btn-neutral float-left" title="Viewer Inputs and Outputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../collections.html" class="btn btn-neutral float-right" title="Collections" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
