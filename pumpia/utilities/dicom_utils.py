@@ -22,12 +22,13 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
     title = "DICOM Tags"
     if isinstance(dicom, (Series, Instance)):
         if dicom.dicom_dataset is not None:
-            dicom = dicom.dicom_dataset
             title = title + ": " + str(dicom)
+            dicom = dicom.dicom_dataset
         else:
             return
 
-    root = tk.Tk(screenName=title)
+    root = tk.Tk()
+    root.title(title)
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     root.resizable(True, True)
