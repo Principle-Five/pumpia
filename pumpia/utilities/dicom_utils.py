@@ -19,13 +19,15 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
     dicom : pydicom.Dataset or Series or Instance
         The DICOM dataset, series, or instance to display the tags for.
     """
+    title = "DICOM Tags"
     if isinstance(dicom, (Series, Instance)):
         if dicom.dicom_dataset is not None:
             dicom = dicom.dicom_dataset
+            title = title + ": " + str(dicom)
         else:
             return
 
-    root = tk.Tk()
+    root = tk.Tk(screenName=title)
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     root.resizable(True, True)
