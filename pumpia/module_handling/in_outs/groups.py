@@ -7,6 +7,7 @@ from pumpia.module_handling.in_outs.simple import BaseIO
 class IOGroup:
     """
     Represents a group of linked input / output objects.
+    IOs should only be a member of one group.
 
     Parameters
     ----------
