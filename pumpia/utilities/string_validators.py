@@ -20,8 +20,8 @@ def check_date(s: str) -> bool:
         if date == "":
             return True
         date = date.split("/")
-        if len(date) > 3:
-            raise NameError
+        if len(date) != 3:
+            return False
         date = datetime(int(date[2]), int(date[1]), int(date[0]))
         return True
     except ValueError:

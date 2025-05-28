@@ -798,6 +798,8 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
+        for roi in self.rois:
+            roi.register_roi(None)
         if context is None:
             context = self.get_context()
         self.draw_rois(context, batch)

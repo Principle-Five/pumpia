@@ -4,7 +4,6 @@ Classes:
 """
 
 import tkinter as tk
-from tkinter import messagebox as tkmessagebox
 from datetime import date
 
 from pumpia.utilities.string_validators import check_date
@@ -29,15 +28,13 @@ class DateVar(tk.StringVar):
         """
         r_date = super().get()
         r_date = r_date.strip()
-        try:
+        if r_date != "" and check_date(r_date):
             r_date = r_date.split("/")
             if len(r_date[2]) == 2:
                 r_date[2] = "20" + r_date[2]
             return date(int(r_date[2]), int(r_date[1]), int(r_date[0]))
-
-        except ValueError as exc:
-            tkmessagebox.showerror("Date Error", "Invalid Date \n Format d/m/y required")
-            raise ValueError("Invalid Date: format d/m/y required") from exc
+        else:
+            raise ValueError("Invalid Date: format d/m/y required")
 
     def set(self, value: date | str) -> None:
         """

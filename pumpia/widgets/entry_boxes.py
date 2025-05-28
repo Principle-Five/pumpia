@@ -11,8 +11,16 @@ from tkinter import ttk
 from typing import Literal, overload
 from collections.abc import Callable
 
-from pumpia.utilities.string_validators import check_date, check_signed_float, check_signed_int, check_perc
-from pumpia.widgets.typing import Cursor, TakeFocusValue, FontDescription, EntryValidateCommand, EntryValidateOptions, XYScrollCommand
+from pumpia.utilities.string_validators import (check_date,
+                                                check_signed_float,
+                                                check_signed_int,
+                                                check_perc)
+from pumpia.widgets.typing import (Cursor,
+                                   TakeFocusValue,
+                                   FontDescription,
+                                   EntryValidateCommand,
+                                   EntryValidateOptions,
+                                   XYScrollCommand)
 from pumpia.widgets.variables import DateVar
 
 

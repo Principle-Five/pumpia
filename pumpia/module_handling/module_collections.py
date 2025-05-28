@@ -326,6 +326,7 @@ class WindowGroup(ttk.Panedwindow):
         else:
             self.direction = "vertical"
         self.kw = kw
+        self.kw["orient"] = self.direction
 
     def setup(self, parent: tk.Misc, verbose_name: str | None = None):
         """
@@ -825,8 +826,19 @@ class BaseCollection(ABC, ttk.Frame):
         calls the `create_rois` method for each module.
         """
         context = self.get_context()
+        filters = warnings.filters
         for module in self.modules:
-            module.create_rois(context, batch=True)
+            warnings.simplefilter("error")
+            try:
+                module.create_rois(context, batch=True)
+            # pylint: disable-next=broad-exception-caught
+            except Exception as exc:
+                warning = UserWarning(f"{module.verbose_name} module had an error drawing ROIs.")
+                warning.with_traceback(exc.__traceback__)
+                traceback.print_exc()
+                warnings.simplefilter("always")
+                warnings.warn(warning, stacklevel=2)
+        warnings.filters = filters
         self.update_viewers()
 
     def run_analysis(self) -> None:
@@ -840,7 +852,7 @@ class BaseCollection(ABC, ttk.Frame):
                 module.run_analysis(batch=True)
             # pylint: disable-next=broad-exception-caught
             except Exception as exc:
-                warning = UserWarning(f"{module.verbose_name} module had an error.")
+                warning = UserWarning(f"{module.verbose_name} module had an error on analysis.")
                 warning.with_traceback(exc.__traceback__)
                 traceback.print_exc()
                 warnings.simplefilter("always")
