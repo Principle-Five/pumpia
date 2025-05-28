@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../components/components.html">Core Components</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="usage.html">Usage</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_ios/module_ios.html">Module Inputs and Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="collections.html">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html">The User Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="usage.html">Usage</a></li>
+      <li class="breadcrumb-item active">Example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/example.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example">
+<h1>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h1>
+<p>The <a class="reference download internal" download="" href="../_downloads/598f507a4c95c410a9bf6cd99637ba56/example.py"><code class="xref download docutils literal notranslate"><span class="pre">example</span></code></a> below demonstrates the core principles of writing a module and collection.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.module_collections</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">BaseCollection</span><span class="p">,</span>
+                                                    <span class="n">OutputFrame</span><span class="p">,</span>
+                                                    <span class="n">WindowGroup</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.in_outs.roi_ios</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseInputROI</span><span class="p">,</span> <span class="n">InputEllipseROI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.in_outs.viewer_ios</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayViewerIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.in_outs.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">PercInput</span><span class="p">,</span> <span class="n">FloatOutput</span><span class="p">,</span> <span class="n">IntOutput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.in_outs.groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">IOGroup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.module_handling.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.widgets.viewers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseViewer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.image_handling.roi_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">EllipseROI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.image_handling.image_structures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pumpia.utilities.tkinter_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">tk_copy</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ExampleModule</span><span class="p">(</span><span class="n">BaseModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An Example Module.</span>
+
+<span class="sd">    This module demonstrates the use of the PumpIA modules.</span>
+<span class="sd">    It draws an ellipse ROI on an image based on the size of image and input from the user.</span>
+<span class="sd">    The analysis calculates the average pixel value within the ellipse,</span>
+<span class="sd">    or the root sum of squares of the means if a multisample image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">show_draw_rois_button</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">show_analyse_button</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">viewer</span> <span class="o">=</span> <span class="n">ArrayViewerIO</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">PercInput</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Size (%)&quot;</span><span class="p">)</span>
+    <span class="n">ellipse_roi</span> <span class="o">=</span> <span class="n">InputEllipseROI</span><span class="p">(</span><span class="s2">&quot;Ellipse ROI&quot;</span><span class="p">)</span>
+
+    <span class="n">width</span> <span class="o">=</span> <span class="n">IntOutput</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Width (px)&quot;</span><span class="p">)</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">IntOutput</span><span class="p">(</span><span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Height (px)&quot;</span><span class="p">)</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="n">FloatOutput</span><span class="p">(</span><span class="n">reset_on_analysis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">link_rois_viewers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ellipse_roi</span><span class="o">.</span><span class="n">viewer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">draw_rois</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">SimpleContext</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">value</span> <span class="o">/</span> <span class="mi">100</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="n">context</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">factor</span> <span class="o">*</span> <span class="n">context</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ellipse_roi</span><span class="o">.</span><span class="n">register_roi</span><span class="p">(</span><span class="n">EllipseROI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">image</span><span class="p">,</span>
+                                                    <span class="nb">round</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">xcent</span><span class="p">),</span>
+                                                    <span class="nb">round</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">ycent</span><span class="p">),</span>
+                                                    <span class="n">a</span><span class="p">,</span>
+                                                    <span class="n">b</span><span class="p">,</span>
+                                                    <span class="n">slice_num</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">current_slice</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post_roi_register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi_input</span><span class="p">:</span> <span class="n">BaseInputROI</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ellipse_roi</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">add_roi</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ellipse_roi</span><span class="o">.</span><span class="n">roi</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ellipse_roi</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">roi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ellipse_roi</span><span class="o">.</span><span class="n">roi</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">mean</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">average</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">mean</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">average</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sumprod</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">mean</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_image_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewer</span><span class="p">:</span> <span class="n">BaseViewer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">viewer</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">image</span>
+            <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_command</span><span class="p">(</span><span class="s2">&quot;Copy Average&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_average</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy_average</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy the value of the average to the clipboard.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tk_copy</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">average</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ExampleCollection</span><span class="p">(</span><span class="n">BaseCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An example collection.</span>
+
+<span class="sd">    This collection demonstrates the use of the PumpIA collections.</span>
+<span class="sd">    It has 2 viewers in the main window and loads 2 `ExampleModule` instances into a second window.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">viewer1</span> <span class="o">=</span> <span class="n">ArrayViewerIO</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">viewer2</span> <span class="o">=</span> <span class="n">ArrayViewerIO</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">main</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">module1</span> <span class="o">=</span> <span class="n">ExampleModule</span><span class="p">()</span>
+    <span class="n">module2</span> <span class="o">=</span> <span class="n">ExampleModule</span><span class="p">()</span>
+
+    <span class="n">average_output</span> <span class="o">=</span> <span class="n">OutputFrame</span><span class="p">()</span>
+
+    <span class="c1"># makes sure the two modules are in the same window in the collection</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">WindowGroup</span><span class="p">([</span><span class="n">module1</span><span class="p">,</span> <span class="n">module2</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_output</span><span class="o">.</span><span class="n">register_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module1</span><span class="o">.</span><span class="n">average</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Average 1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_output</span><span class="o">.</span><span class="n">register_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">average</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Average 2&quot;</span><span class="p">)</span>
+        <span class="n">IOGroup</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">module1</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">size</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_image_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewer</span><span class="p">:</span> <span class="n">BaseViewer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># loads the image loaded into a viewer into the relevant modules viewer</span>
+        <span class="c1"># if the image is an ImageCollection then only loads the first image into the module</span>
+        <span class="k">if</span> <span class="n">viewer</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer1</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer1</span><span class="o">.</span><span class="n">image</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ImageCollection</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">module1</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">load_image</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">image_set</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">module1</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">load_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">viewer</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer2</span><span class="o">.</span><span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer2</span><span class="o">.</span><span class="n">image</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ImageCollection</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">load_image</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">image_set</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">viewer</span><span class="o">.</span><span class="n">load_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_command</span><span class="p">(</span><span class="s2">&quot;Copy Averages&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_averages</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy_averages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy the values of the averages to the clipboard, comma seperated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tk_copy</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module1</span><span class="o">.</span><span class="n">average</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">average</span><span class="o">.</span><span class="n">value</span><span class="p">)]))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">ExampleCollection</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

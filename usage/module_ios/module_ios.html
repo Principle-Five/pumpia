@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module Inputs and Outputs &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Simple Inputs and Outputs" href="simple.html" />
+    <link rel="prev" title="Modules" href="../modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../components/components.html">Core Components</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">Modules</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Module Inputs and Outputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple.html">Simple Inputs and Outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="groups.html">IO Groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html">Viewer Inputs and Outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html">Region of Interest Inputs and Outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../collections.html">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context.html">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_interface.html">The User Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">Usage</a></li>
+      <li class="breadcrumb-item active">Module Inputs and Outputs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/usage/module_ios/module_ios.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-inputs-and-outputs">
+<h1>Module Inputs and Outputs<a class="headerlink" href="#module-inputs-and-outputs" title="Link to this heading"></a></h1>
+<section id="simple">
+<h2><a class="reference internal" href="simple.html"><span class="doc">Simple Inputs and Outputs</span></a><a class="headerlink" href="#simple" title="Link to this heading"></a></h2>
+<p>Simple IOs represent the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Strings</p></li>
+<li><p>Integers</p></li>
+<li><p>Floats</p></li>
+<li><p>Dates</p></li>
+</ul>
+</div></blockquote>
+<p>Inputs can also be options or booleans.</p>
+<p>Outputs are reset before analysis if their <code class="docutils literal notranslate"><span class="pre">reset_on_analysis</span></code> parameter is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this may be useful for debugging.</p>
+<p>Labels are automatically generated by replacing underscores with spaces and capitalising words, unless provided by <code class="docutils literal notranslate"><span class="pre">verbose_name</span></code>.
+For inputs the ttk style for the label and entry can be provided.
+For outputs the ttk style for the name and value labels can be provided seperatly.</p>
+</section>
+<section id="groups">
+<h2><a class="reference internal" href="groups.html"><span class="doc">IO Groups</span></a><a class="headerlink" href="#groups" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">IOGroup</span></code> can only be used with collections.
+Put them in the <code class="docutils literal notranslate"><span class="pre">load_outputs</span></code> method of the collection.</p>
+</section>
+<section id="viewer-ios">
+<h2><a class="reference internal" href="viewer_ios.html"><span class="doc">Viewer Inputs and Outputs</span></a><a class="headerlink" href="#viewer-ios" title="Link to this heading"></a></h2>
+<p>Viewer IOs have the same parameters as <a class="reference internal" href="../../components/viewers.html#pumpia.widgets.viewers.BaseViewer" title="pumpia.widgets.viewers.BaseViewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewers</span></code></a>, with the addition of the row and column that to position the viewer.
+The following viewer IOs are provided:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.ViewerIO" title="pumpia.module_handling.in_outs.viewer_ios.ViewerIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerIO</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.ArrayViewerIO" title="pumpia.module_handling.in_outs.viewer_ios.ArrayViewerIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArrayViewerIO</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.MonochromeViewerIO" title="pumpia.module_handling.in_outs.viewer_ios.MonochromeViewerIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonochromeViewerIO</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.DicomViewerIO" title="pumpia.module_handling.in_outs.viewer_ios.DicomViewerIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomViewerIO</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.MonochromeDicomViewerIO" title="pumpia.module_handling.in_outs.viewer_ios.MonochromeDicomViewerIO"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonochromeDicomViewerIO</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="roi-ios">
+<h2><a class="reference internal" href="roi_ios.html"><span class="doc">Region of Interest Inputs and Outputs</span></a><a class="headerlink" href="#roi-ios" title="Link to this heading"></a></h2>
+<p>If an <a class="reference internal" href="../../components/rois.html"><span class="doc">ROI</span></a> is generated procedurally then it must be registered with the relevant input using <code class="docutils literal notranslate"><span class="pre">register_roi</span></code> to access it in the user interface.
+A registered ROI can be accessed through the <code class="docutils literal notranslate"><span class="pre">roi</span></code> attribute.</p>
+<p>The following ROI IOs are provided:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputGeneralROI" title="pumpia.module_handling.in_outs.roi_ios.InputGeneralROI"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputGeneralROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputRectangleROI" title="pumpia.module_handling.in_outs.roi_ios.InputRectangleROI"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputRectangleROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputEllipseROI" title="pumpia.module_handling.in_outs.roi_ios.InputEllipseROI"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputEllipseROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputLineROI" title="pumpia.module_handling.in_outs.roi_ios.InputLineROI"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputLineROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputAngle" title="pumpia.module_handling.in_outs.roi_ios.InputAngle"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputAngle</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputPointROI" title="pumpia.module_handling.in_outs.roi_ios.InputPointROI"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPointROI</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Inputs and Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.verbose_name"><code class="docutils literal notranslate"><span class="pre">BaseIO.verbose_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.value"><code class="docutils literal notranslate"><span class="pre">BaseIO.value</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.label"><code class="docutils literal notranslate"><span class="pre">BaseIO.label</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.label_var"><code class="docutils literal notranslate"><span class="pre">BaseIO.label_var</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.value_var"><code class="docutils literal notranslate"><span class="pre">BaseIO.value_var</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.hidden"><code class="docutils literal notranslate"><span class="pre">BaseIO.hidden</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseIO.set_parent"><code class="docutils literal notranslate"><span class="pre">BaseIO.set_parent()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseInput"><code class="docutils literal notranslate"><span class="pre">BaseInput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseInput.entry"><code class="docutils literal notranslate"><span class="pre">BaseInput.entry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseOutput"><code class="docutils literal notranslate"><span class="pre">BaseOutput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BaseOutput.value_label"><code class="docutils literal notranslate"><span class="pre">BaseOutput.value_label</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.OptionInput"><code class="docutils literal notranslate"><span class="pre">OptionInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.BoolInput"><code class="docutils literal notranslate"><span class="pre">BoolInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.StringInput"><code class="docutils literal notranslate"><span class="pre">StringInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.IntInput"><code class="docutils literal notranslate"><span class="pre">IntInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.PercInput"><code class="docutils literal notranslate"><span class="pre">PercInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.FloatInput"><code class="docutils literal notranslate"><span class="pre">FloatInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.DateInput"><code class="docutils literal notranslate"><span class="pre">DateInput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.StringOutput"><code class="docutils literal notranslate"><span class="pre">StringOutput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.IntOutput"><code class="docutils literal notranslate"><span class="pre">IntOutput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.FloatOutput"><code class="docutils literal notranslate"><span class="pre">FloatOutput</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.in_outs.simple.DateOutput"><code class="docutils literal notranslate"><span class="pre">DateOutput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="groups.html">IO Groups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="groups.html#pumpia.module_handling.in_outs.groups.IOGroup"><code class="docutils literal notranslate"><span class="pre">IOGroup</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="groups.html#pumpia.module_handling.in_outs.groups.IOGroup.linked_ios"><code class="docutils literal notranslate"><span class="pre">IOGroup.linked_ios</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="viewer_ios.html">Viewer Inputs and Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO.row"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO.row</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO.column"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO.column</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO.allow_drag_drop"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO.allow_drag_drop</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO.allow_drawing_rois"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO.allow_drawing_rois</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO.validation_command"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO.validation_command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.BaseViewerIO.main"><code class="docutils literal notranslate"><span class="pre">BaseViewerIO.main</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.ViewerIO"><code class="docutils literal notranslate"><span class="pre">ViewerIO</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.ArrayViewerIO"><code class="docutils literal notranslate"><span class="pre">ArrayViewerIO</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.MonochromeViewerIO"><code class="docutils literal notranslate"><span class="pre">MonochromeViewerIO</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.DicomViewerIO"><code class="docutils literal notranslate"><span class="pre">DicomViewerIO</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_ios.html#pumpia.module_handling.in_outs.viewer_ios.MonochromeDicomViewerIO"><code class="docutils literal notranslate"><span class="pre">MonochromeDicomViewerIO</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="roi_ios.html">Region of Interest Inputs and Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI"><code class="docutils literal notranslate"><span class="pre">BaseInputROI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.name"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.roi"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.roi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.post_register_command"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.post_register_command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.label_var"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.label_var</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.select_button"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.select_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.draw_button"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.draw_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.register_roi"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.register_roi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_parent"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.set_parent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_manager"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.set_manager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.BaseInputROI.set_as_active"><code class="docutils literal notranslate"><span class="pre">BaseInputROI.set_as_active()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputGeneralROI"><code class="docutils literal notranslate"><span class="pre">InputGeneralROI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputRectangleROI"><code class="docutils literal notranslate"><span class="pre">InputRectangleROI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputEllipseROI"><code class="docutils literal notranslate"><span class="pre">InputEllipseROI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputLineROI"><code class="docutils literal notranslate"><span class="pre">InputLineROI</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputAngle"><code class="docutils literal notranslate"><span class="pre">InputAngle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_ios.html#pumpia.module_handling.in_outs.roi_ios.InputPointROI"><code class="docutils literal notranslate"><span class="pre">InputPointROI</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../modules.html" class="btn btn-neutral float-left" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simple.html" class="btn btn-neutral float-right" title="Simple Inputs and Outputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
