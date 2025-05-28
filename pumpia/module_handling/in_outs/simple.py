@@ -60,6 +60,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         self._var_trace: str = ""
         self.hidden: bool = hidden
         self._initial_value: ValT | Callable[[], ValT] = initial_value
+        self._error: bool = False
 
     @property
     def verbose_name(self) -> str | None:
@@ -79,7 +80,9 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         """
         The value of the input/output.
         """
-        if callable(self._value):
+        if self._error:
+            raise ValueError(f"Error in value of {self.verbose_name}")
+        elif callable(self._value):
             value = self._value()
             self._value = value  # type: ignore
             return value  # type: ignore
@@ -138,7 +141,8 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
         if self._parent is None:
             raise ValueError("Parent has not been set")
         if self._var is None:
-            self._var = self.var_type(self._parent, value=self.initial_value)  # type: ignore
+            self._var = self.var_type(self._parent)  # type: ignore
+            self._var.set(self.initial_value)  # type: ignore
             self._var_trace = self._var.trace_add("write", self._var_to_val)  # type: ignore
         return self._var  # type: ignore
 
@@ -183,10 +187,9 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
     def _var_to_val(self, *_):
         try:
             self._value = self.value_var.get()
-        except ValueError:
-            pass
-        except tk.TclError:
-            pass
+            self._error = False
+        except (ValueError, tk.TclError):
+            self._error = True
 
 
 class BaseInput[ValT, TkVarT](BaseIO[ValT, TkVarT]):  # type: ignore
@@ -344,6 +347,8 @@ class OptionInput[DictValT](BaseInput[str, tk.StringVar]):
         The object mapped to the option as given by `options_map`.
         Can be set by using the option string or, if `allow_inv_mapping` is True, the object.
         """
+        if self._error:
+            raise ValueError(f"Error in value of {self.verbose_name}")
         if callable(self._value):
             value = self._value()
             return self.options_map[value]
