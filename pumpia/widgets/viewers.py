@@ -14,7 +14,8 @@ Classes:
  * TempSquare
  * Viewer
 """
-
+import warnings
+import traceback
 import math
 from abc import ABC, abstractmethod
 import tkinter as tk
@@ -558,8 +559,19 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         """
         Runs the load trace functions.
         """
+        filters = warnings.filters
         for func in self._load_traces:
-            func()
+            warnings.simplefilter("error")
+            try:
+                func()
+            # pylint: disable-next=broad-exception-caught
+            except Exception as exc:
+                warning = UserWarning("Image load trace had an error.")
+                warning.with_traceback(exc.__traceback__)
+                traceback.print_exc()
+                warnings.simplefilter("always")
+                warnings.warn(warning, stacklevel=2)
+        warnings.filters = filters
 
     @overload
     def viewer_to_image_pos(self, position: Position) -> Position:
