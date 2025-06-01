@@ -7,6 +7,8 @@ This means that the full power of python and its libraries are available to the 
 
 See documentation at [PumpIA](https://principle-five.github.io/pumpia/).
 
+Please note there isn't a stable version (v1.0.0) yet, backwards compatibility breaks are instead denoted by the minor version.
+
 Requirements
 ------------
 PumpIA has been designed to use the minimum number of dependencies, so the user interface relies on tkinter.
