@@ -21,6 +21,7 @@ The class method :py:meth:`run <pumpia.module_handling.modules.BaseModule.run>` 
 If the class attribute ``show_draw_rois_button`` is set to ``True`` then a button to draw ROIs is shown.
 If the class attribute ``show_analyse_button`` is set to ``True`` then a button to analyse the image is shown.
 If both are set to ``True`` then a button to do both is also shown.
+The ``name`` class attribute is shown in the window title, this defaults to ``None``.
 
 :doc:`module_ios/module_ios`
 ----------------------------
@@ -38,9 +39,11 @@ In the user interface collections of widgets called `context managers` use the m
 Each context manager requires a `context manager generator` which is used to create the context manager when running the module, this is set using the ``context_manager_generator`` class attribute.
 Alternatively a modules `get_context` method can be overwritten.
 
-Three context managers and generators are provided:
+The following context managers and generators are provided:
 
     * :py:class:`BaseContextManager <pumpia.widgets.context_managers.BaseContextManager>` : :py:class:`BaseContextManagerGenerator <pumpia.widgets.context_managers.BaseContextManagerGenerator>`
+    * :py:class:`SimpleContextManager <pumpia.widgets.context_managers.SimpleContextManager>` : :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManagerGenerator>`
+    * :py:class:`PhantomContextManager <pumpia.widgets.context_managers.PhantomContextManager>` : :py:class:`PhantomContextManagerGenerator <pumpia.widgets.context_managers.PhantomContextManagerGenerator>`
     * :py:class:`ManualPhantomManager <pumpia.widgets.context_managers.ManualPhantomManager>` : :py:class:`ManualPhantomManagerGenerator <pumpia.widgets.context_managers.ManualPhantomManagerGenerator>`
     * :py:class:`AutoPhantomManager <pumpia.widgets.context_managers.AutoPhantomManager>` : :py:class:`AutoPhantomManagerGenerator <pumpia.widgets.context_managers.AutoPhantomManagerGenerator>`
 
@@ -52,7 +55,8 @@ Collections are used to group modules together, with a main tab showing the cont
 Only :doc:`viewer IOs <module_ios/viewer_ios>` can be used with collections, any others will be ignored/wont function as expected.
 
 Similar to modules they have context which is shared across all the modules in the collection.
-The ``context_manager_generator`` class attribute must be defined for collections.
+The ``context_manager_generator`` class attribute must be defined for collections, it defaults to :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManagerGenerator>`.
+The ``name`` class attribute is shown in the window title, this defaults to ``None``.
 
 Collections introduce two other useful classes:
 

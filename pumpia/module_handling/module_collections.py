@@ -414,6 +414,7 @@ class BaseCollection(ABC, ttk.Frame):
     """
 
     context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
+    name: str | None = None
 
     @overload
     def __init__(
@@ -878,6 +879,7 @@ class BaseCollection(ABC, ttk.Frame):
             The direction of the collection (default is "Horizontal").
         """
         app = tk.Tk()
+        app.title(cls.name)
         app.columnconfigure(0, weight=1)
         app.columnconfigure(1, weight=1)
         app.rowconfigure(1, weight=1)
