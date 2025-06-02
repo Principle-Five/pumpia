@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PumpIA documentation &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Core Components" href="components/components.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="components/components.html">Core Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">PumpIA documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pumpia-documentation">
+<h1>PumpIA documentation<a class="headerlink" href="#pumpia-documentation" title="Link to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>PumpIA is a python framework designed to allow users to visualise the analysis of images through a user interface.
+It does not do any image analysis itself, but rather provides a platform for users to write their own analysis code and view the results.
+This means that the full power of python and its libraries are available to the user.</p>
+<p>Please note there isn’t a stable version (v1.0.0) yet, backwards compatibility breaks are instead denoted by the minor version.</p>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>PumpIA has been designed to use the minimum number of dependencies, so the user interface relies on <a class="reference external" href="https://docs.python.org/3/library/tkinter.html">tkinter</a>.
+PumpIA has the following dependencies:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://numpy.org/">numpy</a></p></li>
+<li><p><a class="reference external" href="https://scipy.org/">scipy</a></p></li>
+<li><p><a class="reference external" href="https://pillow.readthedocs.io/en/stable/">pillow</a></p></li>
+<li><p><a class="reference external" href="https://pydicom.github.io/pydicom/stable/">pydicom</a></p></li>
+<li><p><a class="reference external" href="https://matplotlib.org/">matplotlib</a></p></li>
+</ul>
+<p>See <a class="reference external" href="https://pydicom.github.io/pydicom/stable/tutorials/pixel_data/compressing.html#compression-of-pixel-data">pydicom: Compression of Pixel Data</a> for information on how to install the required libraries for reading compressed dicom files.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>PumpIA requires <a class="reference external" href="https://www.python.org">python</a> 3.12 or greater.
+To use PumpIA, install it using pip:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp gp-VirtualEnv">(.venv)</span> <span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>pumpia
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<p>See the sections <a class="reference internal" href="usage/usage.html"><span class="doc">usage</span></a> for creating a module and collection, and <a class="reference internal" href="usage/user_interface.html"><span class="doc">user interface</span></a> for how to use the user interface.</p>
+<p>An <a class="reference internal" href="usage/example.html"><span class="doc">example</span></a> is provided, this is shown below.</p>
+<figure class="align-default">
+<img alt="_images/Example.png" src="_images/Example.png" />
+</figure>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="components/components.html">Core Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="components/manager.html">The Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components/viewers.html">Viewers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components/images.html">Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components/rois.html">Regions of Interest</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/example.html">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/modules.html">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/module_ios/module_ios.html">Module Inputs and Outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/collections.html">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/context.html">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/user_interface.html">The User Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="file_handling/file_handling.html">File Handling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="file_handling/general_images.html">General Image Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_handling/dicoms.html">DICOM File Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_handling/dicom_tags.html">DICOM Tags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utilities/utilities.html">Utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities/array_utils.html">Array Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/feature_utils.html">Feature Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/string_validators.html">String Validators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/tk_utilities.html">Tkinter Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/file_utils.html">File Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="widgets/widgets.html">Widgets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="widgets/entry_boxes.html">Entry Boxes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="widgets/scrolled_window.html">Scrolled Window</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="components/components.html" class="btn btn-neutral float-right" title="Core Components" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
