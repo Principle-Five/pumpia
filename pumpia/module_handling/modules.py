@@ -115,6 +115,7 @@ class BaseModule(ABC, ttk.Frame):
     context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
     show_draw_rois_button: bool = False
     show_analyse_button: bool = False
+    name: str | None = None
 
     @overload
     def __init__(
@@ -561,6 +562,7 @@ class BaseModule(ABC, ttk.Frame):
             The direction child widgets in the module (default is "Horizontal").
         """
         app = tk.Tk()
+        app.title(cls.name)
         cls.setup_window(app, direction)
         app.mainloop()
 
@@ -961,10 +963,3 @@ class PhantomModule(BaseModule):
                                          command=boundary_command,
                                          text="Draw Phantom Boundary")
             boundary_button.grid(column=2, row=0, sticky="nsew")
-
-    @classmethod
-    def run(cls: type[Self],
-            direction: DirectionType = "Horizontal"):
-        app = tk.Tk()
-        cls.setup_window(app, direction)
-        app.mainloop()
