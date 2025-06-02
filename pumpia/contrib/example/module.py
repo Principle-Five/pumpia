@@ -21,6 +21,7 @@ class ExampleModule(BaseModule):
     """
     show_draw_rois_button = True
     show_analyse_button = True
+    name = "Example Module"
 
     viewer = ArrayViewerIO(row=0, column=0)
     size = PercInput(80, verbose_name="Size (%)")
