@@ -404,14 +404,21 @@ git_file = open(current_folder / ".gitignore", "w+")
 git_file.write("*")
 git_file.close()
 
-dcm_file = open(current_folder / "all_tags.py", "w+")
-xray_file = open(current_folder / "xray_tags.py", "w+")
-ct_file = open(current_folder / "ct_tags.py", "w+")
-nuc_med_file = open(current_folder / "nuc_med_tags.py", "w+")
-us_file = open(current_folder / "us_tags.py", "w+")
-mri_file = open(current_folder / "mri_tags.py", "w+")
+dcm_file = open(current_folder / "DicomTags.py", "w+")
+xray_file = open(current_folder / "XRAYTags.py", "w+")
+ct_file = open(current_folder / "CTTags.py", "w+")
+nuc_med_file = open(current_folder / "NucMedTags.py", "w+")
+us_file = open(current_folder / "USTags.py", "w+")
+mri_file = open(current_folder / "MRTags.py", "w+")
 
 init_text = "from pumpia.file_handling.dicom_tags import Tag, TagLink\n\n"
+
+dcm_file.write('"""Module containing all DICOM Tags."""\n\n')
+xray_file.write('"""Module containing X-ray DICOM Tags."""\n\n')
+ct_file.write('"""Module containing CT DICOM Tags."""\n\n')
+nuc_med_file.write('"""Module containing Nuclear Medicine DICOM Tags."""\n\n')
+us_file.write('"""Module containing Ultrasound DICOM Tags."""\n\n')
+mri_file.write('"""Module containing MRI DICOM Tags."""\n\n')
 
 dcm_file.write(init_text)
 xray_file.write(init_text)
@@ -419,13 +426,6 @@ ct_file.write(init_text)
 nuc_med_file.write(init_text)
 us_file.write(init_text)
 mri_file.write(init_text)
-
-dcm_file.write('class DicomTags():\n    """Class containing all DICOM Tags as class attributes."""\n')
-xray_file.write('class XRAYTags():\n    """Class containing X-ray DICOM Tags as class attributes."""\n')
-ct_file.write('class CTTags():\n    """Class containing CT DICOM Tags as class attributes."""\n')
-nuc_med_file.write('class NucMedTags():\n    """Class containing Nuclear Medicine DICOM Tags as class attributes."""\n')
-us_file.write('class USTags():\n    """Class containing Ultrasound DICOM Tags as class attributes."""\n')
-mri_file.write('class MRTags():\n    """Class containing MRI DICOM Tags as class attributes."""\n')
 
 
 def write_to_files(tag: Tag, chain: list[Tag]):
@@ -462,7 +462,7 @@ def write_to_files(tag: Tag, chain: list[Tag]):
             else:
                 alternative_tags = ""
 
-            text = f'    {keyword} = Tag({name}, "{keyword}", {group}, {element}{parents}{alternative_tags})\n'
+            text = f'{keyword} = Tag({name}, "{keyword}", {group}, {element}{parents}{alternative_tags})\n'
             dcm_file.write(text)
             if 'XRAY' in tag.modalities:
                 xray_file.write(text)

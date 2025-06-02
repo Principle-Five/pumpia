@@ -5,14 +5,26 @@ DICOM Tags
 
 .. autoclass:: pumpia.file_handling.dicom_tags.Tag
 
-.. autoclass:: pumpia.file_handling.dicom_tags.DicomTags
+**pumpia.file_handling.dicom_tags.DicomTags**
 
-.. autoclass:: pumpia.file_handling.dicom_tags.XRAYTags
+.. automodule:: pumpia.file_handling.dicom_tags.DicomTags
 
-.. autoclass:: pumpia.file_handling.dicom_tags.CTTags
+**pumpia.file_handling.dicom_tags.XRAYTags**
 
-.. autoclass:: pumpia.file_handling.dicom_tags.NucMedTags
+.. automodule:: pumpia.file_handling.dicom_tags.XRAYTags
 
-.. autoclass:: pumpia.file_handling.dicom_tags.MRTags
+**pumpia.file_handling.dicom_tags.CTTags**
 
-.. autoclass:: pumpia.file_handling.dicom_tags.USTags
+.. automodule:: pumpia.file_handling.dicom_tags.CTTags
+
+**pumpia.file_handling.dicom_tags.NucMedTags**
+
+.. automodule:: pumpia.file_handling.dicom_tags.NucMedTags
+
+**pumpia.file_handling.dicom_tags.MRTags**
+
+.. automodule:: pumpia.file_handling.dicom_tags.MRTags
+
+**pumpia.file_handling.dicom_tags.USTags**
+
+.. automodule:: pumpia.file_handling.dicom_tags.USTags
