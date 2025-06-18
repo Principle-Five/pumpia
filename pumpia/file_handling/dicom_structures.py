@@ -801,42 +801,39 @@ class Instance(FileImageSet):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if self.is_frame:
-            return np.array([self.series.array[self.slice_number - 1]])  # type: ignore
+        raw_array = np.astype(self.raw_array, float)
+        if self.get_tag(DicomTags.SamplesPerPixel) == 1:
+            try:
+                slope = self.get_tag(DicomTags.RescaleSlope)
+                intercept = self.get_tag(DicomTags.RescaleIntercept)
+                return raw_array * slope + intercept
+            except KeyError:
+                return raw_array
         else:
-            raw_array = np.astype(self.raw_array, float)
-            if self.get_tag(DicomTags.SamplesPerPixel) == 1:
-                try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
-                    return raw_array * slope + intercept
-                except KeyError:
-                    return raw_array
-            else:
-                try:
-                    photo_interp = self.get_tag(
-                        DicomTags.PhotometricInterpretation)
-                    if isinstance(photo_interp, str):
-                        if photo_interp != "RGB":
-                            return np.astype(convert_color_space(self.raw_array,
-                                                                 photo_interp,
-                                                                 'RGB'), float)
-                        else:
-                            return raw_array
+            try:
+                photo_interp = self.get_tag(
+                    DicomTags.PhotometricInterpretation)
+                if isinstance(photo_interp, str):
+                    if photo_interp != "RGB":
+                        return np.astype(convert_color_space(self.raw_array,
+                                                             photo_interp,
+                                                             'RGB'), float)
                     else:
-                        try:
-                            slope = self.get_tag(DicomTags.RescaleSlope)
-                            intercept = self.get_tag(DicomTags.RescaleIntercept)
-                            return raw_array * slope + intercept
-                        except KeyError:
-                            return raw_array
-                except (KeyError, NotImplementedError):
+                        return raw_array
+                else:
                     try:
                         slope = self.get_tag(DicomTags.RescaleSlope)
                         intercept = self.get_tag(DicomTags.RescaleIntercept)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
+            except (KeyError, NotImplementedError):
+                try:
+                    slope = self.get_tag(DicomTags.RescaleSlope)
+                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    return raw_array * slope + intercept
+                except KeyError:
+                    return raw_array
 
     @property
     def vmax(self) -> float | None:

@@ -810,7 +810,7 @@ class BaseCollection(ABC, ttk.Frame):
         """
         Handles the event when a tab is changed.
         """
-        self._tab_change_calls[event.widget.select()]()
+        self._tab_change_calls[event.widget.select()]()  # type: ignore
 
     def get_context(self) -> BaseContext | None:
         """

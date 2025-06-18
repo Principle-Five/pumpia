@@ -8,7 +8,7 @@ import traceback
 import gc
 import datetime
 import typing
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Callable
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askdirectory
@@ -93,6 +93,8 @@ class Manager:
         The current ROI action.
     viewers : list[BaseViewer]
         The list of viewers.
+    popup_menu_options : list[tuple[str, Callable[[], None]]]
+        A list containing the popup menu options for the current focus.
 
     Methods
     -------
@@ -122,7 +124,7 @@ class Manager:
         Copies the directory of the current focus to the clipboard in POSIX format.
     update_viewers(image: BaseImageSet | None = None)
         Updates the viewers linked to the Manager.
-    get_tree_frame(parent: tk.Misc, allow_delete_roi: bool = True) -> ttk.Frame
+    get_tree_frame(parent: tk.Misc) -> ttk.Frame
         Returns a frame containing a treeview.
     get_mouse_options_combobox(parent: tk.Misc, size: Literal["full", "reduced"] = "full") -> ttk.Combobox
         Returns a combobox for selecting mouse options.
@@ -165,6 +167,25 @@ class Manager:
         if isinstance(self._focus, BaseROI):
             self._focus.active = True
             self.update_viewers(self._focus.image)
+
+    @property
+    def popup_menu_options(self) -> list[tuple[str, Callable[[], None]]]:
+        """
+        A list containing the popup menu options for the current focus.
+        """
+        menu_options: list[tuple[str, Callable[[], None]]] = []
+        if self.focus is not None:
+            if isinstance(self.focus, BaseROI):
+                menu_options.extend([("Delete ROI", self.delete_current_roi)])
+            elif isinstance(self.focus, (Series, Instance, FileImageSet)):
+                if isinstance(self.focus, (Series, Instance)):
+                    menu_options.extend([("Show Tags", self.show_tags)])
+                menu_options.extend([("Copy Filepath", self.copy_filepath),
+                                     ("Copy Filepath as posix", self.copy_filepath_as_posix),
+                                     ("Copy Directory", self.copy_directory),
+                                     ("Copy Directory as posix", self.copy_directory_as_posix)])
+            menu_options.extend(self.focus.menu_options)
+        return menu_options
 
     def load_folder(self,
                     add: bool = True,
@@ -874,7 +895,7 @@ class Manager:
         """
         self.select_time = event.time
 
-    def get_tree_frame(self, parent: tk.Misc, allow_delete_roi: bool = True) -> ttk.Frame:
+    def get_tree_frame(self, parent: tk.Misc) -> ttk.Frame:
         """
         Returns a frame containing a treeview.
 
@@ -882,8 +903,6 @@ class Manager:
         ----------
         parent : tk.Misc
             The parent widget.
-        allow_delete_roi : bool, optional
-            Whether to allow deleting ROIs (default is True).
 
         Returns
         -------
@@ -916,27 +935,9 @@ class Manager:
 
         def popup_menu(event: tk.Event):
             menu = tk.Menu(current_frame, tearoff=False)
-            if isinstance(self.focus, BaseROI):
-                if allow_delete_roi:
-                    menu.add_command(
-                        label="Delete ROI", command=self.delete_current_roi)
 
-                for label, command in self.focus.menu_options:
-                    menu.add_command(label=label, command=command)
-
-            elif isinstance(self.focus, (Series, Instance, FileImageSet)):
-                if isinstance(self.focus, (Series, Instance)):
-                    menu.add_command(label="Show Tags", command=self.show_tags)
-                menu.add_command(label="Copy Filepath",
-                                 command=self.copy_filepath)
-                menu.add_command(label="Copy Filepath as posix",
-                                 command=self.copy_filepath_as_posix)
-                menu.add_command(label="Copy Directory",
-                                 command=self.copy_directory)
-                menu.add_command(label="Copy Directory as posix",
-                                 command=self.copy_directory_as_posix)
-                for label, command in self.focus.menu_options:
-                    menu.add_command(label=label, command=command)
+            for label, command in self.popup_menu_options:
+                menu.add_command(label=label, command=command)
 
             menu.tk_popup(event.x_root, event.y_root)
 
