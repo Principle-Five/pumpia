@@ -246,7 +246,7 @@ class Manager:
             gc.collect()
 
         filters = warnings.filters
-        warnings.simplefilter("error")
+        warnings.simplefilter("default")
         try:
             try:
                 open_dicom = dcmread(filepath)
@@ -338,7 +338,7 @@ class Manager:
 
         filters = warnings.filters
         for file in files:
-            warnings.simplefilter("error")
+            warnings.simplefilter("default")
             try:
                 try:
                     open_dicom = dcmread(file)

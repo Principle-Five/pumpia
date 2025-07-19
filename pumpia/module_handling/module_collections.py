@@ -829,7 +829,7 @@ class BaseCollection(ABC, ttk.Frame):
         context = self.get_context()
         filters = warnings.filters
         for module in self.modules:
-            warnings.simplefilter("error")
+            warnings.simplefilter("default")
             try:
                 module.create_rois(context, batch=True)
             # pylint: disable-next=broad-exception-caught
@@ -848,7 +848,7 @@ class BaseCollection(ABC, ttk.Frame):
         """
         filters = warnings.filters
         for module in self.modules:
-            warnings.simplefilter("error")
+            warnings.simplefilter("default")
             try:
                 module.run_analysis(batch=True)
             # pylint: disable-next=broad-exception-caught

@@ -566,7 +566,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         """
         filters = warnings.filters
         for func in self._load_traces:
-            warnings.simplefilter("error")
+            warnings.simplefilter("default")
             try:
                 func()
             # pylint: disable-next=broad-exception-caught
