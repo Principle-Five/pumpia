@@ -240,13 +240,15 @@ class Manager:
             self.focus = None
             self.selected = []
             self.patients = set()
+            for image in self.general_images:
+                image.pil_image.close()
             self.general_images = set()
             for viewer in self.viewers:
                 viewer.unload_images()
             gc.collect()
 
         filters = warnings.filters
-        warnings.simplefilter("error")
+        warnings.simplefilter("default")
         try:
             try:
                 open_dicom = dcmread(filepath)
@@ -257,11 +259,6 @@ class Manager:
                     pass
                 else:
                     self.general_images.add(GeneralImage(image, filepath))
-                finally:
-                    try:
-                        image.close()
-                    except UnboundLocalError:
-                        pass
             else:
                 try:
                     _ = open_dicom.pixel_array
@@ -309,6 +306,8 @@ class Manager:
             self.focus = None
             self.selected = []
             self.patients = set()
+            for image in self.general_images:
+                image.pil_image.close()
             self.general_images = set()
             for viewer in self.viewers:
                 viewer.unload_images()
@@ -338,7 +337,7 @@ class Manager:
 
         filters = warnings.filters
         for file in files:
-            warnings.simplefilter("error")
+            warnings.simplefilter("default")
             try:
                 try:
                     open_dicom = dcmread(file)
@@ -349,11 +348,6 @@ class Manager:
                         pass
                     else:
                         self.general_images.add(GeneralImage(image, file))
-                    finally:
-                        try:
-                            image.close()
-                        except UnboundLocalError:
-                            pass
                 else:
                     try:
                         _ = open_dicom.pixel_array

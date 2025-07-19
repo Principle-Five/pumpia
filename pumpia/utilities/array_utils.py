@@ -177,14 +177,14 @@ def nth_max_positions(array: np.ndarray,
     if maximum is None:
         maximum = np.max(array)
 
-    half_maximum = (maximum + minimum) / divisor
+    half_maximum = (maximum + minimum) / divisor  # type: ignore
     gte_half_maximum = array >= half_maximum
     lt_half_maximum = array < half_maximum
     mask = ((lt_half_maximum & np.roll(gte_half_maximum, -1))
             | (np.roll(lt_half_maximum, -1) & gte_half_maximum))
 
     indices = mask[:-1].nonzero()[0]
-    corr_locs:list[float] = []
+    corr_locs: list[float] = []
     for ind in indices:
         l_val = array[ind]
         r_val = array[ind + 1]
@@ -226,13 +226,13 @@ def nth_max_up_positions(array: np.ndarray,
     if maximum is None:
         maximum = np.max(array)
 
-    half_maximum = (maximum + minimum) / divisor
+    half_maximum = (maximum + minimum) / divisor  # type: ignore
     gte_half_maximum = array >= half_maximum
     lt_half_maximum = array < half_maximum
     mask = lt_half_maximum & np.roll(gte_half_maximum, -1)
 
     indices = mask[:-1].nonzero()[0]
-    corr_locs:list[float] = []
+    corr_locs: list[float] = []
     for ind in indices:
         l_val = array[ind]
         r_val = array[ind + 1]
@@ -274,13 +274,13 @@ def nth_max_down_positions(array: np.ndarray,
     if maximum is None:
         maximum = np.max(array)
 
-    half_maximum = (maximum + minimum) / divisor
+    half_maximum = (maximum + minimum) / divisor  # type: ignore
     gte_half_maximum = array >= half_maximum
     lt_half_maximum = array < half_maximum
     mask = np.roll(lt_half_maximum, -1) & gte_half_maximum
 
     indices = mask[:-1].nonzero()[0]
-    corr_locs:list[float] = []
+    corr_locs: list[float] = []
     for ind in indices:
         l_val = array[ind]
         r_val = array[ind + 1]
