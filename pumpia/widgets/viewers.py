@@ -56,9 +56,12 @@ def _showable_array_image(image: BaseImageSet) -> TypeGuard[ArrayImage]:
     """
     Checks if the image is a showable array image for a Viewer.
     """
-    return (isinstance(image, ArrayImage) and (image.array.ndim == 3
-                                               or (image.array.ndim == 4
-                                                   and image.is_multisample)))
+    if isinstance(image, GeneralImage):
+        return True
+    elif isinstance(image, ArrayImage):
+        array = image.array
+        return array.ndim == 3 or (array.ndim == 4 and image.is_multisample)
+    return False
 
 
 def _monochrome_image(image: BaseImageSet) -> TypeGuard[ArrayImage]:
@@ -441,7 +444,6 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         self.bind('<Configure>', self._configure_window)
 
         self.image: ImageT | None = None
-        self.array_shown: np.ndarray = np.empty((0, 0))
         axes_array: np.ndarray = np.empty((0, 0))
         self.pil_image: Image.Image = Image.fromarray(axes_array)
         self.pil_tkimage: ImageTk.PhotoImage = ImageTk.PhotoImage(
@@ -541,10 +543,6 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
             if self.validation_command is None or self.validation_command(image):
                 self.image = image
                 if isinstance(self.image, ArrayImage):
-                    if isinstance(self.image, (Series, Instance)):
-                        self.array_shown = self.image.array
-                    elif isinstance(self.image, GeneralImage):
-                        self.array_shown = self.image.raw_array
                     self._x = self.image.x
                     self._y = self.image.y
                     self._zoom = self.image.zoom
@@ -651,7 +649,6 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
         Updates the viewer with the current image.
         """
         if self.image is None:
-            self.array_shown = np.empty((0, 0))
             axes_array: np.ndarray = np.empty((0, 0))
             self.pil_image: Image.Image = Image.fromarray(axes_array)
             self.pil_tkimage: ImageTk.PhotoImage = ImageTk.PhotoImage(
@@ -721,11 +718,11 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                 iy = lower_h * self.zoom_factor - (orig_height - new_height) / 2
 
             self.image.current_slice = self.current_slice
-            axes_array = self.array_shown[self.current_slice,
-                                          lower_h:upper_h,
-                                          lower_w:upper_w]
 
             if isinstance(self.image, (Series, Instance)):
+                axes_array = self.image.array[self.current_slice,
+                                              lower_h:upper_h,
+                                              lower_w:upper_w]
                 if axes_array.ndim == 2:
                     if (self._user_level is not None
                             and self._user_window is not None):
@@ -737,13 +734,14 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                         array_to_show[array_to_show < 0] = 0
                         array_to_show = array_to_show.astype(np.uint8)
 
-                        self.pil_image = Image.fromarray(array_to_show, mode='L')
+                        self.pil_image = Image.fromarray(array_to_show)
 
                 elif self.image.is_colour:
-                    self.pil_image = Image.fromarray(axes_array.astype(np.uint8), mode="RGB")
+                    self.pil_image = Image.fromarray(axes_array.astype(np.uint8))
 
             elif isinstance(self.image, GeneralImage):
-                self.pil_image = Image.fromarray(axes_array, mode=self.image.mode)
+                self.image.pil_image.seek(self.current_slice)
+                self.pil_image = self.image.pil_image.crop((lower_w, lower_h, upper_w, upper_h))
 
             self.pil_image = self.pil_image.resize((new_width, new_height),
                                                    resample=Image.Resampling.NEAREST)

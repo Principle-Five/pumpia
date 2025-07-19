@@ -22,24 +22,20 @@ class GeneralImage(FileImageSet):
 
     Attributes
     ----------
+    pil_image : PIL.Image.Image
     raw_array : np.ndarray
     """
 
     def __init__(self, image: Image.Image, path: Path):
-        frame_list = [np.array(frame) for frame in ImageSequence.Iterator(image)]
-
-        try:
-            self._array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-                np.array(frame_list))  # type: ignore
-        except ValueError as exc:
-            if image.format == "GIF":
-                self._array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-                    np.array(frame_list[1:]))  # type: ignore
-            else:
-                raise exc
+        self.pil_image: Image.Image = image
 
         self.format = image.format
-        super().__init__(self._array.shape, path, mode=image.mode)
+        n_frames = getattr(image, "n_frames", 1)
+        if image.mode[0] == "P":
+            n_bands = 3  # assume pallets are 'RGB'
+        else:
+            n_bands = len(image.getbands())
+        super().__init__((n_frames, image.height, image.width, n_bands), path, mode=image.mode)
 
     def __hash__(self) -> int:
         # from docs: A class that overrides __eq__() and does not define __hash__()
@@ -60,11 +56,37 @@ class GeneralImage(FileImageSet):
     def raw_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """Returns the raw array of the series as stored in the file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        return self._array
+        frame_list = [np.array(frame) for frame in ImageSequence.Iterator(self.pil_image)]
+
+        try:
+            array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
+                np.array(frame_list))  # type: ignore
+        except ValueError as exc:
+            if self.pil_image.format == "GIF":
+                array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
+                    np.array(frame_list[1:]))  # type: ignore
+            else:
+                raise exc
+
+        return array
 
     @property
     def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        return np.astype(self._array, float)
+        frame_list = [np.array(frame) for frame in ImageSequence.Iterator(self.pil_image)]
+
+        try:
+            array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
+                np.array(frame_list, float))  # type: ignore
+        except ValueError as exc:
+            if self.pil_image.format == "GIF":
+                array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
+                    np.array(frame_list[1:], float))  # type: ignore
+            else:
+                raise exc
+
+        return array
+
+    # current_slice_array could be optimised here, but need to be careful with GIFs
 
     @property
     def id_string(self) -> str:

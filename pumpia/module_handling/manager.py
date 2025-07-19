@@ -240,6 +240,8 @@ class Manager:
             self.focus = None
             self.selected = []
             self.patients = set()
+            for image in self.general_images:
+                image.pil_image.close()
             self.general_images = set()
             for viewer in self.viewers:
                 viewer.unload_images()
@@ -257,11 +259,6 @@ class Manager:
                     pass
                 else:
                     self.general_images.add(GeneralImage(image, filepath))
-                finally:
-                    try:
-                        image.close()
-                    except UnboundLocalError:
-                        pass
             else:
                 try:
                     _ = open_dicom.pixel_array
@@ -309,6 +306,8 @@ class Manager:
             self.focus = None
             self.selected = []
             self.patients = set()
+            for image in self.general_images:
+                image.pil_image.close()
             self.general_images = set()
             for viewer in self.viewers:
                 viewer.unload_images()
@@ -349,11 +348,6 @@ class Manager:
                         pass
                     else:
                         self.general_images.add(GeneralImage(image, file))
-                    finally:
-                        try:
-                            image.close()
-                        except UnboundLocalError:
-                            pass
                 else:
                     try:
                         _ = open_dicom.pixel_array
