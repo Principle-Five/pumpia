@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DICOM File Handling &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DICOM Tags" href="dicom_tags.html" />
+    <link rel="prev" title="General Image Handling" href="general_images.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../components/components.html">Core Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="file_handling.html">File Handling</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="general_images.html">General Image Handling</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DICOM File Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicom_tags.html">DICOM Tags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="file_handling.html">File Handling</a></li>
+      <li class="breadcrumb-item active">DICOM File Handling</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/file_handling/dicoms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dicom-file-handling">
+<h1>DICOM File Handling<a class="headerlink" href="#dicom-file-handling" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.file_handling.dicom_structures.</span></span><span class="sig-name descname"><span class="pre">Patient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patient_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient" title="Link to this definition"></a></dt>
+<dd><p>Represents a patient from a DICOM file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patient_id</strong> (<em>str</em>) – The ID of the patient.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The name of the patient.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.patient_id">
+<span class="sig-name descname"><span class="pre">patient_id</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.patient_id" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.name" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.studies">
+<span class="sig-name descname"><span class="pre">studies</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.studies" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study">Study</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.tag">
+<span class="sig-name descname"><span class="pre">tag</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.id_string">
+<span class="sig-name descname"><span class="pre">id_string</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.id_string" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.menu_options">
+<span class="sig-name descname"><span class="pre">menu_options</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.menu_options" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[str, Callable[[], None]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Patient.add_study">
+<span class="sig-name descname"><span class="pre">add_study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">study</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study"><span class="pre">Study</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Patient.add_study" title="Link to this definition"></a></dt>
+<dd><p>Adds a study to the patient.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.file_handling.dicom_structures.</span></span><span class="sig-name descname"><span class="pre">Study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patient</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Patient" title="pumpia.file_handling.dicom_structures.Patient"><span class="pre">Patient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">study_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">study_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">study_desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study" title="Link to this definition"></a></dt>
+<dd><p>Represents a DICOM study.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>patient</strong> (<a class="reference internal" href="#pumpia.file_handling.dicom_structures.Patient" title="pumpia.file_handling.dicom_structures.Patient"><em>Patient</em></a>) – The patient associated with the study.</p></li>
+<li><p><strong>study_id</strong> (<em>str</em>) – The ID of the study.</p></li>
+<li><p><strong>study_date</strong> (<em>datetime.date</em>) – The date of the study.</p></li>
+<li><p><strong>study_desc</strong> (<em>str</em>) – The description of the study.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.patient">
+<span class="sig-name descname"><span class="pre">patient</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.patient" title="Link to this definition"></a></dt>
+<dd><p>The patient associated with the study.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Patient" title="pumpia.file_handling.dicom_structures.Patient">Patient</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.study_id">
+<span class="sig-name descname"><span class="pre">study_id</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.study_id" title="Link to this definition"></a></dt>
+<dd><p>The ID of the study.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.study_date">
+<span class="sig-name descname"><span class="pre">study_date</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.study_date" title="Link to this definition"></a></dt>
+<dd><p>The date of the study.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime.date</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.study_description">
+<span class="sig-name descname"><span class="pre">study_description</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.study_description" title="Link to this definition"></a></dt>
+<dd><p>The description of the study.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.series">
+<span class="sig-name descname"><span class="pre">series</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.series" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#pumpia.file_handling.dicom_structures.Series" title="pumpia.file_handling.dicom_structures.Series">Series</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.tag">
+<span class="sig-name descname"><span class="pre">tag</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.id_string">
+<span class="sig-name descname"><span class="pre">id_string</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.id_string" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.menu_options">
+<span class="sig-name descname"><span class="pre">menu_options</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.menu_options" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[str, Callable[[], None]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Study.add_series">
+<span class="sig-name descname"><span class="pre">add_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Series" title="pumpia.file_handling.dicom_structures.Series"><span class="pre">Series</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Study.add_series" title="Link to this definition"></a></dt>
+<dd><p>Adds a series to the study.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.file_handling.dicom_structures.</span></span><span class="sig-name descname"><span class="pre">Series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">study</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study"><span class="pre">Study</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">series_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_stack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_dicom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series" title="Link to this definition"></a></dt>
+<dd><p>Represents a DICOM series.
+Has the same attributes and methods as ImageCollection unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>study</strong> (<a class="reference internal" href="#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study"><em>Study</em></a>) – The study associated with the series.</p></li>
+<li><p><strong>series_id</strong> (<em>str</em>) – The ID of the series.</p></li>
+<li><p><strong>series_description</strong> (<em>str</em>) – The description of the series.</p></li>
+<li><p><strong>series_number</strong> (<em>int</em>) – The number of the series.</p></li>
+<li><p><strong>acquisition_number</strong> (<em>int</em>) – The acquisition number of the series.</p></li>
+<li><p><strong>instance_number</strong> (<em>int</em>) – The instance number of the series.
+Required if series is a stack, ignored otherwise.</p></li>
+<li><p><strong>is_stack</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the series is a stack (default is False).</p></li>
+<li><p><strong>open_dicom</strong> (<em>pydicom.Dataset</em><em>, </em><em>optional</em>) – The open DICOM dataset (default is None).</p></li>
+<li><p><strong>filepath</strong> (<em>Path</em><em>, </em><em>optional</em>) – The file path of the series (default is None).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.study">
+<span class="sig-name descname"><span class="pre">study</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.study" title="Link to this definition"></a></dt>
+<dd><p>The study associated with the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study">Study</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.series_id">
+<span class="sig-name descname"><span class="pre">series_id</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.series_id" title="Link to this definition"></a></dt>
+<dd><p>The ID of the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.series_number">
+<span class="sig-name descname"><span class="pre">series_number</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.series_number" title="Link to this definition"></a></dt>
+<dd><p>The number of the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.acquisition_number">
+<span class="sig-name descname"><span class="pre">acquisition_number</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.acquisition_number" title="Link to this definition"></a></dt>
+<dd><p>The acquisition number of the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.instance_number">
+<span class="sig-name descname"><span class="pre">instance_number</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.instance_number" title="Link to this definition"></a></dt>
+<dd><p>The instance number of the series.
+Int if series is a stack, None otherwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.series_description">
+<span class="sig-name descname"><span class="pre">series_description</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.series_description" title="Link to this definition"></a></dt>
+<dd><p>The description of the series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.is_stack">
+<span class="sig-name descname"><span class="pre">is_stack</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.is_stack" title="Link to this definition"></a></dt>
+<dd><p>Whether the series is a stack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.loaded">
+<span class="sig-name descname"><span class="pre">loaded</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.loaded" title="Link to this definition"></a></dt>
+<dd><p>Whether the series is loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.dicom_dataset">
+<span class="sig-name descname"><span class="pre">dicom_dataset</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.dicom_dataset" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pydicom.Dataset | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.instances">
+<span class="sig-name descname"><span class="pre">instances</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.instances" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#pumpia.file_handling.dicom_structures.Instance" title="pumpia.file_handling.dicom_structures.Instance">Instance</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.raw_array">
+<span class="sig-name descname"><span class="pre">raw_array</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.raw_array" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.add_instance">
+<span class="sig-name descname"><span class="pre">add_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Instance'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.add_instance" title="Link to this definition"></a></dt>
+<dd><p>Adds an instance to the series.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.get_tags">
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dicom_tags.html#pumpia.file_handling.dicom_tags.Tag" title="pumpia.file_handling.dicom_tags.Tag"><span class="pre">Tag</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.get_tags" title="Link to this definition"></a></dt>
+<dd><p>Gets the values of a dicom tag for all instances in the series.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Series.get_tag">
+<span class="sig-name descname"><span class="pre">get_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dicom_tags.html#pumpia.file_handling.dicom_tags.Tag" title="pumpia.file_handling.dicom_tags.Tag"><span class="pre">Tag</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Series.get_tag" title="Link to this definition"></a></dt>
+<dd><p>Gets the value of a tag for a specific instance in the series.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.file_handling.dicom_structures.</span></span><span class="sig-name descname"><span class="pre">Instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Series" title="pumpia.file_handling.dicom_structures.Series"><span class="pre">Series</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_index_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_dicom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance" title="Link to this definition"></a></dt>
+<dd><p>Represents a DICOM instance if file has 1 frame or a frame if file has multiple frames.
+Has the same attributes and methods as FileImageSet unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>series</strong> (<a class="reference internal" href="#pumpia.file_handling.dicom_structures.Series" title="pumpia.file_handling.dicom_structures.Series"><em>Series</em></a>) – The series associated with the instance.</p></li>
+<li><p><strong>slice_number</strong> (<em>int</em>) – The slice number of the instance.
+For a frame this will be the frame number, otherwise this will be the instance number.</p></li>
+<li><p><strong>filepath</strong> (<em>Path</em><em>, </em><em>optional</em>) – The file path of the instance (default is None).</p></li>
+<li><p><strong>is_frame</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the instance is a frame (default is False).</p></li>
+<li><p><strong>dimension_index_values</strong> (<em>list</em><em> or </em><em>tuple</em><em>, </em><em>optional</em>) – The dimension index values of the instance (default is None).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.series">
+<span class="sig-name descname"><span class="pre">series</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.series" title="Link to this definition"></a></dt>
+<dd><p>The series associated with the instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pumpia.file_handling.dicom_structures.Series" title="pumpia.file_handling.dicom_structures.Series">Series</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.slice_number">
+<span class="sig-name descname"><span class="pre">slice_number</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.slice_number" title="Link to this definition"></a></dt>
+<dd><p>The slice number of the instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.is_frame">
+<span class="sig-name descname"><span class="pre">is_frame</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.is_frame" title="Link to this definition"></a></dt>
+<dd><p>Whether the instance is a frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.dimension_index_values">
+<span class="sig-name descname"><span class="pre">dimension_index_values</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.dimension_index_values" title="Link to this definition"></a></dt>
+<dd><p>The dimension index values of the instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.loaded">
+<span class="sig-name descname"><span class="pre">loaded</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.loaded" title="Link to this definition"></a></dt>
+<dd><p>Whether the instance is loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.dicom_dataset">
+<span class="sig-name descname"><span class="pre">dicom_dataset</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.dicom_dataset" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pydicom.Dataset | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.raw_array">
+<span class="sig-name descname"><span class="pre">raw_array</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.raw_array" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_structures.Instance.get_tag">
+<span class="sig-name descname"><span class="pre">get_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dicom_tags.html#pumpia.file_handling.dicom_tags.Tag" title="pumpia.file_handling.dicom_tags.Tag"><span class="pre">Tag</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_structures.Instance.get_tag" title="Link to this definition"></a></dt>
+<dd><p>Gets the value of a tag for the instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="general_images.html" class="btn btn-neutral float-left" title="General Image Handling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dicom_tags.html" class="btn btn-neutral float-right" title="DICOM Tags" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

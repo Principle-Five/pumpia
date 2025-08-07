@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core Components &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Manager" href="manager.html" />
+    <link rel="prev" title="PumpIA documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Core Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="manager.html">The Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html">Viewers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html">Regions of Interest</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Core Components</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/components/components.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="core-components">
+<h1>Core Components<a class="headerlink" href="#core-components" title="Link to this heading"></a></h1>
+<p>Most people will want to use PumpIA through the <a class="reference internal" href="../usage/modules.html"><span class="doc">modules</span></a> and <a class="reference internal" href="../usage/collections.html"><span class="doc">collections</span></a> as described in <a class="reference internal" href="../usage/usage.html"><span class="doc">usage</span></a>,
+however the core components and how they iteract are described for anyone who wants more control over them, or who wants to embed them in their own program.</p>
+<section id="manager">
+<h2><a class="reference internal" href="manager.html"><span class="doc">The Manager</span></a><a class="headerlink" href="#manager" title="Link to this heading"></a></h2>
+<p>This is the central piece of the program, it controls the loading of all images and links all the other components together.
+Use the manager to get the treeviews and widgets for the controls within the program.
+Users can right click on different entries in treeviews for different options.
+There is typically only one manager per program.</p>
+</section>
+<section id="viewers">
+<h2><a class="reference internal" href="viewers.html"><span class="doc">Viewers</span></a><a class="headerlink" href="#viewers" title="Link to this heading"></a></h2>
+<p>These are the widgets which show the images.
+There are a few different kinds depending on if the image loaded should be limited.
+Viewers have multiple shortcuts to make it easier for the end user, see <a class="reference internal" href="../usage/user_interface.html"><span class="doc">user interface</span></a>.</p>
+</section>
+<section id="images">
+<h2><a class="reference internal" href="images.html"><span class="doc">Images</span></a><a class="headerlink" href="#images" title="Link to this heading"></a></h2>
+<p>Different classes which represent images and collections of images.
+Also see <a class="reference internal" href="../file_handling/file_handling.html"><span class="doc">file handling</span></a>.</p>
+</section>
+<section id="rois">
+<h2><a class="reference internal" href="rois.html"><span class="doc">Regions of Interest</span></a><a class="headerlink" href="#rois" title="Link to this heading"></a></h2>
+<p>These represent regions of interest of different shapes.</p>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="manager.html">The Manager</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager"><code class="docutils literal notranslate"><span class="pre">Manager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.patients"><code class="docutils literal notranslate"><span class="pre">Manager.patients</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.general_images"><code class="docutils literal notranslate"><span class="pre">Manager.general_images</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.select_time"><code class="docutils literal notranslate"><span class="pre">Manager.select_time</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.focus"><code class="docutils literal notranslate"><span class="pre">Manager.focus</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.selected"><code class="docutils literal notranslate"><span class="pre">Manager.selected</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.current_action"><code class="docutils literal notranslate"><span class="pre">Manager.current_action</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.roi_action"><code class="docutils literal notranslate"><span class="pre">Manager.roi_action</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.viewers"><code class="docutils literal notranslate"><span class="pre">Manager.viewers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.popup_menu_options"><code class="docutils literal notranslate"><span class="pre">Manager.popup_menu_options</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.load_folder"><code class="docutils literal notranslate"><span class="pre">Manager.load_folder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.load_image"><code class="docutils literal notranslate"><span class="pre">Manager.load_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.load_images"><code class="docutils literal notranslate"><span class="pre">Manager.load_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.load_dicom"><code class="docutils literal notranslate"><span class="pre">Manager.load_dicom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.update_trees"><code class="docutils literal notranslate"><span class="pre">Manager.update_trees()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.add_roi"><code class="docutils literal notranslate"><span class="pre">Manager.add_roi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.delete_current_roi"><code class="docutils literal notranslate"><span class="pre">Manager.delete_current_roi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.show_tags"><code class="docutils literal notranslate"><span class="pre">Manager.show_tags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.copy_filepath"><code class="docutils literal notranslate"><span class="pre">Manager.copy_filepath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.copy_filepath_as_posix"><code class="docutils literal notranslate"><span class="pre">Manager.copy_filepath_as_posix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.copy_directory"><code class="docutils literal notranslate"><span class="pre">Manager.copy_directory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.copy_directory_as_posix"><code class="docutils literal notranslate"><span class="pre">Manager.copy_directory_as_posix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.update_viewers"><code class="docutils literal notranslate"><span class="pre">Manager.update_viewers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.get_tree_frame"><code class="docutils literal notranslate"><span class="pre">Manager.get_tree_frame()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.get_mouse_options_combobox"><code class="docutils literal notranslate"><span class="pre">Manager.get_mouse_options_combobox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.set_current_action"><code class="docutils literal notranslate"><span class="pre">Manager.set_current_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.get_roi_options_frame"><code class="docutils literal notranslate"><span class="pre">Manager.get_roi_options_frame()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager.set_current_roi_action"><code class="docutils literal notranslate"><span class="pre">Manager.set_current_roi_action()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="viewers.html">Viewers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer"><code class="docutils literal notranslate"><span class="pre">BaseViewer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.manager"><code class="docutils literal notranslate"><span class="pre">BaseViewer.manager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.allow_drag_drop"><code class="docutils literal notranslate"><span class="pre">BaseViewer.allow_drag_drop</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.allow_drawing_rois"><code class="docutils literal notranslate"><span class="pre">BaseViewer.allow_drawing_rois</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.validation_command"><code class="docutils literal notranslate"><span class="pre">BaseViewer.validation_command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.preload_command"><code class="docutils literal notranslate"><span class="pre">BaseViewer.preload_command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.mouse_x"><code class="docutils literal notranslate"><span class="pre">BaseViewer.mouse_x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.mouse_y"><code class="docutils literal notranslate"><span class="pre">BaseViewer.mouse_y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.last_event_time"><code class="docutils literal notranslate"><span class="pre">BaseViewer.last_event_time</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.center"><code class="docutils literal notranslate"><span class="pre">BaseViewer.center</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.current_slice"><code class="docutils literal notranslate"><span class="pre">BaseViewer.current_slice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.manual_override"><code class="docutils literal notranslate"><span class="pre">BaseViewer.manual_override</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.pil_image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.pil_image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.pil_tkimage"><code class="docutils literal notranslate"><span class="pre">BaseViewer.pil_tkimage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.zoom_factor"><code class="docutils literal notranslate"><span class="pre">BaseViewer.zoom_factor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.current_image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.current_image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.add_load_trace"><code class="docutils literal notranslate"><span class="pre">BaseViewer.add_load_trace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.remove_load_trace"><code class="docutils literal notranslate"><span class="pre">BaseViewer.remove_load_trace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.can_show_image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.can_show_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.unload_images"><code class="docutils literal notranslate"><span class="pre">BaseViewer.unload_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.load_image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.load_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.viewer_to_image_pos"><code class="docutils literal notranslate"><span class="pre">BaseViewer.viewer_to_image_pos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.image_to_viewer_pos"><code class="docutils literal notranslate"><span class="pre">BaseViewer.image_to_viewer_pos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.update"><code class="docutils literal notranslate"><span class="pre">BaseViewer.update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.reset_image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.reset_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.manual_roi_draw"><code class="docutils literal notranslate"><span class="pre">BaseViewer.manual_roi_draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.stop_manual_roi_draw"><code class="docutils literal notranslate"><span class="pre">BaseViewer.stop_manual_roi_draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.change_slice"><code class="docutils literal notranslate"><span class="pre">BaseViewer.change_slice()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.set_slice"><code class="docutils literal notranslate"><span class="pre">BaseViewer.set_slice()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.change_zoom"><code class="docutils literal notranslate"><span class="pre">BaseViewer.change_zoom()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.window_level"><code class="docutils literal notranslate"><span class="pre">BaseViewer.window_level()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.set_window_level"><code class="docutils literal notranslate"><span class="pre">BaseViewer.set_window_level()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.move_image"><code class="docutils literal notranslate"><span class="pre">BaseViewer.move_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer.set_image_loc"><code class="docutils literal notranslate"><span class="pre">BaseViewer.set_image_loc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.Viewer"><code class="docutils literal notranslate"><span class="pre">Viewer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.ArrayViewer"><code class="docutils literal notranslate"><span class="pre">ArrayViewer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.MonochromeViewer"><code class="docutils literal notranslate"><span class="pre">MonochromeViewer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.DicomViewer"><code class="docutils literal notranslate"><span class="pre">DicomViewer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html#pumpia.widgets.viewers.MonochromeDicomViewer"><code class="docutils literal notranslate"><span class="pre">MonochromeDicomViewer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="images.html">Images</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet"><code class="docutils literal notranslate"><span class="pre">BaseImageSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet.tag"><code class="docutils literal notranslate"><span class="pre">BaseImageSet.tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet.id_string"><code class="docutils literal notranslate"><span class="pre">BaseImageSet.id_string</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet.menu_options"><code class="docutils literal notranslate"><span class="pre">BaseImageSet.menu_options</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage"><code class="docutils literal notranslate"><span class="pre">ArrayImage</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.x"><code class="docutils literal notranslate"><span class="pre">ArrayImage.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.y"><code class="docutils literal notranslate"><span class="pre">ArrayImage.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.zoom"><code class="docutils literal notranslate"><span class="pre">ArrayImage.zoom</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.rotation"><code class="docutils literal notranslate"><span class="pre">ArrayImage.rotation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.shape"><code class="docutils literal notranslate"><span class="pre">ArrayImage.shape</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.num_samples"><code class="docutils literal notranslate"><span class="pre">ArrayImage.num_samples</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.mode"><code class="docutils literal notranslate"><span class="pre">ArrayImage.mode</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.is_multisample"><code class="docutils literal notranslate"><span class="pre">ArrayImage.is_multisample</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.is_rgb"><code class="docutils literal notranslate"><span class="pre">ArrayImage.is_rgb</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.current_slice"><code class="docutils literal notranslate"><span class="pre">ArrayImage.current_slice</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.location"><code class="docutils literal notranslate"><span class="pre">ArrayImage.location</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.num_slices"><code class="docutils literal notranslate"><span class="pre">ArrayImage.num_slices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.raw_array"><code class="docutils literal notranslate"><span class="pre">ArrayImage.raw_array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.array"><code class="docutils literal notranslate"><span class="pre">ArrayImage.array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.current_slice_array"><code class="docutils literal notranslate"><span class="pre">ArrayImage.current_slice_array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.vmax"><code class="docutils literal notranslate"><span class="pre">ArrayImage.vmax</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.vmin"><code class="docutils literal notranslate"><span class="pre">ArrayImage.vmin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.window"><code class="docutils literal notranslate"><span class="pre">ArrayImage.window</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.level"><code class="docutils literal notranslate"><span class="pre">ArrayImage.level</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.rois"><code class="docutils literal notranslate"><span class="pre">ArrayImage.rois</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.roi_names"><code class="docutils literal notranslate"><span class="pre">ArrayImage.roi_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.user_window"><code class="docutils literal notranslate"><span class="pre">ArrayImage.user_window</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.user_level"><code class="docutils literal notranslate"><span class="pre">ArrayImage.user_level</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.pixel_size"><code class="docutils literal notranslate"><span class="pre">ArrayImage.pixel_size</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.aspect"><code class="docutils literal notranslate"><span class="pre">ArrayImage.aspect</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.z_profile"><code class="docutils literal notranslate"><span class="pre">ArrayImage.z_profile</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.get_rois"><code class="docutils literal notranslate"><span class="pre">ArrayImage.get_rois()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.add_roi"><code class="docutils literal notranslate"><span class="pre">ArrayImage.add_roi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.remove_roi"><code class="docutils literal notranslate"><span class="pre">ArrayImage.remove_roi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.change_slice"><code class="docutils literal notranslate"><span class="pre">ArrayImage.change_slice()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage.reset"><code class="docutils literal notranslate"><span class="pre">ArrayImage.reset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.FileImageSet"><code class="docutils literal notranslate"><span class="pre">FileImageSet</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.FileImageSet.filepath"><code class="docutils literal notranslate"><span class="pre">FileImageSet.filepath</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ImageCollection"><code class="docutils literal notranslate"><span class="pre">ImageCollection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ImageCollection.image_set"><code class="docutils literal notranslate"><span class="pre">ImageCollection.image_set</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ImageCollection.current_image"><code class="docutils literal notranslate"><span class="pre">ImageCollection.current_image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ImageCollection.add_image"><code class="docutils literal notranslate"><span class="pre">ImageCollection.add_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rois.html">Regions of Interest</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI"><code class="docutils literal notranslate"><span class="pre">BaseROI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.image"><code class="docutils literal notranslate"><span class="pre">BaseROI.image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.slice_num"><code class="docutils literal notranslate"><span class="pre">BaseROI.slice_num</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.cache_values"><code class="docutils literal notranslate"><span class="pre">BaseROI.cache_values</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.colour"><code class="docutils literal notranslate"><span class="pre">BaseROI.colour</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.active_colour"><code class="docutils literal notranslate"><span class="pre">BaseROI.active_colour</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.active"><code class="docutils literal notranslate"><span class="pre">BaseROI.active</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.hidden"><code class="docutils literal notranslate"><span class="pre">BaseROI.hidden</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.id_string"><code class="docutils literal notranslate"><span class="pre">BaseROI.id_string</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.storage_string"><code class="docutils literal notranslate"><span class="pre">BaseROI.storage_string</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.tag"><code class="docutils literal notranslate"><span class="pre">BaseROI.tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.pixel_values"><code class="docutils literal notranslate"><span class="pre">BaseROI.pixel_values</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.pixel_array"><code class="docutils literal notranslate"><span class="pre">BaseROI.pixel_array</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.mask"><code class="docutils literal notranslate"><span class="pre">BaseROI.mask</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.area"><code class="docutils literal notranslate"><span class="pre">BaseROI.area</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.perimeter"><code class="docutils literal notranslate"><span class="pre">BaseROI.perimeter</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.mean"><code class="docutils literal notranslate"><span class="pre">BaseROI.mean</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.std"><code class="docutils literal notranslate"><span class="pre">BaseROI.std</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.xmin"><code class="docutils literal notranslate"><span class="pre">BaseROI.xmin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.xmax"><code class="docutils literal notranslate"><span class="pre">BaseROI.xmax</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.ymin"><code class="docutils literal notranslate"><span class="pre">BaseROI.ymin</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.ymax"><code class="docutils literal notranslate"><span class="pre">BaseROI.ymax</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.xcent"><code class="docutils literal notranslate"><span class="pre">BaseROI.xcent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.ycent"><code class="docutils literal notranslate"><span class="pre">BaseROI.ycent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.values_str"><code class="docutils literal notranslate"><span class="pre">BaseROI.values_str</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.menu_options"><code class="docutils literal notranslate"><span class="pre">BaseROI.menu_options</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.delete_cache"><code class="docutils literal notranslate"><span class="pre">BaseROI.delete_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.point_is_in"><code class="docutils literal notranslate"><span class="pre">BaseROI.point_is_in()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.point_is_on"><code class="docutils literal notranslate"><span class="pre">BaseROI.point_is_on()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.move"><code class="docutils literal notranslate"><span class="pre">BaseROI.move()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.enlarge"><code class="docutils literal notranslate"><span class="pre">BaseROI.enlarge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.resize_bbox"><code class="docutils literal notranslate"><span class="pre">BaseROI.resize_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.rotate"><code class="docutils literal notranslate"><span class="pre">BaseROI.rotate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.copy_to_image"><code class="docutils literal notranslate"><span class="pre">BaseROI.copy_to_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI.move_to_image"><code class="docutils literal notranslate"><span class="pre">BaseROI.move_to_image()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle"><code class="docutils literal notranslate"><span class="pre">Angle</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.x"><code class="docutils literal notranslate"><span class="pre">Angle.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.y"><code class="docutils literal notranslate"><span class="pre">Angle.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.x1"><code class="docutils literal notranslate"><span class="pre">Angle.x1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.y1"><code class="docutils literal notranslate"><span class="pre">Angle.y1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.x2"><code class="docutils literal notranslate"><span class="pre">Angle.x2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.y2"><code class="docutils literal notranslate"><span class="pre">Angle.y2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.angle"><code class="docutils literal notranslate"><span class="pre">Angle.angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.Angle.angle_degrees"><code class="docutils literal notranslate"><span class="pre">Angle.angle_degrees</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.PointROI"><code class="docutils literal notranslate"><span class="pre">PointROI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.PointROI.x"><code class="docutils literal notranslate"><span class="pre">PointROI.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.PointROI.y"><code class="docutils literal notranslate"><span class="pre">PointROI.y</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.EllipseROI"><code class="docutils literal notranslate"><span class="pre">EllipseROI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.EllipseROI.x"><code class="docutils literal notranslate"><span class="pre">EllipseROI.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.EllipseROI.y"><code class="docutils literal notranslate"><span class="pre">EllipseROI.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.EllipseROI.a"><code class="docutils literal notranslate"><span class="pre">EllipseROI.a</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.EllipseROI.b"><code class="docutils literal notranslate"><span class="pre">EllipseROI.b</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI"><code class="docutils literal notranslate"><span class="pre">RectangleROI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.x"><code class="docutils literal notranslate"><span class="pre">RectangleROI.x</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.y"><code class="docutils literal notranslate"><span class="pre">RectangleROI.y</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.width"><code class="docutils literal notranslate"><span class="pre">RectangleROI.width</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.height"><code class="docutils literal notranslate"><span class="pre">RectangleROI.height</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.h_profile"><code class="docutils literal notranslate"><span class="pre">RectangleROI.h_profile</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.v_profile"><code class="docutils literal notranslate"><span class="pre">RectangleROI.v_profile</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.plot_h_profile"><code class="docutils literal notranslate"><span class="pre">RectangleROI.plot_h_profile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.RectangleROI.plot_v_profile"><code class="docutils literal notranslate"><span class="pre">RectangleROI.plot_v_profile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI"><code class="docutils literal notranslate"><span class="pre">LineROI</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.x1"><code class="docutils literal notranslate"><span class="pre">LineROI.x1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.y1"><code class="docutils literal notranslate"><span class="pre">LineROI.y1</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.x2"><code class="docutils literal notranslate"><span class="pre">LineROI.x2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.y2"><code class="docutils literal notranslate"><span class="pre">LineROI.y2</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.length"><code class="docutils literal notranslate"><span class="pre">LineROI.length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.profile"><code class="docutils literal notranslate"><span class="pre">LineROI.profile</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.x_len"><code class="docutils literal notranslate"><span class="pre">LineROI.x_len</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.y_len"><code class="docutils literal notranslate"><span class="pre">LineROI.y_len</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.LineROI.plot_profile"><code class="docutils literal notranslate"><span class="pre">LineROI.plot_profile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="PumpIA documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manager.html" class="btn btn-neutral float-right" title="The Manager" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
