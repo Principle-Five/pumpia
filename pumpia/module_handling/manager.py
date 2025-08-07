@@ -494,9 +494,12 @@ class Manager:
                         if ins == instance_id_str:
                             instance = ins
                 else:
-                    dimension_index_values = get_tag(open_dicom,
-                                                     DicomTags.DimensionIndexValues,
-                                                     frame_number).value
+                    try:
+                        dimension_index_values = get_tag(open_dicom,
+                                                         DicomTags.DimensionIndexValues,
+                                                         frame_number).value
+                    except KeyError:
+                        dimension_index_values = None
                     instance = Instance(series=series,
                                         slice_number=frame_number,
                                         filepath=file,

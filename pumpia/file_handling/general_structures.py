@@ -54,7 +54,7 @@ class GeneralImage(FileImageSet):
 
     @property
     def raw_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        """Returns the raw array of the series as stored in the file.
+        """Returns the raw array of the image as stored in the file.
         This is usually an unsigned dtype so users should be careful when processing."""
         frame_list = [np.array(frame) for frame in ImageSequence.Iterator(self.pil_image)]
 
@@ -69,6 +69,11 @@ class GeneralImage(FileImageSet):
                 raise exc
 
         return array
+
+    @property
+    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
+        """Returns an array suitable for passing to the viewer"""
+        return self.raw_array
 
     @property
     def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
