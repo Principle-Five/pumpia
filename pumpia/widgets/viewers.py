@@ -59,7 +59,7 @@ def _showable_array_image(image: BaseImageSet) -> TypeGuard[ArrayImage]:
     if isinstance(image, GeneralImage):
         return True
     elif isinstance(image, ArrayImage):
-        array = image.array
+        array = image.raw_array
         return array.ndim == 3 or (array.ndim == 4 and image.is_multisample)
     return False
 
@@ -68,7 +68,7 @@ def _monochrome_image(image: BaseImageSet) -> TypeGuard[ArrayImage]:
     """
     Checks if the image is a monochrome image.
     """
-    return isinstance(image, ArrayImage) and image.array.ndim == 3 and not image.is_multisample
+    return isinstance(image, ArrayImage) and image.raw_array.ndim == 3 and not image.is_multisample
 
 
 class BaseTempROI(ABC):
@@ -720,9 +720,9 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
             self.image.current_slice = self.current_slice
 
             if isinstance(self.image, (Series, Instance)):
-                axes_array = self.image.array[self.current_slice,
-                                              lower_h:upper_h,
-                                              lower_w:upper_w]
+                axes_array = self.image.image_array[self.current_slice,
+                                                    lower_h:upper_h,
+                                                    lower_w:upper_w]
                 if axes_array.ndim == 2:
                     if (self._user_level is not None
                             and self._user_window is not None):

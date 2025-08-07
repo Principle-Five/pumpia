@@ -94,6 +94,7 @@ class ArrayImage(BaseImageSet):
     current_slice : int
     location : tuple[float, float]
     num_slices : int
+    raw_array : np.ndarray
     array : np.ndarray
     current_slice_array : np.ndarray
     vmax : float | None
@@ -232,6 +233,18 @@ class ArrayImage(BaseImageSet):
         The width of the image
         """
         return self.shape[2]
+
+    @property
+    @abstractmethod
+    def raw_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
+        """Returns the raw array of the image as stored in the file.
+        This is usually an unsigned dtype so users should be careful when processing."""
+
+    @property
+    @abstractmethod
+    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
+        """Returns the raw array of the image as stored in the file.
+        This is usually an unsigned dtype so users should be careful when processing."""
 
     @property
     @abstractmethod

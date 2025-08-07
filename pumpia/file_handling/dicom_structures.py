@@ -423,6 +423,45 @@ class Series(ImageCollection):
             return np.concatenate([a.raw_array for a in self.instances])  # type: ignore
 
     @property
+    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
+        """Returns an array suitable for passing to the viewer"""
+        if self.is_stack:
+            raw_array = self.raw_array
+            if not self.is_colour:
+                try:
+                    slope = self.get_tag(DicomTags.RescaleSlope)
+                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    return raw_array * slope + intercept
+                except KeyError:
+                    return raw_array
+            else:
+                try:
+                    photo_interp = self.get_tag(DicomTags.PhotometricInterpretation)
+                    if isinstance(photo_interp, str):
+                        if photo_interp != "RGB":
+                            return convert_color_space(self.raw_array,
+                                                       photo_interp,
+                                                       'RGB')
+                        else:
+                            return raw_array
+                    else:
+                        try:
+                            slope = self.get_tag(DicomTags.RescaleSlope)
+                            intercept = self.get_tag(DicomTags.RescaleIntercept)
+                            return raw_array * slope + intercept
+                        except KeyError:
+                            return raw_array
+                except (KeyError, NotImplementedError):
+                    try:
+                        slope = self.get_tag(DicomTags.RescaleSlope)
+                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        return raw_array * slope + intercept
+                    except KeyError:
+                        return raw_array
+        else:
+            return np.concatenate([a.raw_array for a in self.instances])  # type: ignore
+
+    @property
     def array(self
               ) -> np.ndarray[tuple[int, int, int, Literal[3]]
                               | tuple[int, int, int],
@@ -791,6 +830,43 @@ class Instance(FileImageSet):
             return np.array([self._dicom.pixel_array])  # type: ignore
         else:
             return np.zeros((1, 1, 1), dtype=np.uint8)
+
+    @property
+    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
+        """Returns an array suitable for passing to the viewer"""
+        raw_array = self.raw_array
+        if self.get_tag(DicomTags.SamplesPerPixel) == 1:
+            try:
+                slope = self.get_tag(DicomTags.RescaleSlope)
+                intercept = self.get_tag(DicomTags.RescaleIntercept)
+                return raw_array * slope + intercept
+            except KeyError:
+                return raw_array
+        else:
+            try:
+                photo_interp = self.get_tag(
+                    DicomTags.PhotometricInterpretation)
+                if isinstance(photo_interp, str):
+                    if photo_interp != "RGB":
+                        return convert_color_space(self.raw_array,
+                                                   photo_interp,
+                                                   'RGB')
+                    else:
+                        return raw_array
+                else:
+                    try:
+                        slope = self.get_tag(DicomTags.RescaleSlope)
+                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        return raw_array * slope + intercept
+                    except KeyError:
+                        return raw_array
+            except (KeyError, NotImplementedError):
+                try:
+                    slope = self.get_tag(DicomTags.RescaleSlope)
+                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    return raw_array * slope + intercept
+                except KeyError:
+                    return raw_array
 
     @property
     def array(self
