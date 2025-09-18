@@ -130,6 +130,11 @@ def ellipse_eq(pos: np.ndarray,
                b: float) -> np.ndarray:
     """
     Ellipse equation.
+    Should return an array of 1's if the input positions are on the ellipse.
+
+    .. math::
+
+        \\bigg(\\frac{x-x_c}{a}\\bigg)^2 + \\bigg(\\frac{y-y_c}{b}\\bigg)^2 =1
 
     Parameters
     ----------
@@ -161,6 +166,23 @@ def ellipse_eq_min_max(pos: np.ndarray,
                        ymax: float) -> np.ndarray:
     """
     Ellipse equation using min and max values.
+    Should return an array of 1's if the input positions are on the ellipse.
+
+    .. math::
+
+        \\bigg(\\frac{x-x_c}{a}\\bigg)^2 + \\bigg(\\frac{y-y_c}{b}\\bigg)^2 =1
+
+    where
+
+    .. math::
+
+        x_c = \\frac{x_{max} + x_{min}}{2}
+
+        y_c = \\frac{y_{max} + y_{min}}{2}
+
+        a = x_{max} - x_{min}
+
+        b = y_{max} - y_{min}
 
     Parameters
     ----------
@@ -193,6 +215,19 @@ def rectangle_eq(pos: np.ndarray,
                  b: float) -> np.ndarray:
     """
     Rectangle equation.
+    Should return an array of 1's if the input positions are on the rectangle.
+
+    .. math::
+
+        \\bigg|\\frac{x-x_c}{\\frac{a}{2}} + \\frac{y-y_c}{\\frac{b}{2}}\\bigg| + \\bigg|\\frac{x-x_c}{\\frac{a}{2}} - \\frac{y-y_c}{\\frac{b}{2}}\\bigg| =1
+
+    where
+
+    .. math::
+
+        x_c =  x_{min} + \\frac{a}{2}
+
+        y_c = y_{min} + \\frac{b}{2}
 
     Parameters
     ----------
@@ -214,8 +249,11 @@ def rectangle_eq(pos: np.ndarray,
     """
     if pos.ndim != 2 or pos.shape[1] != 2:
         raise ValueError("Incorrect shape for position")
-    return (np.min([np.abs(xmin - pos[:, 0]), np.abs(xmin + a - pos[:, 0]),
-            np.abs(ymin - pos[:, 1]), np.abs(ymin + b - pos[:, 1])], axis=0))
+    xc = xmin + a / 2
+    yc = ymin + b / 2
+    x_norm = (pos[:, 0] - xc) / a
+    y_norm = (pos[:, 1] - yc) / b
+    return np.abs(x_norm + y_norm) + np.abs(x_norm - y_norm)
 
 
 def rectangle_eq_min_max(pos: np.ndarray,
@@ -225,6 +263,23 @@ def rectangle_eq_min_max(pos: np.ndarray,
                          ymax: float) -> np.ndarray:
     """
     Rectangle equation using min and max values.
+    Should return an array of 1's if the input positions are on the rectangle.
+
+    .. math::
+
+        \\bigg|\\frac{x-x_c}{\\frac{a}{2}} + \\frac{y-y_c}{\\frac{b}{2}}\\bigg| + \\bigg|\\frac{x-x_c}{\\frac{a}{2}} - \\frac{y-y_c}{\\frac{b}{2}}\\bigg| =1
+
+    where
+
+    .. math::
+
+        x_c = \\frac{x_{max} + x_{min}}{2}
+
+        y_c = \\frac{y_{max} + y_{min}}{2}
+
+        a = x_{max} - x_{min}
+
+        b = y_{max} - y_{min}
 
     Parameters
     ----------
@@ -246,8 +301,13 @@ def rectangle_eq_min_max(pos: np.ndarray,
     """
     if pos.ndim != 2 or pos.shape[1] != 2:
         raise ValueError("Incorrect shape for position")
-    return (np.min(np.array([np.abs(pos[:, 0] - xmin), np.abs(pos[:, 0] - xmax),
-            np.abs(pos[:, 1] - ymin), np.abs(pos[:, 1] - ymax)]), axis=0))
+    a = xmax - xmin
+    b = ymax - ymin
+    xc = (xmax + xmin) / 2
+    yc = (ymax + ymin) / 2
+    x_norm = (pos[:, 0] - xc) / a
+    y_norm = (pos[:, 1] - yc) / b
+    return np.abs(x_norm + y_norm) + np.abs(x_norm - y_norm)
 
 
 def single_feature_boundbox(array: np.ndarray,
@@ -377,14 +437,23 @@ def phantom_boundary_automatic(array: np.ndarray,
     max_val = float(np.percentile(array, top_perc))
     points: list[tuple[float, float]] = []
 
+    xmin_init: int | float = 0
+    xmax_init: int | float = array.shape[1]
+    ymin_init: int | float = 0
+    ymax_init: int | float = array.shape[0]
+
     for y in range(array.shape[0]):
         line = array[y, :]
         try:
             bounds = nth_max_bounds(line, sensitivity, maximum=max_val)
             points.append((bounds.minimum, y))
             points.append((bounds.maximum, y))
+            xmin_init = max(xmin_init, bounds.minimum)
+            xmax_init = min(xmax_init, bounds.maximum)
         except ValueError:
             pass
+
+    xmin_init, xmax_init = sorted((xmin_init, xmax_init))
 
     for x in range(array.shape[1]):
         line = array[:, x]
@@ -392,8 +461,12 @@ def phantom_boundary_automatic(array: np.ndarray,
             bounds = nth_max_bounds(line, sensitivity, maximum=max_val)
             points.append((x, bounds.minimum))
             points.append((x, bounds.maximum))
+            ymin_init = max(ymin_init, bounds.minimum)
+            ymax_init = min(ymax_init, bounds.maximum)
         except ValueError:
             pass
+
+    ymin_init, ymax_init = sorted((ymin_init, ymax_init))
 
     val_bounds = ((0, 0, 0, 0), (array.shape[1], array.shape[0], array.shape[1], array.shape[0]))
 
@@ -418,7 +491,7 @@ def phantom_boundary_automatic(array: np.ndarray,
 
     if ellipse:
         ellipse_points_array = points_array.copy()
-        ellipse_fit = (0, 0, array.shape[1], array.shape[0])
+        ellipse_fit = (xmin_init, ymin_init, xmax_init, ymax_init)
         # pylint: disable-next=unbalanced-tuple-unpacking
         ellipse_fit, ellipse_pcov = curve_fit(ellipse_eq_min_max,
                                               ellipse_points_array,
@@ -446,11 +519,11 @@ def phantom_boundary_automatic(array: np.ndarray,
 
     if rect:
         rect_points_array = points_array.copy()
-        rect_fit = (0, 0, array.shape[1], array.shape[0])
+        rect_fit = (xmin_init, ymin_init, xmax_init, ymax_init)
         # pylint: disable-next=unbalanced-tuple-unpacking
         rect_fit, rect_pcov = curve_fit(rectangle_eq_min_max,
                                         rect_points_array,
-                                        np.zeros((len(rect_points_array),)),
+                                        np.ones((len(rect_points_array),)),
                                         rect_fit,
                                         bounds=val_bounds)
 
@@ -466,7 +539,7 @@ def phantom_boundary_automatic(array: np.ndarray,
             # pylint: disable-next=unbalanced-tuple-unpacking
             rect_fit, rect_pcov = curve_fit(rectangle_eq_min_max,
                                             rect_points_array,
-                                            np.zeros((len(rect_points_array),)),
+                                            np.ones((len(rect_points_array),)),
                                             rect_fit,
                                             bounds=val_bounds)
 
