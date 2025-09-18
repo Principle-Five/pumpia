@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DICOM Tags &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Utilities" href="../utilities/utilities.html" />
+    <link rel="prev" title="DICOM File Handling" href="dicoms.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../components/components.html">Core Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="file_handling.html">File Handling</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="general_images.html">General Image Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dicoms.html">DICOM File Handling</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DICOM Tags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="file_handling.html">File Handling</a></li>
+      <li class="breadcrumb-item active">DICOM Tags</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/file_handling/dicom_tags.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dicom-tags">
+<h1>DICOM Tags<a class="headerlink" href="#dicom-tags" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.get_tag">
+<span class="sig-prename descclassname"><span class="pre">pumpia.file_handling.dicom_tags.</span></span><span class="sig-name descname"><span class="pre">get_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dicom_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DataElement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pumpia.file_handling.dicom_tags.Tag" title="pumpia.file_handling.dicom_tags.bases.Tag"><span class="pre">Tag</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataElement</span></span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.get_tag" title="Link to this definition"></a></dt>
+<dd><p>Returns the dicom element from the pydicom Dataset defined by tag.
+If the Dataset is a stack then the frame can be provided for frame specific elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dicom_image</strong> (<em>Dataset</em>) – pydicom Dataset to be searched</p></li>
+<li><p><strong>tag</strong> (<a class="reference internal" href="#pumpia.file_handling.dicom_tags.Tag" title="pumpia.file_handling.dicom_tags.Tag"><em>Tag</em></a>) – tag of element to be returned</p></li>
+<li><p><strong>frame</strong> (<em>int</em><em>, </em><em>optional</em>) – frame number (starting at 1) if relevant, by default None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pydicom Dataelement of the provided tag.
+Use DataElement.value attribute to get the value of the element.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataElement</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – raised if an element is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.file_handling.dicom_tags.</span></span><span class="sig-name descname"><span class="pre">Tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyword:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">links:</span> <span class="pre">list[~pumpia.file_handling.dicom_tags.bases.TagLink]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternative_tags:</span> <span class="pre">list[tuple[int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int]]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag" title="Link to this definition"></a></dt>
+<dd><p>dataclass representing a dicom tag</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – the name of the tag as defined in the dicom standards.</p></li>
+<li><p><strong>keyword</strong> (<em>str</em>) – the keyword of the tag as defined in the dicom standards.</p></li>
+<li><p><strong>group</strong> (<em>int</em>) – the group of the dicom tag</p></li>
+<li><p><strong>element</strong> (<em>int</em>) – the element of the dicom tag</p></li>
+<li><p><strong>links</strong> (<em>list</em><em>[</em><em>TagLink</em><em>]</em>) – a list of TagLinks that hold any sequences the tag may be part of.</p></li>
+<li><p><strong>alternative_tags</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>) – a list of alternative tuples that could represent this tag</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.name" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.keyword">
+<span class="sig-name descname"><span class="pre">keyword</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.keyword" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.group" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.element">
+<span class="sig-name descname"><span class="pre">element</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.element" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.links">
+<span class="sig-name descname"><span class="pre">links</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.links" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[TagLink]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.alternative_tags">
+<span class="sig-name descname"><span class="pre">alternative_tags</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.alternative_tags" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.as_tuple">
+<span class="sig-name descname"><span class="pre">as_tuple</span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.as_tuple" title="Link to this definition"></a></dt>
+<dd><p>This tag as a tuple of (group, element).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.file_handling.dicom_tags.Tag.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pumpia.file_handling.dicom_tags.Tag.get" title="Link to this definition"></a></dt>
+<dd><p>return the dicom tag as a tuple of (group, element).</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><strong>pumpia.file_handling.dicom_tags.DicomTags</strong></p>
+<p id="module-pumpia.file_handling.dicom_tags.DicomTags">Module containing all DICOM Tags.</p>
+<p><strong>pumpia.file_handling.dicom_tags.XRAYTags</strong></p>
+<p id="module-pumpia.file_handling.dicom_tags.XRAYTags">Module containing X-ray DICOM Tags.</p>
+<p><strong>pumpia.file_handling.dicom_tags.CTTags</strong></p>
+<p id="module-pumpia.file_handling.dicom_tags.CTTags">Module containing CT DICOM Tags.</p>
+<p><strong>pumpia.file_handling.dicom_tags.NucMedTags</strong></p>
+<p id="module-pumpia.file_handling.dicom_tags.NucMedTags">Module containing Nuclear Medicine DICOM Tags.</p>
+<p><strong>pumpia.file_handling.dicom_tags.MRTags</strong></p>
+<p id="module-pumpia.file_handling.dicom_tags.MRTags">Module containing MRI DICOM Tags.</p>
+<p><strong>pumpia.file_handling.dicom_tags.USTags</strong></p>
+<p id="module-pumpia.file_handling.dicom_tags.USTags">Module containing Ultrasound DICOM Tags.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dicoms.html" class="btn btn-neutral float-left" title="DICOM File Handling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../utilities/utilities.html" class="btn btn-neutral float-right" title="Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

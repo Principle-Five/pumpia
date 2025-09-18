@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viewers &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Images" href="images.html" />
+    <link rel="prev" title="The Manager" href="manager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="components.html">Core Components</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="manager.html">The Manager</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Viewers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html">Regions of Interest</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="components.html">Core Components</a></li>
+      <li class="breadcrumb-item active">Viewers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/components/viewers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="viewers">
+<h1>Viewers<a class="headerlink" href="#viewers" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.widgets.viewers.</span></span><span class="sig-name descname"><span class="pre">BaseViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drag_drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drawing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_changing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer" title="Link to this definition"></a></dt>
+<dd><p>Base class for viewers. Do not use directly.</p>
+<p>Method <cite>can_show_image</cite> must be overwritten by the user when subclassing <cite>BaseViewer</cite>.
+<cite>image_type</cite> class attribute should also be set to the expected image type,
+default is <cite>BaseImageSet</cite>.</p>
+<p>If allowed the user can drag and drop a valid image from a
+<cite>Manager</cite> treeview into the viewer to load it.</p>
+<p>The following shortcuts are provided for user interaction:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Mouse wheel: Scroll through image slices.</p></li>
+<li><p>Control + Mouse wheel: Zoom in/out.</p></li>
+<li><p>Mouse wheel button + drag: Adjust window/level.</p></li>
+<li><p>Control + R: Reset image viewing parameters.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tk_parent</strong> (<em>tk.Misc</em>) – The parent widget.</p></li>
+<li><p><strong>manager</strong> (<a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><em>Manager</em></a>) – The manager object.</p></li>
+<li><p><strong>allow_drag_drop</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to allow drag and drop of images into the viewer(default is True).</p></li>
+<li><p><strong>allow_drawing_rois</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to allow drawing ROIs on the viewer (default is True).</p></li>
+<li><p><strong>validation_command</strong> (<em>Callable</em><em>[</em><em>[</em><em>ImageT</em><em>]</em><em>, </em><em>bool</em><em>]</em><em>, </em><em>optional</em>) – The validation command ran when an image is loaded,
+if validation fails then image is not shown.
+Must accept an image of the type viewable by the viewer (default is None).</p></li>
+<li><p><strong>preload_command</strong> (<em>Callable</em><em>[</em><em>[</em><em>Self</em><em>, </em><em>ImageT</em><em>]</em><em>, </em><em>ImageT</em><em>]</em><em>, </em><em>optional</em>) – The preload command to process a loaded image before it is shown.
+Must accept and return an image of the type viewable by the viewer(default is None).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.manager">
+<span class="sig-name descname"><span class="pre">manager</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.manager" title="Link to this definition"></a></dt>
+<dd><p>The manager object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager">Manager</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.allow_drag_drop">
+<span class="sig-name descname"><span class="pre">allow_drag_drop</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.allow_drag_drop" title="Link to this definition"></a></dt>
+<dd><p>Whether to allow drag and drop of images into the viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.allow_drawing_rois">
+<span class="sig-name descname"><span class="pre">allow_drawing_rois</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.allow_drawing_rois" title="Link to this definition"></a></dt>
+<dd><p>Whether to allow drawing ROIs on the viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.validation_command">
+<span class="sig-name descname"><span class="pre">validation_command</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.validation_command" title="Link to this definition"></a></dt>
+<dd><p>The validation command ran when an image is loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[ImageT], bool] or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.preload_command">
+<span class="sig-name descname"><span class="pre">preload_command</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.preload_command" title="Link to this definition"></a></dt>
+<dd><p>The preload command to process a loaded image before it is shown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Callable[[Self, ImageT], ImageT] or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.mouse_x">
+<span class="sig-name descname"><span class="pre">mouse_x</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.mouse_x" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the last mouse event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.mouse_y">
+<span class="sig-name descname"><span class="pre">mouse_y</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.mouse_y" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the last mouse event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.last_event_time">
+<span class="sig-name descname"><span class="pre">last_event_time</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.last_event_time" title="Link to this definition"></a></dt>
+<dd><p>The time of the last event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.center">
+<span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.center" title="Link to this definition"></a></dt>
+<dd><p>The center position of the viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../utilities/array_utils.html#pumpia.utilities.array_utils.Position" title="pumpia.utilities.array_utils.Position">Position</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.current_slice">
+<span class="sig-name descname"><span class="pre">current_slice</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.current_slice" title="Link to this definition"></a></dt>
+<dd><p>The current slice number of the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.manual_override">
+<span class="sig-name descname"><span class="pre">manual_override</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.manual_override" title="Link to this definition"></a></dt>
+<dd><p>Whether manual ROI drawing is active.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.image">
+<span class="sig-name descname"><span class="pre">image</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.image" title="Link to this definition"></a></dt>
+<dd><p>The current image showing on the Viewer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>T or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.pil_image">
+<span class="sig-name descname"><span class="pre">pil_image</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.pil_image" title="Link to this definition"></a></dt>
+<dd><p>The PIL image object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Image.Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.pil_tkimage">
+<span class="sig-name descname"><span class="pre">pil_tkimage</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.pil_tkimage" title="Link to this definition"></a></dt>
+<dd><p>The PIL image object as a Tkinter PhotoImage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ImageTk.PhotoImage</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.zoom_factor">
+<span class="sig-name descname"><span class="pre">zoom_factor</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.zoom_factor" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.current_image">
+<span class="sig-name descname"><span class="pre">current_image</span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.current_image" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>T or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.add_load_trace">
+<span class="sig-name descname"><span class="pre">add_load_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.add_load_trace" title="Link to this definition"></a></dt>
+<dd><p>Adds a load trace function. This function is called when an image is loaded.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.remove_load_trace">
+<span class="sig-name descname"><span class="pre">remove_load_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.remove_load_trace" title="Link to this definition"></a></dt>
+<dd><p>Removes a load trace function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.can_show_image">
+<span class="sig-name descname"><span class="pre">can_show_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.can_show_image" title="Link to this definition"></a></dt>
+<dd><p>Checks if the viewer can show the image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.unload_images">
+<span class="sig-name descname"><span class="pre">unload_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.unload_images" title="Link to this definition"></a></dt>
+<dd><p>Unloads the images from the viewer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.load_image">
+<span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.load_image" title="Link to this definition"></a></dt>
+<dd><p>Loads an image into the viewer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.viewer_to_image_pos">
+<span class="sig-name descname"><span class="pre">viewer_to_image_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../utilities/array_utils.html#pumpia.utilities.array_utils.Position" title="pumpia.utilities.array_utils.Position"><span class="pre">Position</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../utilities/array_utils.html#pumpia.utilities.array_utils.Position" title="pumpia.utilities.array_utils.Position"><span class="pre">Position</span></a></span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.viewer_to_image_pos" title="Link to this definition"></a></dt>
+<dd><p>Converts viewer coordinates to image coordinates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.image_to_viewer_pos">
+<span class="sig-name descname"><span class="pre">image_to_viewer_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../utilities/array_utils.html#pumpia.utilities.array_utils.Position" title="pumpia.utilities.array_utils.Position"><span class="pre">Position</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../utilities/array_utils.html#pumpia.utilities.array_utils.Position" title="pumpia.utilities.array_utils.Position"><span class="pre">Position</span></a></span></span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.image_to_viewer_pos" title="Link to this definition"></a></dt>
+<dd><p>Converts image coordinates to viewer coordinates.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.update" title="Link to this definition"></a></dt>
+<dd><p>Updates the viewer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.reset_image">
+<span class="sig-name descname"><span class="pre">reset_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.reset_image" title="Link to this definition"></a></dt>
+<dd><p>Resets the image to its original state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.manual_roi_draw">
+<span class="sig-name descname"><span class="pre">manual_roi_draw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ManualROIType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ROI_COLOUR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ACTIVE_ROI_COLOUR</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.manual_roi_draw" title="Link to this definition"></a></dt>
+<dd><p>Starts manual ROI drawing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.stop_manual_roi_draw">
+<span class="sig-name descname"><span class="pre">stop_manual_roi_draw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.stop_manual_roi_draw" title="Link to this definition"></a></dt>
+<dd><p>Stops manual ROI drawing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.change_slice">
+<span class="sig-name descname"><span class="pre">change_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.change_slice" title="Link to this definition"></a></dt>
+<dd><p>Changes the current slice of the image by amount of slices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.set_slice">
+<span class="sig-name descname"><span class="pre">set_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.set_slice" title="Link to this definition"></a></dt>
+<dd><p>Sets the current slice of the image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.change_zoom">
+<span class="sig-name descname"><span class="pre">change_zoom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.change_zoom" title="Link to this definition"></a></dt>
+<dd><p>Changes the zoom level of the image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.window_level">
+<span class="sig-name descname"><span class="pre">window_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.window_level" title="Link to this definition"></a></dt>
+<dd><p>Adjusts the window and level of the image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.set_window_level">
+<span class="sig-name descname"><span class="pre">set_window_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.set_window_level" title="Link to this definition"></a></dt>
+<dd><p>Sets the window and level of the image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.move_image">
+<span class="sig-name descname"><span class="pre">move_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.move_image" title="Link to this definition"></a></dt>
+<dd><p>Moves the image on the viewer based on the given deltas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.BaseViewer.set_image_loc">
+<span class="sig-name descname"><span class="pre">set_image_loc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.BaseViewer.set_image_loc" title="Link to this definition"></a></dt>
+<dd><p>Sets the image location on the viewer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.Viewer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.widgets.viewers.</span></span><span class="sig-name descname"><span class="pre">Viewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drag_drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drawing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_changing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.Viewer" title="Link to this definition"></a></dt>
+<dd><p>Viewer for displaying all images.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.ArrayViewer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.widgets.viewers.</span></span><span class="sig-name descname"><span class="pre">ArrayViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drag_drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drawing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_changing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.ArrayViewer" title="Link to this definition"></a></dt>
+<dd><p>Viewer for displaying <cite>ArrayImage</cite> images.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.MonochromeViewer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.widgets.viewers.</span></span><span class="sig-name descname"><span class="pre">MonochromeViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drag_drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drawing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_changing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.MonochromeViewer" title="Link to this definition"></a></dt>
+<dd><p>Viewer for displaying monochrome ArrayImage images (i.e. not RGB or multisample).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.DicomViewer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.widgets.viewers.</span></span><span class="sig-name descname"><span class="pre">DicomViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drag_drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drawing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_changing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.DicomViewer" title="Link to this definition"></a></dt>
+<dd><p>Viewer for displaying DICOM Series or Instance images.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.widgets.viewers.MonochromeDicomViewer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.widgets.viewers.</span></span><span class="sig-name descname"><span class="pre">MonochromeDicomViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="manager.html#pumpia.module_handling.manager.Manager" title="pumpia.module_handling.manager.Manager"><span class="pre">Manager</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drag_drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_drawing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_changing_rois</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preload_command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Self</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ImageT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.widgets.viewers.MonochromeDicomViewer" title="Link to this definition"></a></dt>
+<dd><p>Viewer for displaying monochrome DICOM Series or Instance images (i.e. not RGB or multisample).</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="manager.html" class="btn btn-neutral float-left" title="The Manager" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="images.html" class="btn btn-neutral float-right" title="Images" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

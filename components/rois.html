@@ -1,0 +1,852 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regions of Interest &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Usage" href="../usage/usage.html" />
+    <link rel="prev" title="Images" href="images.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="components.html">Core Components</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="manager.html">The Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html">Viewers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Regions of Interest</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="components.html">Core Components</a></li>
+      <li class="breadcrumb-item active">Regions of Interest</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/components/rois.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="regions-of-interest">
+<h1>Regions of Interest<a class="headerlink" href="#regions-of-interest" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.image_handling.roi_structures.</span></span><span class="sig-name descname"><span class="pre">BaseROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yellow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI" title="Link to this definition"></a></dt>
+<dd><p>Base class for Region of Interest (ROI) in an image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><em>ArrayImage</em></a>) – The image associated with the ROI.</p></li>
+<li><p><strong>slice_num</strong> (<em>int</em><em>, </em><em>optional</em>) – The slice number of the ROI (default is 0).</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the ROI (default is None).</p></li>
+<li><p><strong>replace</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to replace an existing ROI with the same name (default is True).</p></li>
+<li><p><strong>cache_values</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to cache pixel values and calculated values (default is True).</p></li>
+<li><p><strong>colour</strong> (<em>str</em><em>, </em><em>optional</em>) – The colour of the ROI.</p></li>
+<li><p><strong>active_colour</strong> (<em>str</em><em>, </em><em>optional</em>) – The colour of the ROI when it is selected.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.image">
+<span class="sig-name descname"><span class="pre">image</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.image" title="Link to this definition"></a></dt>
+<dd><p>The image associated with the ROI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage">ArrayImage</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.slice_num">
+<span class="sig-name descname"><span class="pre">slice_num</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.slice_num" title="Link to this definition"></a></dt>
+<dd><p>The slice number of the ROI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.cache_values">
+<span class="sig-name descname"><span class="pre">cache_values</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.cache_values" title="Link to this definition"></a></dt>
+<dd><p>Whether to cache pixel values and calculated values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.colour">
+<span class="sig-name descname"><span class="pre">colour</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.colour" title="Link to this definition"></a></dt>
+<dd><p>The colour of the ROI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.active_colour">
+<span class="sig-name descname"><span class="pre">active_colour</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.active_colour" title="Link to this definition"></a></dt>
+<dd><p>The colour of the ROI when it is selected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.active">
+<span class="sig-name descname"><span class="pre">active</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.active" title="Link to this definition"></a></dt>
+<dd><p>Whether the ROI is active.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.hidden">
+<span class="sig-name descname"><span class="pre">hidden</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.hidden" title="Link to this definition"></a></dt>
+<dd><p>Whether the ROI is hidden.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.id_string">
+<span class="sig-name descname"><span class="pre">id_string</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.id_string" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.storage_string">
+<span class="sig-name descname"><span class="pre">storage_string</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.storage_string" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.tag">
+<span class="sig-name descname"><span class="pre">tag</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.tag" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.pixel_values">
+<span class="sig-name descname"><span class="pre">pixel_values</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.pixel_values" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int | float | list[float]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.pixel_array">
+<span class="sig-name descname"><span class="pre">pixel_array</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.pixel_array" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.mask" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.area">
+<span class="sig-name descname"><span class="pre">area</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.area" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.perimeter">
+<span class="sig-name descname"><span class="pre">perimeter</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.perimeter" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.mean">
+<span class="sig-name descname"><span class="pre">mean</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.mean" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PixelStatsType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.std">
+<span class="sig-name descname"><span class="pre">std</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.std" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PixelStatsType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.xmin">
+<span class="sig-name descname"><span class="pre">xmin</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.xmin" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.xmax">
+<span class="sig-name descname"><span class="pre">xmax</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.xmax" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.ymin">
+<span class="sig-name descname"><span class="pre">ymin</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.ymin" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.ymax">
+<span class="sig-name descname"><span class="pre">ymax</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.ymax" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.xcent">
+<span class="sig-name descname"><span class="pre">xcent</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.xcent" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.ycent">
+<span class="sig-name descname"><span class="pre">ycent</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.ycent" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.values_str">
+<span class="sig-name descname"><span class="pre">values_str</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.values_str" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.menu_options">
+<span class="sig-name descname"><span class="pre">menu_options</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.menu_options" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[str, Callable[[], None]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.delete_cache">
+<span class="sig-name descname"><span class="pre">delete_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.delete_cache" title="Link to this definition"></a></dt>
+<dd><p>Deletes the cached values of the ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.point_is_in">
+<span class="sig-name descname"><span class="pre">point_is_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.point_is_in" title="Link to this definition"></a></dt>
+<dd><p>Checks if a pixel is inside the ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.point_is_on">
+<span class="sig-name descname"><span class="pre">point_is_on</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.point_is_on" title="Link to this definition"></a></dt>
+<dd><p>Checks if a pixel is on the boundary of the ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.move">
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.move" title="Link to this definition"></a></dt>
+<dd><p>Moves the ROI by the specified amount.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.enlarge">
+<span class="sig-name descname"><span class="pre">enlarge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.enlarge" title="Link to this definition"></a></dt>
+<dd><p>Enlarges the ROI by the specified amount.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.resize_bbox">
+<span class="sig-name descname"><span class="pre">resize_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.resize_bbox" title="Link to this definition"></a></dt>
+<dd><p>Resizes the bounding box of the ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.rotate">
+<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.rotate" title="Link to this definition"></a></dt>
+<dd><p>Rotates the ROI by the specified angle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.copy_to_image">
+<span class="sig-name descname"><span class="pre">copy_to_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ROI_COLOUR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ACTIVE_ROI_COLOUR</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="s"><span class="pre">'BaseROI'</span></span></span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.copy_to_image" title="Link to this definition"></a></dt>
+<dd><p>Copies the ROI to another image.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.BaseROI.move_to_image">
+<span class="sig-name descname"><span class="pre">move_to_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ROI_COLOUR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">ACTIVE_ROI_COLOUR</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="s"><span class="pre">'BaseROI'</span></span></span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.BaseROI.move_to_image" title="Link to this definition"></a></dt>
+<dd><p>Moves the ROI to another image.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.image_handling.roi_structures.</span></span><span class="sig-name descname"><span class="pre">Angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yellow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle" title="Link to this definition"></a></dt>
+<dd><p>Represents an angle ROI.
+Has the same attributes and methods as BaseROI unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the vertex.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the vertex.</p></li>
+<li><p><strong>x1</strong> (<em>int</em>) – The x-coordinate of the first point.</p></li>
+<li><p><strong>y1</strong> (<em>int</em>) – The y-coordinate of the first point.</p></li>
+<li><p><strong>x2</strong> (<em>int</em>) – The x-coordinate of the second point.</p></li>
+<li><p><strong>y2</strong> (<em>int</em>) – The y-coordinate of the second point.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.x" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.y" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.x1">
+<span class="sig-name descname"><span class="pre">x1</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.x1" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the first point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.y1">
+<span class="sig-name descname"><span class="pre">y1</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.y1" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the first point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.x2">
+<span class="sig-name descname"><span class="pre">x2</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.x2" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the second point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.y2">
+<span class="sig-name descname"><span class="pre">y2</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.y2" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the second point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.angle">
+<span class="sig-name descname"><span class="pre">angle</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.angle" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.Angle.angle_degrees">
+<span class="sig-name descname"><span class="pre">angle_degrees</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.Angle.angle_degrees" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.PointROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.image_handling.roi_structures.</span></span><span class="sig-name descname"><span class="pre">PointROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yellow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.PointROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a point ROI.
+Has the same attributes and methods as BaseROI unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the point.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the point.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.PointROI.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.PointROI.x" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.PointROI.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.PointROI.y" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.EllipseROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.image_handling.roi_structures.</span></span><span class="sig-name descname"><span class="pre">EllipseROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yellow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.EllipseROI" title="Link to this definition"></a></dt>
+<dd><p>Represents an ellipse ROI.
+Has the same attributes and methods as BaseROI unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the center of the ellipse.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the center of the ellipse.</p></li>
+<li><p><strong>a</strong> (<em>int</em>) – The length of the horizontal axis of the ellipse.</p></li>
+<li><p><strong>b</strong> (<em>int</em>) – The length of the vertical axis of the ellipse.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.EllipseROI.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.EllipseROI.x" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the center of the ellipse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.EllipseROI.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.EllipseROI.y" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the center of the ellipse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.EllipseROI.a">
+<span class="sig-name descname"><span class="pre">a</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.EllipseROI.a" title="Link to this definition"></a></dt>
+<dd><p>The length of the horizontal axis of the ellipse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.EllipseROI.b">
+<span class="sig-name descname"><span class="pre">b</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.EllipseROI.b" title="Link to this definition"></a></dt>
+<dd><p>The length of the vertical axis of the ellipse.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.image_handling.roi_structures.</span></span><span class="sig-name descname"><span class="pre">RectangleROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yellow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a rectangle ROI.
+Has the same attributes and methods as BaseROI unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xmin</strong> (<em>int</em>) – The minimum x-coordinate of the rectangle.</p></li>
+<li><p><strong>ymin</strong> (<em>int</em>) – The minimum y-coordinate of the rectangle.</p></li>
+<li><p><strong>width</strong> (<em>int</em>) – The width of the rectangle.</p></li>
+<li><p><strong>height</strong> (<em>int</em>) – The height of the rectangle.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.x" title="Link to this definition"></a></dt>
+<dd><p>The minimum x-coordinate of the rectangle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.y" title="Link to this definition"></a></dt>
+<dd><p>The minimum y-coordinate of the rectangle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.width" title="Link to this definition"></a></dt>
+<dd><p>The width of the rectangle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.height" title="Link to this definition"></a></dt>
+<dd><p>The height of the rectangle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.h_profile">
+<span class="sig-name descname"><span class="pre">h_profile</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.h_profile" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.v_profile">
+<span class="sig-name descname"><span class="pre">v_profile</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.v_profile" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.plot_h_profile">
+<span class="sig-name descname"><span class="pre">plot_h_profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.plot_h_profile" title="Link to this definition"></a></dt>
+<dd><p>Plots the horizontal profile of the ROI in a new window.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.RectangleROI.plot_v_profile">
+<span class="sig-name descname"><span class="pre">plot_v_profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.RectangleROI.plot_v_profile" title="Link to this definition"></a></dt>
+<dd><p>Plots the vertical profile of the ROI in a new window.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.image_handling.roi_structures.</span></span><span class="sig-name descname"><span class="pre">LineROI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.ArrayImage" title="pumpia.image_handling.image_structures.ArrayImage"><span class="pre">ArrayImage</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yellow'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_colour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI" title="Link to this definition"></a></dt>
+<dd><p>Represents a line ROI.
+Has the same attributes and methods as BaseROI unless stated below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> (<em>int</em>) – The x-coordinate of the first point.</p></li>
+<li><p><strong>y1</strong> (<em>int</em>) – The y-coordinate of the first point.</p></li>
+<li><p><strong>x2</strong> (<em>int</em>) – The x-coordinate of the second point.</p></li>
+<li><p><strong>y2</strong> (<em>int</em>) – The y-coordinate of the second point.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.x1">
+<span class="sig-name descname"><span class="pre">x1</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.x1" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the first point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.y1">
+<span class="sig-name descname"><span class="pre">y1</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.y1" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the first point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.x2">
+<span class="sig-name descname"><span class="pre">x2</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.x2" title="Link to this definition"></a></dt>
+<dd><p>The x-coordinate of the second point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.y2">
+<span class="sig-name descname"><span class="pre">y2</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.y2" title="Link to this definition"></a></dt>
+<dd><p>The y-coordinate of the second point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.length">
+<span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.length" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.profile">
+<span class="sig-name descname"><span class="pre">profile</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.profile" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.x_len">
+<span class="sig-name descname"><span class="pre">x_len</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.x_len" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.y_len">
+<span class="sig-name descname"><span class="pre">y_len</span></span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.y_len" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.image_handling.roi_structures.LineROI.plot_profile">
+<span class="sig-name descname"><span class="pre">plot_profile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.image_handling.roi_structures.LineROI.plot_profile" title="Link to this definition"></a></dt>
+<dd><p>Plots the profile of the ROI in a new window.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="images.html" class="btn btn-neutral float-left" title="Images" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../usage/usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

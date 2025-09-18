@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature Utilities &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="String Validators" href="string_validators.html" />
+    <link rel="prev" title="Array Utilities" href="array_utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../components/components.html">Core Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="utilities.html">Utilities</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="array_utils.html">Array Utilities</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Feature Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="string_validators.html">String Validators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tk_utilities.html">Tkinter Utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file_utils.html">File Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="utilities.html">Utilities</a></li>
+      <li class="breadcrumb-item active">Feature Utilities</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/utilities/feature_utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="feature-utilities">
+<h1>Feature Utilities<a class="headerlink" href="#feature-utilities" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.flat_top_gauss">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">flat_top_gauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.flat_top_gauss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the flat top gaussian given by:</p>
+<div class="math notranslate nohighlight">
+\[amp * exp\bigg(-\bigg(\frac{(pos-x0)^2}{2sigma^2}\bigg)^{rank}\bigg) + offset\]</div>
+<p>A rank of 1 is a standard gaussian.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>)</p></li>
+<li><p><strong>x0</strong> (<em>float</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rank</strong> (<em>float</em>)</p></li>
+<li><p><strong>amp</strong> (<em>float</em>) – by default 1</p></li>
+<li><p><strong>offset</strong> (<em>float</em><em>, </em><em>optional</em>) – by default 0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.split_gauss">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">split_gauss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.split_gauss" title="Link to this definition"></a></dt>
+<dd><p>Returns an array of values for a gaussian split down the middle and joined by a line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>) – 1 dimensional array of positions.</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – left position of the top of the curve.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – right position of the top of the curve.</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – half width of gaussian part.</p></li>
+<li><p><strong>amp</strong> (<em>float</em>) – amplitude of the curve.</p></li>
+<li><p><strong>offset</strong> (<em>float</em><em>, </em><em>optional</em>) – base offset added to the curve (default is 0).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.split_gauss_integral">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">split_gauss_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.split_gauss_integral" title="Link to this definition"></a></dt>
+<dd><p>Integrates accross <cite>split_gauss</cite> and adds <cite>baseline</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>) – 1 dimensional array of positions</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – left position of the top of the curve</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – right position of the top of the curve</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – half width of gaussian part</p></li>
+<li><p><strong>amp</strong> (<em>float</em>) – amplitude of the curve</p></li>
+<li><p><strong>baseline</strong> (<em>float</em>) – baseline to be added onto the integral</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 dimensional array, 1 shorter that pos</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.ellipse_eq">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">ellipse_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.ellipse_eq" title="Link to this definition"></a></dt>
+<dd><p>Ellipse equation.
+Should return an array of 1’s if the input positions are on the ellipse.</p>
+<div class="math notranslate nohighlight">
+\[\bigg(\frac{x-x_c}{a}\bigg)^2 + \bigg(\frac{y-y_c}{b}\bigg)^2 =1\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>) – The positions array.</p></li>
+<li><p><strong>xc</strong> (<em>float</em>) – The x-center of the ellipse.</p></li>
+<li><p><strong>yc</strong> (<em>float</em>) – The y-center of the ellipse.</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – The width of the ellipse.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – The height of the ellipse.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the ellipse equation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.ellipse_eq_min_max">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">ellipse_eq_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.ellipse_eq_min_max" title="Link to this definition"></a></dt>
+<dd><p>Ellipse equation using min and max values.
+Should return an array of 1’s if the input positions are on the ellipse.</p>
+<div class="math notranslate nohighlight">
+\[\bigg(\frac{x-x_c}{a}\bigg)^2 + \bigg(\frac{y-y_c}{b}\bigg)^2 =1\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}x_c = \frac{x_{max} + x_{min}}{2}\\y_c = \frac{y_{max} + y_{min}}{2}\\a = x_{max} - x_{min}\\b = y_{max} - y_{min}\end{aligned}\end{align} \]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>) – The positions array.</p></li>
+<li><p><strong>xmin</strong> (<em>float</em>) – The minimum x-coordinate.</p></li>
+<li><p><strong>ymin</strong> (<em>float</em>) – The minimum y-coordinate.</p></li>
+<li><p><strong>xmax</strong> (<em>float</em>) – The maximum x-coordinate.</p></li>
+<li><p><strong>ymax</strong> (<em>float</em>) – The maximum y-coordinate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the ellipse equation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.rectangle_eq">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">rectangle_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.rectangle_eq" title="Link to this definition"></a></dt>
+<dd><p>Rectangle equation.
+Should return an array of 1’s if the input positions are on the rectangle.</p>
+<div class="math notranslate nohighlight">
+\[\bigg|\frac{x-x_c}{\frac{a}{2}} + \frac{y-y_c}{\frac{b}{2}}\bigg| + \bigg|\frac{x-x_c}{\frac{a}{2}} - \frac{y-y_c}{\frac{b}{2}}\bigg| =1\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}x_c =  x_{min} + \frac{a}{2}\\y_c = y_{min} + \frac{b}{2}\end{aligned}\end{align} \]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>) – The positions array.</p></li>
+<li><p><strong>xmin</strong> (<em>float</em>) – The minimum x-coordinate.</p></li>
+<li><p><strong>ymin</strong> (<em>float</em>) – The minimum y-coordinate.</p></li>
+<li><p><strong>a</strong> (<em>float</em>) – The width of the rectangle.</p></li>
+<li><p><strong>b</strong> (<em>float</em>) – The height of the rectangle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the rectangle equation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.rectangle_eq_min_max">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">rectangle_eq_min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.rectangle_eq_min_max" title="Link to this definition"></a></dt>
+<dd><p>Rectangle equation using min and max values.
+Should return an array of 1’s if the input positions are on the rectangle.</p>
+<div class="math notranslate nohighlight">
+\[\bigg|\frac{x-x_c}{\frac{a}{2}} + \frac{y-y_c}{\frac{b}{2}}\bigg| + \bigg|\frac{x-x_c}{\frac{a}{2}} - \frac{y-y_c}{\frac{b}{2}}\bigg| =1\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}x_c = \frac{x_{max} + x_{min}}{2}\\y_c = \frac{y_{max} + y_{min}}{2}\\a = x_{max} - x_{min}\\b = y_{max} - y_{min}\end{aligned}\end{align} \]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>np.ndarray</em>) – The positions array.</p></li>
+<li><p><strong>xmin</strong> (<em>float</em>) – The minimum x-coordinate.</p></li>
+<li><p><strong>ymin</strong> (<em>float</em>) – The minimum y-coordinate.</p></li>
+<li><p><strong>xmax</strong> (<em>float</em>) – The maximum x-coordinate.</p></li>
+<li><p><strong>ymax</strong> (<em>float</em>) – The maximum y-coordinate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the rectangle equation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.single_feature_boundbox">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">single_feature_boundbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">divisor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_perc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">95</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../usage/context.html#pumpia.module_handling.context.BoundBoxContext" title="pumpia.module_handling.context.BoundBoxContext"><span class="pre">BoundBoxContext</span></a></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.single_feature_boundbox" title="Link to this definition"></a></dt>
+<dd><p>Finds the bounding box for an array with a single feature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>np.ndarray</em>) – The input array. should be 2 dimensional</p></li>
+<li><p><strong>divisor</strong> (<em>float</em><em>, </em><em>optional</em>) – The divisor to calculate the nth maximum value (default is 2).</p></li>
+<li><p><strong>top_perc</strong> (<em>float</em><em>, </em><em>optional</em>) – The percentile to calculate the working maximum from, to exclude outliers (default is 95).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bounding box context.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../usage/context.html#pumpia.module_handling.context.BoundBoxContext" title="pumpia.module_handling.context.BoundBoxContext">BoundBoxContext</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.phantom_boundbox_manual">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">phantom_boundbox_manual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitivity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_perc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bubble_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bubble_side</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'top'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'bottom'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'top'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../usage/context.html#pumpia.module_handling.context.BoundBoxContext" title="pumpia.module_handling.context.BoundBoxContext"><span class="pre">BoundBoxContext</span></a></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.phantom_boundbox_manual" title="Link to this definition"></a></dt>
+<dd><p>Finds the bounding box for a phantom with bubble info provided manually.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>np.ndarray</em>) – The input array. Should be 2 dimensional</p></li>
+<li><p><strong>sensitivity</strong> (<em>float</em><em>, </em><em>optional</em>) – The sensitivity for boundary detection.
+e.g. 2 would use half the maximum, 10 would use a tenth (default is 2).</p></li>
+<li><p><strong>top_perc</strong> (<em>float</em><em>, </em><em>optional</em>) – The percentile to calculate the working maximum from, to exclude outliers (default is 95).</p></li>
+<li><p><strong>bubble_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – The bubble offset for boundary detection in pixels (default is 0).</p></li>
+<li><p><strong>bubble_side</strong> (<em>SideType</em><em>, </em><em>optional</em>) – The side of the phantom the bubble is on (default is “top”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bounding box context.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../usage/context.html#pumpia.module_handling.context.BoundBoxContext" title="pumpia.module_handling.context.BoundBoxContext">BoundBoxContext</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pumpia.utilities.feature_utils.phantom_boundary_automatic">
+<span class="sig-prename descclassname"><span class="pre">pumpia.utilities.feature_utils.</span></span><span class="sig-name descname"><span class="pre">phantom_boundary_automatic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensitivity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_perc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cull_perc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'rectangle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ellipse'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'rectangle'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ellipse'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../usage/context.html#pumpia.module_handling.context.PhantomContext" title="pumpia.module_handling.context.PhantomContext"><span class="pre">PhantomContext</span></a></span></span><a class="headerlink" href="#pumpia.utilities.feature_utils.phantom_boundary_automatic" title="Link to this definition"></a></dt>
+<dd><p>Finds the boundary of a phantom automatically.</p>
+<p>This is done by finding the pixel positions of the boundary of the phantom,
+using the nth maximum method.
+The boundary is then fitted to an ellipse and a rectangle.
+The worst fitting positions are removed and the fitting is repeated.
+The best fitting shape after n iterations is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>np.ndarray</em>) – The input array. Should be 2 dimensional</p></li>
+<li><p><strong>sensitivity</strong> (<em>float</em><em>, </em><em>optional</em>) – The sensitivity for boundary detection.
+e.g. 2 would use half the maximum, 10 would use a tenth(default is 3).</p></li>
+<li><p><strong>top_perc</strong> (<em>float</em><em>, </em><em>optional</em>) – The percentile to calculate the working maximum from, to exclude outliers (default is 95).</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations in the algorithm (default is 2).</p></li>
+<li><p><strong>cull_perc</strong> (<em>float</em><em>, </em><em>optional</em>) – The percentile to determine how many positions are kept each iteration (default is 80).</p></li>
+<li><p><strong>shape</strong> (<em>PhantomShapes</em><em>, </em><em>optional</em>) – The shape of the phantom.
+Calculated if not given (default is None).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The phantom context.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../usage/context.html#pumpia.module_handling.context.PhantomContext" title="pumpia.module_handling.context.PhantomContext">PhantomContext</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="array_utils.html" class="btn btn-neutral float-left" title="Array Utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="string_validators.html" class="btn btn-neutral float-right" title="String Validators" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

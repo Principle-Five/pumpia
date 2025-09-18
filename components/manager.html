@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Manager &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Viewers" href="viewers.html" />
+    <link rel="prev" title="Core Components" href="components.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="components.html">Core Components</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewers.html">Viewers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="images.html">Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rois.html">Regions of Interest</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="components.html">Core Components</a></li>
+      <li class="breadcrumb-item active">The Manager</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/components/manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-manager">
+<h1>The Manager<a class="headerlink" href="#the-manager" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pumpia.module_handling.manager.</span></span><span class="sig-name descname"><span class="pre">Manager</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager" title="Link to this definition"></a></dt>
+<dd><p>Manages the data and shared widgets of the application.</p>
+<p>Users can drag images from the treeview widgets created by a Manager
+into a <cite>Viewer</cite> to show that image in the viewer.</p>
+<p>Right click menus within the treeviews have different options depending on the focus,
+for example:</p>
+<ul class="simple">
+<li><p>copy the filepath for images loaded from files</p></li>
+<li><p>show the tags of DICOM images</p></li>
+<li><p>delete ROIs</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.patients">
+<span class="sig-name descname"><span class="pre">patients</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.patients" title="Link to this definition"></a></dt>
+<dd><p>The set of patients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>set[<a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Patient" title="pumpia.file_handling.dicom_structures.Patient">Patient</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.general_images">
+<span class="sig-name descname"><span class="pre">general_images</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.general_images" title="Link to this definition"></a></dt>
+<dd><p>The set of general images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>set[<a class="reference internal" href="../file_handling/general_images.html#pumpia.file_handling.general_structures.GeneralImage" title="pumpia.file_handling.general_structures.GeneralImage">GeneralImage</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.select_time">
+<span class="sig-name descname"><span class="pre">select_time</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.select_time" title="Link to this definition"></a></dt>
+<dd><p>The time of the last selection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.focus">
+<span class="sig-name descname"><span class="pre">focus</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.focus" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Patient" title="pumpia.file_handling.dicom_structures.Patient">Patient</a> | <a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study">Study</a> | <a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet" title="pumpia.image_handling.image_structures.BaseImageSet">BaseImageSet</a> | <a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI" title="pumpia.image_handling.roi_structures.BaseROI">BaseROI</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.selected">
+<span class="sig-name descname"><span class="pre">selected</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.selected" title="Link to this definition"></a></dt>
+<dd><p>The list of selected items.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Patient" title="pumpia.file_handling.dicom_structures.Patient">Patient</a> | <a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Study" title="pumpia.file_handling.dicom_structures.Study">Study</a> | <a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet" title="pumpia.image_handling.image_structures.BaseImageSet">BaseImageSet</a> | <a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI" title="pumpia.image_handling.roi_structures.BaseROI">BaseROI</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.current_action">
+<span class="sig-name descname"><span class="pre">current_action</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.current_action" title="Link to this definition"></a></dt>
+<dd><p>The current mouse action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>MouseOptionsType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.roi_action">
+<span class="sig-name descname"><span class="pre">roi_action</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.roi_action" title="Link to this definition"></a></dt>
+<dd><p>The current ROI action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ROIOptionsType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.viewers">
+<span class="sig-name descname"><span class="pre">viewers</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.viewers" title="Link to this definition"></a></dt>
+<dd><p>The list of viewers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="viewers.html#pumpia.widgets.viewers.BaseViewer" title="pumpia.widgets.viewers.BaseViewer">BaseViewer</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.popup_menu_options">
+<span class="sig-name descname"><span class="pre">popup_menu_options</span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.popup_menu_options" title="Link to this definition"></a></dt>
+<dd><p>A list containing the popup menu options for the current focus.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[tuple[str, Callable[[], None]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.load_folder">
+<span class="sig-name descname"><span class="pre">load_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tk.Misc</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_stack_direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DirectionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Vertical'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.load_folder" title="Link to this definition"></a></dt>
+<dd><p>Loads DICOM files from a folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.load_image">
+<span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.load_image" title="Link to this definition"></a></dt>
+<dd><p>Loads an image given by filepath.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.load_images">
+<span class="sig-name descname"><span class="pre">load_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tk_parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tk.Misc</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_row</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter_stack_direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DirectionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Vertical'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.load_images" title="Link to this definition"></a></dt>
+<dd><p>Loads images from a list of files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.load_dicom">
+<span class="sig-name descname"><span class="pre">load_dicom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">open_dicom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FileDataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Series" title="pumpia.file_handling.dicom_structures.Series"><span class="pre">Series</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../file_handling/dicoms.html#pumpia.file_handling.dicom_structures.Instance" title="pumpia.file_handling.dicom_structures.Instance"><span class="pre">Instance</span></a></span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.load_dicom" title="Link to this definition"></a></dt>
+<dd><p>Loads a DICOM file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.update_trees">
+<span class="sig-name descname"><span class="pre">update_trees</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.update_trees" title="Link to this definition"></a></dt>
+<dd><p>Updates the treeviews with the current data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.add_roi">
+<span class="sig-name descname"><span class="pre">add_roi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rois.html#pumpia.image_handling.roi_structures.BaseROI" title="pumpia.image_handling.roi_structures.BaseROI"><span class="pre">BaseROI</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.add_roi" title="Link to this definition"></a></dt>
+<dd><p>Adds an ROI to the treeviews.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.delete_current_roi">
+<span class="sig-name descname"><span class="pre">delete_current_roi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.delete_current_roi" title="Link to this definition"></a></dt>
+<dd><p>Deletes the current focus if it is an ROI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.show_tags">
+<span class="sig-name descname"><span class="pre">show_tags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.show_tags" title="Link to this definition"></a></dt>
+<dd><p>Shows the DICOM tags of the current focus if a DICOM file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.copy_filepath">
+<span class="sig-name descname"><span class="pre">copy_filepath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.copy_filepath" title="Link to this definition"></a></dt>
+<dd><p>Copies the filepath of the current focus to the clipboard.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.copy_filepath_as_posix">
+<span class="sig-name descname"><span class="pre">copy_filepath_as_posix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.copy_filepath_as_posix" title="Link to this definition"></a></dt>
+<dd><p>Copies the filepath of the current focus to the clipboard in POSIX format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.copy_directory">
+<span class="sig-name descname"><span class="pre">copy_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.copy_directory" title="Link to this definition"></a></dt>
+<dd><p>Copies the directory of the current focus to the clipboard.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.copy_directory_as_posix">
+<span class="sig-name descname"><span class="pre">copy_directory_as_posix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.copy_directory_as_posix" title="Link to this definition"></a></dt>
+<dd><p>Copies the directory of the current focus to the clipboard in POSIX format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.update_viewers">
+<span class="sig-name descname"><span class="pre">update_viewers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="images.html#pumpia.image_handling.image_structures.BaseImageSet" title="pumpia.image_handling.image_structures.BaseImageSet"><span class="pre">BaseImageSet</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.update_viewers" title="Link to this definition"></a></dt>
+<dd><p>Updates the viewers linked to the Manager.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.get_tree_frame">
+<span class="sig-name descname"><span class="pre">get_tree_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tk.Misc</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ttk.Frame</span></span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.get_tree_frame" title="Link to this definition"></a></dt>
+<dd><p>Returns a frame containing a treeview.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.get_mouse_options_combobox">
+<span class="sig-name descname"><span class="pre">get_mouse_options_combobox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tk.Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'full'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'reduced'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ttk.Combobox</span></span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.get_mouse_options_combobox" title="Link to this definition"></a></dt>
+<dd><p>Returns a combobox for selecting mouse options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.set_current_action">
+<span class="sig-name descname"><span class="pre">set_current_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MouseOptionsType</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.set_current_action" title="Link to this definition"></a></dt>
+<dd><p>Sets the current action.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.get_roi_options_frame">
+<span class="sig-name descname"><span class="pre">get_roi_options_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tk.Misc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DirectionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Vertical'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ttk.Labelframe</span></span></span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.get_roi_options_frame" title="Link to this definition"></a></dt>
+<dd><p>Returns a frame containing ROI options.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pumpia.module_handling.manager.Manager.set_current_roi_action">
+<span class="sig-name descname"><span class="pre">set_current_roi_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ROIOptionsType</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pumpia.module_handling.manager.Manager.set_current_roi_action" title="Link to this definition"></a></dt>
+<dd><p>Sets the current ROI action.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="components.html" class="btn btn-neutral float-left" title="Core Components" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="viewers.html" class="btn btn-neutral float-right" title="Viewers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
