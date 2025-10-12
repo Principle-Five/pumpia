@@ -7,8 +7,8 @@ Functions:
 from pathlib import Path
 from pumpia.image_handling.image_structures import FileImageSet
 
-type TreeDict = dict[str, TreeDict | FileImageSet]
-type TreePathDict = dict[Path, TreePathDict | FileImageSet]
+type TreeDict = dict[str, 'TreeDict | FileImageSet']
+type TreePathDict = dict[Path, 'TreePathDict | FileImageSet']
 
 
 def get_file_tree_dict(images: list[FileImageSet]) -> TreePathDict:

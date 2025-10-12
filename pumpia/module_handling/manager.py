@@ -8,7 +8,8 @@ import traceback
 import gc
 import datetime
 import typing
-from typing import TYPE_CHECKING, Literal, Callable
+from typing import TYPE_CHECKING, Literal
+from collections.abc import Callable
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askdirectory

@@ -192,7 +192,7 @@ class BaseIO[ValT, TkVarT:tk.Variable](ABC):
             self._error = True
 
 
-class BaseInput[ValT, TkVarT](BaseIO[ValT, TkVarT]):  # type: ignore
+class BaseInput[ValT, TkVarT:tk.Variable](BaseIO['ValT', 'TkVarT']):
     """
     Base class for input handling for modules.
     Has the same attributes and methods as BaseIO unless stated below.
@@ -244,7 +244,7 @@ class BaseInput[ValT, TkVarT](BaseIO[ValT, TkVarT]):  # type: ignore
             self._entry.configure(textvariable=self.value_var)
 
 
-class BaseOutput[ValT, TkVarT](BaseIO[ValT, TkVarT]):  # type: ignore
+class BaseOutput[ValT, TkVarT:tk.Variable](BaseIO['ValT', 'TkVarT']):
     """
     Base class for output handling.
     Has the same attributes and methods as BaseIO unless stated below.
