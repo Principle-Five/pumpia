@@ -2,5 +2,5 @@
 
 from typing import Literal
 
-SideType = Literal["top", "bottom", "left", "right"]
-DirectionType = Literal["Horizontal", "h", "H", "Vertical", "v", "V"]
+type SideType = Literal["top", "bottom", "left", "right"]
+type DirectionType = Literal["Horizontal", "h", "H", "Vertical", "v", "V"]
