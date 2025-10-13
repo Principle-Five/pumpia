@@ -21,7 +21,7 @@ PumpIA has the following dependencies:
 * `pydicom <https://pydicom.github.io/pydicom/stable/>`_
 * `matplotlib <https://matplotlib.org/>`_
 
-See `pydicom: Compression of Pixel Data <https://pydicom.github.io/pydicom/stable/guides/user/image_data_handlers.html>`_ for information on how to install the required libraries for reading compressed dicom files.
+See `pydicom: Handling of compressed pixel data <https://pydicom.github.io/pydicom/stable/guides/user/image_data_handlers.html>`_ for information on how to install the required libraries for reading compressed dicom files.
 
 Installation
 ------------
