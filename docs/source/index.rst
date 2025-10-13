@@ -31,7 +31,7 @@ To use PumpIA, install it using pip:
 
 .. code-block:: console
 
-   (.venv) $ pip install pumpia
+   pip install pumpia
 
 Usage
 -----
