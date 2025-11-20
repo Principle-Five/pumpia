@@ -90,7 +90,7 @@ class Patient:
     @property
     def studies(self) -> list['Study']:
         """Returns the list of studies for the patient."""
-        return sorted(self._studies, key=lambda x: x.study_date, reverse=True)
+        return sorted(self._studies, key=lambda x: x.study_datetime, reverse=True)
 
     @property
     def tag(self) -> str:
@@ -124,8 +124,8 @@ class Study:
         The patient associated with the study.
     study_id : str
         The ID of the study.
-    study_date : datetime.date
-        The date of the study.
+    study_datetime : datetime.datetime
+        The date and time of the study.
     study_desc : str
         The description of the study.
 
@@ -135,8 +135,8 @@ class Study:
         The patient associated with the study.
     study_id : str
         The ID of the study.
-    study_date : datetime.date
-        The date of the study.
+    study_datetime : datetime.datetime
+        The date and time of the study.
     study_description : str
         The description of the study.
     series : list[Series]
@@ -153,11 +153,11 @@ class Study:
     def __init__(self,
                  patient: Patient,
                  study_id: str,
-                 study_date: datetime.date,
+                 study_datetime: datetime.datetime,
                  study_desc: str) -> None:
         self.patient: Patient = patient
         self.study_id: str = study_id
-        self.study_date: datetime.date = study_date
+        self.study_datetime: datetime.datetime = study_datetime
         self.study_description: str = study_desc
         self._series: set[Series] = set()
 
@@ -189,7 +189,7 @@ class Study:
 
     def __str__(self) -> str:
         """Returns the string representation of the study."""
-        return self.study_date.strftime("%d/%m/%Y") + ": " + self.study_description
+        return self.study_datetime.strftime("%d/%m/%Y, %H:%M:%S ") + "- " + self.study_description
 
     @property
     def id_string(self) -> str:

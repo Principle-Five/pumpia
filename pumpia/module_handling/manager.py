@@ -413,17 +413,27 @@ class Manager:
                     study = sd
         else:
             study_date = get_tag(open_dicom, DicomTags.StudyDate).value
+            study_time = get_tag(open_dicom, DicomTags.StudyTime).value
             try:
                 study_desc = get_tag(
                     open_dicom, DicomTags.StudyDescription).value
             except KeyError:
                 study_desc = ""
-            study_date = datetime.date(int(study_date[:4]),
-                                       int(study_date[4:6]),
-                                       int(study_date[6:]))
+            study_datetime = datetime.datetime(int(study_date[:4]),
+                                               int(study_date[4:6]),
+                                               int(study_date[6:]),
+                                               int(study_time[:2]))
+            if len(study_time) > 2:
+                study_datetime = study_datetime.replace(minute=int(study_time[2:4]))
+                if len(study_time) > 4:
+                    study_datetime = study_datetime.replace(second=int(study_time[4:6]))
+                    if len(study_time) > 6:
+                        microseconds = study_time[7:].ljust(6, "0")
+                        study_datetime = study_datetime.replace(microsecond=int(microseconds))
+
             study = Study(patient=patient,
                           study_id=study_id,
-                          study_date=study_date,
+                          study_datetime=study_datetime,
                           study_desc=study_desc)
             patient.add_study(study)
 
