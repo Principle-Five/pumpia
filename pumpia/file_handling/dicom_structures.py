@@ -16,7 +16,7 @@ from pydicom.errors import InvalidDicomError
 from pydicom import dcmread
 from pydicom.pixels.processing import convert_color_space
 import numpy as np
-from pumpia.file_handling.dicom_tags import DicomTags, Tag, get_tag
+from pumpia.file_handling.dicom_tags import _CoreTags, Tag, get_tag
 from pumpia.image_handling.image_structures import FileImageSet, ImageCollection
 
 
@@ -319,9 +319,9 @@ class Series(ImageCollection):
                 except InvalidDicomError as exc:
                     raise InvalidDicomError(
                         "filepath must be a valid DICOM file") from exc
-            num_samples = get_tag(open_dicom, DicomTags.SamplesPerPixel).value
+            num_samples = get_tag(open_dicom, _CoreTags.SamplesPerPixel).value
             try:
-                photo_interp = get_tag(open_dicom, DicomTags.PhotometricInterpretation).value
+                photo_interp = get_tag(open_dicom, _CoreTags.PhotometricInterpretation).value
             except KeyError:
                 photo_interp = None
             if num_samples == 1:
@@ -429,14 +429,14 @@ class Series(ImageCollection):
             raw_array = self.raw_array
             if not self.is_colour:
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_tag(_CoreTags.RescaleSlope)
+                    intercept = self.get_tag(_CoreTags.RescaleIntercept)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
             else:
                 try:
-                    photo_interp = self.get_tag(DicomTags.PhotometricInterpretation)
+                    photo_interp = self.get_tag(_CoreTags.PhotometricInterpretation)
                     if isinstance(photo_interp, str):
                         if photo_interp != "RGB":
                             return convert_color_space(self.raw_array,
@@ -446,15 +446,15 @@ class Series(ImageCollection):
                             return raw_array
                     else:
                         try:
-                            slope = self.get_tag(DicomTags.RescaleSlope)
-                            intercept = self.get_tag(DicomTags.RescaleIntercept)
+                            slope = self.get_tag(_CoreTags.RescaleSlope)
+                            intercept = self.get_tag(_CoreTags.RescaleIntercept)
                             return raw_array * slope + intercept
                         except KeyError:
                             return raw_array
                 except (KeyError, NotImplementedError):
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_tag(_CoreTags.RescaleSlope)
+                        intercept = self.get_tag(_CoreTags.RescaleIntercept)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
@@ -474,14 +474,14 @@ class Series(ImageCollection):
             raw_array = np.astype(self.raw_array, float)
             if not self.is_colour:
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_tag(_CoreTags.RescaleSlope)
+                    intercept = self.get_tag(_CoreTags.RescaleIntercept)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
             else:
                 try:
-                    photo_interp = self.get_tag(DicomTags.PhotometricInterpretation)
+                    photo_interp = self.get_tag(_CoreTags.PhotometricInterpretation)
                     if isinstance(photo_interp, str):
                         if photo_interp != "RGB":
                             return np.astype(convert_color_space(self.raw_array,
@@ -492,15 +492,15 @@ class Series(ImageCollection):
                             return raw_array
                     else:
                         try:
-                            slope = self.get_tag(DicomTags.RescaleSlope)
-                            intercept = self.get_tag(DicomTags.RescaleIntercept)
+                            slope = self.get_tag(_CoreTags.RescaleSlope)
+                            intercept = self.get_tag(_CoreTags.RescaleIntercept)
                             return raw_array * slope + intercept
                         except KeyError:
                             return raw_array
                 except (KeyError, NotImplementedError):
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_tag(_CoreTags.RescaleSlope)
+                        intercept = self.get_tag(_CoreTags.RescaleIntercept)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
@@ -521,8 +521,8 @@ class Series(ImageCollection):
         This is **not** normally the maximum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_tag(_CoreTags.WindowWidth)
+            window_center = self.get_tag(_CoreTags.WindowCenter)
             if window_center is not None and window_width is not None:
                 vmax = window_center + (window_width / 2)
             else:
@@ -540,8 +540,8 @@ class Series(ImageCollection):
         This is **not** normally the minimum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_tag(_CoreTags.WindowWidth)
+            window_center = self.get_tag(_CoreTags.WindowCenter)
             if window_center is not None and window_width is not None:
                 vmin = window_center - (window_width / 2)
             else:
@@ -557,7 +557,7 @@ class Series(ImageCollection):
         """Returns the default window width from the window width tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            window = self.get_tag(DicomTags.WindowWidth)
+            window = self.get_tag(_CoreTags.WindowWidth)
             if window is not None:
                 return float(window)
             else:
@@ -574,7 +574,7 @@ class Series(ImageCollection):
         """Returns the default level (window centre) from the window center tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            level = self.get_tag(DicomTags.WindowCenter)
+            level = self.get_tag(_CoreTags.WindowCenter)
             if level is not None:
                 return float(level)
             else:
@@ -590,11 +590,11 @@ class Series(ImageCollection):
         (slice_thickness, row_spacing, column_spacing)
         """
         try:
-            pixel_spacing = self.get_tag(DicomTags.PixelSpacing)
+            pixel_spacing = self.get_tag(_CoreTags.PixelSpacing)
         except KeyError:
             pixel_spacing = (1, 1)
         try:
-            slice_thickness = self.get_tag(DicomTags.SliceThickness)
+            slice_thickness = self.get_tag(_CoreTags.SliceThickness)
         except KeyError:
             slice_thickness = 1
 
@@ -772,9 +772,9 @@ class Instance(FileImageSet):
                 except InvalidDicomError as exc:
                     raise InvalidDicomError(
                         "filepath must be a valid DICOM file") from exc
-            num_samples = get_tag(open_dicom, DicomTags.SamplesPerPixel).value
+            num_samples = get_tag(open_dicom, _CoreTags.SamplesPerPixel).value
             try:
-                photo_interp = get_tag(open_dicom, DicomTags.PhotometricInterpretation).value
+                photo_interp = get_tag(open_dicom, _CoreTags.PhotometricInterpretation).value
             except KeyError:
                 photo_interp = None
             if num_samples == 1:
@@ -835,17 +835,17 @@ class Instance(FileImageSet):
     def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """Returns an array suitable for passing to the viewer"""
         raw_array = self.raw_array
-        if self.get_tag(DicomTags.SamplesPerPixel) == 1:
+        if self.get_tag(_CoreTags.SamplesPerPixel) == 1:
             try:
-                slope = self.get_tag(DicomTags.RescaleSlope)
-                intercept = self.get_tag(DicomTags.RescaleIntercept)
+                slope = self.get_tag(_CoreTags.RescaleSlope)
+                intercept = self.get_tag(_CoreTags.RescaleIntercept)
                 return raw_array * slope + intercept
             except KeyError:
                 return raw_array
         else:
             try:
                 photo_interp = self.get_tag(
-                    DicomTags.PhotometricInterpretation)
+                    _CoreTags.PhotometricInterpretation)
                 if isinstance(photo_interp, str):
                     if photo_interp != "RGB":
                         return convert_color_space(self.raw_array,
@@ -855,15 +855,15 @@ class Instance(FileImageSet):
                         return raw_array
                 else:
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_tag(_CoreTags.RescaleSlope)
+                        intercept = self.get_tag(_CoreTags.RescaleIntercept)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
             except (KeyError, NotImplementedError):
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_tag(_CoreTags.RescaleSlope)
+                    intercept = self.get_tag(_CoreTags.RescaleIntercept)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
@@ -878,17 +878,17 @@ class Instance(FileImageSet):
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
         raw_array = np.astype(self.raw_array, float)
-        if self.get_tag(DicomTags.SamplesPerPixel) == 1:
+        if self.get_tag(_CoreTags.SamplesPerPixel) == 1:
             try:
-                slope = self.get_tag(DicomTags.RescaleSlope)
-                intercept = self.get_tag(DicomTags.RescaleIntercept)
+                slope = self.get_tag(_CoreTags.RescaleSlope)
+                intercept = self.get_tag(_CoreTags.RescaleIntercept)
                 return raw_array * slope + intercept
             except KeyError:
                 return raw_array
         else:
             try:
                 photo_interp = self.get_tag(
-                    DicomTags.PhotometricInterpretation)
+                    _CoreTags.PhotometricInterpretation)
                 if isinstance(photo_interp, str):
                     if photo_interp != "RGB":
                         return np.astype(convert_color_space(self.raw_array,
@@ -898,15 +898,15 @@ class Instance(FileImageSet):
                         return raw_array
                 else:
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_tag(_CoreTags.RescaleSlope)
+                        intercept = self.get_tag(_CoreTags.RescaleIntercept)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
             except (KeyError, NotImplementedError):
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_tag(_CoreTags.RescaleSlope)
+                    intercept = self.get_tag(_CoreTags.RescaleIntercept)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
@@ -918,8 +918,8 @@ class Instance(FileImageSet):
         This is **not** normally the maximum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_tag(_CoreTags.WindowWidth)
+            window_center = self.get_tag(_CoreTags.WindowCenter)
             if window_center is not None and window_width is not None:
                 vmax = window_center + (window_width / 2)
             else:
@@ -937,8 +937,8 @@ class Instance(FileImageSet):
         This is **not** normally the minimum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_tag(_CoreTags.WindowWidth)
+            window_center = self.get_tag(_CoreTags.WindowCenter)
             if window_center is not None and window_width is not None:
                 vmin = window_center - (window_width / 2)
             else:
@@ -954,7 +954,7 @@ class Instance(FileImageSet):
         """Returns the default window width from the window width tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            return self.get_tag(DicomTags.WindowWidth)
+            return self.get_tag(_CoreTags.WindowWidth)
         except KeyError:
             return super().window
         except IndexError:
@@ -965,7 +965,7 @@ class Instance(FileImageSet):
         """Returns the default level (window centre) from the window center tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            return self.get_tag(DicomTags.WindowCenter)
+            return self.get_tag(_CoreTags.WindowCenter)
         except KeyError:
             return super().level
         except IndexError:
@@ -977,11 +977,11 @@ class Instance(FileImageSet):
         (slice_thickness, row_spacing, column_spacing)
         """
         try:
-            pixel_spacing = self.get_tag(DicomTags.PixelSpacing)
+            pixel_spacing = self.get_tag(_CoreTags.PixelSpacing)
         except KeyError:
             pixel_spacing = (1, 1)
         try:
-            slice_thickness = self.get_tag(DicomTags.SliceThickness)
+            slice_thickness = self.get_tag(_CoreTags.SliceThickness)
         except KeyError:
             slice_thickness = 1
 

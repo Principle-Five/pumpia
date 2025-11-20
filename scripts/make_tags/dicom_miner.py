@@ -145,6 +145,28 @@ def section_tables(root: ET.Element, section_name: str) -> list[str]:
 
     return tables
 
+
+CORE_TAGS = [(0x0008, 0x0020),
+             (0x0008, 0x0030),
+             (0x0008, 0x1030),
+             (0x0008, 0x103E),
+             (0x0010, 0x0010),
+             (0x0010, 0x0020),
+             (0x0018, 0x0050),
+             (0x0020, 0x000D),
+             (0x0020, 0x000E),
+             (0x0020, 0x0011),
+             (0x0020, 0x0012),
+             (0x0020, 0x0013),
+             (0x0020, 0x9157),
+             (0x0028, 0x0002),
+             (0x0028, 0x0004),
+             (0x0028, 0x0008),
+             (0x0028, 0x0030),
+             (0x0028, 0x1050),
+             (0x0028, 0x1051),
+             (0x0028, 0x1052),
+             (0x0028, 0x1053)]
 ############################################
 # STEP 1
 
@@ -201,6 +223,8 @@ for table in root.iter(f'{{{namespace}}}table'):
                 init_tag = tag[first]
                 alt_tag = tag[first + 1:]
                 tags[init_tag] = Tag(vals[1], desc, init_tag[0], init_tag[1], alternative_tags=alt_tag)
+                if init_tag in CORE_TAGS:
+                    tags[init_tag].add_modality("CORE")
 
 ###################################################
 # STEP 2
@@ -410,6 +434,7 @@ ct_file = open(current_folder / "CTTags.py", "w+")
 nuc_med_file = open(current_folder / "NucMedTags.py", "w+")
 us_file = open(current_folder / "USTags.py", "w+")
 mri_file = open(current_folder / "MRTags.py", "w+")
+core_file = open(current_folder / "_CoreTags.py", "w+")
 
 init_text = "from pumpia.file_handling.dicom_tags import Tag, TagLink\n\n"
 
@@ -419,6 +444,7 @@ ct_file.write('"""Module containing CT DICOM Tags."""\n\n')
 nuc_med_file.write('"""Module containing Nuclear Medicine DICOM Tags."""\n\n')
 us_file.write('"""Module containing Ultrasound DICOM Tags."""\n\n')
 mri_file.write('"""Module containing MRI DICOM Tags."""\n\n')
+core_file.write('"""Module containing Core Tags."""\n\n')
 
 dcm_file.write(init_text)
 xray_file.write(init_text)
@@ -426,6 +452,7 @@ ct_file.write(init_text)
 nuc_med_file.write(init_text)
 us_file.write(init_text)
 mri_file.write(init_text)
+core_file.write(init_text)
 
 
 def write_to_files(tag: Tag, chain: list[Tag]):
@@ -474,6 +501,8 @@ def write_to_files(tag: Tag, chain: list[Tag]):
                 us_file.write(text)
             if 'MRI' in tag.modalities:
                 mri_file.write(text)
+            if 'CORE' in tag.modalities:
+                core_file.write(text)
 
             tag.written = True
 
@@ -487,3 +516,4 @@ ct_file.close()
 nuc_med_file.close()
 us_file.close()
 mri_file.close()
+core_file.close()

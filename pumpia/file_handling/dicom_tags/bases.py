@@ -1,3 +1,6 @@
+"""
+Base classes and functions for DICOM handling.
+"""
 import dataclasses as dc
 from dataclasses import dataclass
 import pydicom

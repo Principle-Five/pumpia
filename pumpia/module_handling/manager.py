@@ -24,7 +24,7 @@ from pumpia.file_handling.dicom_structures import Patient, Study, Series, Instan
 from pumpia.file_handling.general_structures import GeneralImage
 from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet, ImageCollection
 from pumpia.image_handling.roi_structures import BaseROI
-from pumpia.file_handling.dicom_tags import DicomTags, get_tag
+from pumpia.file_handling.dicom_tags import _CoreTags, get_tag
 from pumpia.utilities.dicom_utils import show_dicom_tags
 from pumpia.utilities.file_utils import get_file_tree_dict, TreePathDict
 from pumpia.utilities.typing import DirectionType
@@ -393,30 +393,31 @@ class Manager:
             The loaded series or instance.
         """
         # load patient
-        patient_id = get_tag(open_dicom, DicomTags.PatientID).value
+        patient_id = get_tag(open_dicom, _CoreTags.PatientID).value
         patient_id_str = "DICOM : " + patient_id
         if patient_id_str in self.patients:
             for pt in self.patients:
                 if pt == patient_id_str:
                     patient = pt
         else:
-            patient_name = get_tag(open_dicom, DicomTags.PatientName).value
+            patient_name = get_tag(open_dicom, _CoreTags.PatientName).value
             patient = Patient(patient_id=patient_id, name=patient_name)
             self.patients.add(patient)
 
         # load study
-        study_id = get_tag(open_dicom, DicomTags.StudyInstanceUID).value
+        study_id = get_tag(open_dicom, _CoreTags.StudyInstanceUID).value
         study_id_str = patient.id_string + " : " + study_id
         if study_id_str in patient.studies:
             for sd in patient.studies:
                 if sd == study_id_str:
                     study = sd
         else:
-            study_date = get_tag(open_dicom, DicomTags.StudyDate).value
-            study_time = get_tag(open_dicom, DicomTags.StudyTime).value
+            study_date = get_tag(open_dicom, _CoreTags.StudyDate).value
+            study_time = get_tag(open_dicom, _CoreTags.StudyTime).value
+
             try:
                 study_desc = get_tag(
-                    open_dicom, DicomTags.StudyDescription).value
+                    open_dicom, _CoreTags.StudyDescription).value
             except KeyError:
                 study_desc = ""
             study_datetime = datetime.datetime(int(study_date[:4]),
@@ -440,20 +441,20 @@ class Manager:
         # load series
         try:
             series_description = get_tag(
-                open_dicom, DicomTags.SeriesDescription).value
+                open_dicom, _CoreTags.SeriesDescription).value
         except KeyError:
             series_description = ""
-        series_number = get_tag(open_dicom, DicomTags.SeriesNumber).value
-        series_id = get_tag(open_dicom, DicomTags.SeriesInstanceUID).value
+        series_number = get_tag(open_dicom, _CoreTags.SeriesNumber).value
+        series_id = get_tag(open_dicom, _CoreTags.SeriesInstanceUID).value
         try:
             acquisition_number = int(
-                open_dicom[DicomTags.AcquisitionNumber.get()].value)
+                open_dicom[_CoreTags.AcquisitionNumber.get()].value)
         except KeyError:
             acquisition_number = 0
 
         try:
             no_of_frames = get_tag(
-                open_dicom, DicomTags.NumberOfFrames).value
+                open_dicom, _CoreTags.NumberOfFrames).value
             if no_of_frames == 1:
                 is_stack = False
             else:
@@ -462,7 +463,7 @@ class Manager:
             is_stack = False
 
         instance_number = get_tag(open_dicom,
-                                  DicomTags.InstanceNumber).value
+                                  _CoreTags.InstanceNumber).value
 
         if is_stack:
             series_id_str = (study.id_string
@@ -507,7 +508,7 @@ class Manager:
                 else:
                     try:
                         dimension_index_values = get_tag(open_dicom,
-                                                         DicomTags.DimensionIndexValues,
+                                                         _CoreTags.DimensionIndexValues,
                                                          frame_number).value
                     except KeyError:
                         dimension_index_values = None
