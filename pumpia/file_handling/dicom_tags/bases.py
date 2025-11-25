@@ -131,8 +131,8 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
 
     Returns
     -------
-    DataElement
-        pydicom Dataelement of the provided tag.
+    TagEntries | DataElement
+        pydicom DataElement of the provided tag, or a list of pydicom DataElements for the provided tag.
         Use DataElement.value attribute to get the value of the element.
 
     Raises
