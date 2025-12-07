@@ -456,18 +456,15 @@ class Manager:
             no_of_frames = get_tag(
                 open_dicom, _CoreTags.NumberOfFrames,
                 get_first=True).value
-            if no_of_frames == 1:
-                is_stack = False
-            else:
-                is_stack = True
+            is_enhanced = True
         except KeyError:
-            is_stack = False
+            is_enhanced = False
 
         instance_number = get_tag(open_dicom,
                                   _CoreTags.InstanceNumber,
                                   get_first=True).value
 
-        if is_stack:
+        if is_enhanced:
             series_id_str = (study.id_string
                              + " : " + series_id
                              + "-" + str(acquisition_number)
@@ -480,14 +477,14 @@ class Manager:
                 if sr == series_id_str:
                     series = sr
         else:
-            if is_stack:
+            if is_enhanced:
                 series = Series(study=study,
                                 series_id=series_id,
                                 series_description=series_description,
                                 series_number=series_number,
                                 acquisition_number=acquisition_number,
                                 instance_number=instance_number,
-                                is_stack=is_stack,
+                                is_enhanced=is_enhanced,
                                 open_dicom=open_dicom,
                                 filepath=file)
             else:
@@ -496,25 +493,26 @@ class Manager:
                                 series_description=series_description,
                                 series_number=series_number,
                                 acquisition_number=acquisition_number,
-                                is_stack=is_stack)
+                                is_enhanced=is_enhanced)
             study.add_series(series)
 
         # load instance
-        if is_stack:
+        if is_enhanced:
             for frame_number in range(1, no_of_frames + 1):
-                instance_id_str = series.id_string + " : " + str(frame_number)
-                if instance_id_str in series.instances:
-                    for ins in series.instances:
-                        if ins == instance_id_str:
-                            instance = ins
+                try:
+                    dimension_index_values = get_tag(open_dicom,
+                                                     _CoreTags.DimensionIndexValues,
+                                                     frame_number,
+                                                     get_first=True).value
+                except KeyError:
+                    dimension_index_values = None
+
+                if dimension_index_values is None:
+                    instance_id_str = series.id_string + " : " + str(frame_number)
                 else:
-                    try:
-                        dimension_index_values = get_tag(open_dicom,
-                                                         _CoreTags.DimensionIndexValues,
-                                                         frame_number,
-                                                         get_first=True).value
-                    except KeyError:
-                        dimension_index_values = None
+                    instance_id_str = series.id_string + " : " + str(dimension_index_values)
+
+                if not instance_id_str in series.instances:
                     instance = Instance(series=series,
                                         slice_number=frame_number,
                                         filepath=file,
@@ -524,6 +522,9 @@ class Manager:
                         series.add_instance(instance)
                     except ValueError:
                         pass
+
+            return series
+
         else:
             instance_id_str = series.id_string + " : " + str(instance_number)
             if instance_id_str in series.instances:
@@ -541,9 +542,6 @@ class Manager:
                 except ValueError:
                     pass
 
-        if is_stack:
-            return series
-        else:
             return instance
 
     def update_trees(self):

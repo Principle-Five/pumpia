@@ -19,7 +19,6 @@ import numpy as np
 
 from pumpia.file_handling.dicom_tags import _CoreTags, Tag, get_tag
 from pumpia.image_handling.image_structures import FileImageSet, ImageCollection
-from pumpia.utilities.typing import TagEntries
 
 
 class Patient:
@@ -244,9 +243,9 @@ class Series(ImageCollection):
         The acquisition number of the series.
     instance_number : int
         The instance number of the series.
-        Required if series is a stack, ignored otherwise.
-    is_stack : bool, optional
-        Whether the series is a stack (default is False).
+        Required if series is from an enhanced dicom file, ignored otherwise.
+    is_enhanced : bool, optional
+        Whether the series is from an enhanced dicom file (default is False).
     open_dicom : pydicom.Dataset, optional
         The open DICOM dataset (default is None).
     filepath : Path, optional
@@ -264,11 +263,11 @@ class Series(ImageCollection):
         The acquisition number of the series.
     instance_number : int
         The instance number of the series.
-        Int if series is a stack, None otherwise.
+        Int if series is from an enhanced dicom file, None otherwise.
     series_description : str
         The description of the series.
-    is_stack : bool
-        Whether the series is a stack.
+    is_enhanced : bool
+        Whether the series is from an enhanced dicom file.
     loaded : bool
         Whether the series is loaded.
     dicom_dataset : pydicom.Dataset | None
@@ -292,7 +291,7 @@ class Series(ImageCollection):
                  series_number: int,
                  acquisition_number: int,
                  instance_number: int | None = None,
-                 is_stack: bool = False,
+                 is_enhanced: bool = False,
                  open_dicom: pydicom.Dataset | None = None,
                  filepath: Path | None = None) -> None:
         self.study: Study = study
@@ -300,21 +299,21 @@ class Series(ImageCollection):
         self.series_number: int = series_number
         self.acquisition_number: int = acquisition_number
         self.series_description: str = series_description
-        self.is_stack: bool = is_stack
+        self.is_enhanced: bool = is_enhanced
 
-        if self.is_stack:
+        if self.is_enhanced:
             if instance_number is None:
-                raise ValueError("instance number must be provided for stack")
+                raise ValueError("instance number must be provided for an enhanced dicom file")
             self.instance_number: int | None = instance_number
         else:
             self.instance_number = None
 
         self._filepath: Path | None = copy(filepath)
 
-        if self.is_stack:
+        if self.is_enhanced:
             if self._filepath is None:
                 raise FileNotFoundError(
-                    "a valid filepath must be provided for stack")
+                    "a valid filepath must be provided for an enhanced dicom file")
             if open_dicom is None:
                 try:
                     open_dicom = dcmread(self._filepath)
@@ -350,7 +349,7 @@ class Series(ImageCollection):
             return False
 
     def __str__(self) -> str:
-        if self.is_stack:
+        if self.is_enhanced:
             return (str(self.series_number)
                     + "-" + str(self.acquisition_number)
                     + "-" + str(self.instance_number)
@@ -366,7 +365,7 @@ class Series(ImageCollection):
 
     @property
     def id_string(self) -> str:
-        if self.is_stack:
+        if self.is_enhanced:
             return (self.study.id_string
                     + " : " + self.series_id
                     + "-" + str(self.acquisition_number)
@@ -383,7 +382,7 @@ class Series(ImageCollection):
     @property
     def sort_value(self) -> tuple[int, int] | tuple[int, int, int]:
         """Returns the sort value of the series."""
-        if self.is_stack and self.instance_number is not None:
+        if self.is_enhanced and self.instance_number is not None:
             return (self.series_number, self.acquisition_number, self.instance_number)
         else:
             return (self.series_number, self.acquisition_number)
@@ -419,15 +418,18 @@ class Series(ImageCollection):
                                   np.dtype]:
         """Returns the raw array of the series as stored in the dicom file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        if self.is_stack and self._dicom is not None:
-            return self._dicom.pixel_array
+        if self.is_enhanced and self._dicom is not None:
+            array = self._dicom.pixel_array
+            if array.ndim == 2:
+                return np.expand_dims(array, axis=0)
+            return array
         else:
             return np.concatenate([a.raw_array for a in self.instances])  # type: ignore
 
     @property
     def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """Returns an array suitable for passing to the viewer"""
-        if self.is_stack:
+        if self.is_enhanced:
             raw_array = self.raw_array
             if not self.is_colour:
                 try:
@@ -486,7 +488,7 @@ class Series(ImageCollection):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if self.is_stack:
+        if self.is_enhanced:
             raw_array = np.astype(self.raw_array, float)
             if not self.is_colour:
                 try:
@@ -653,7 +655,7 @@ class Series(ImageCollection):
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
         """Returns the pydicom dataset of the series."""
-        if self.is_stack:
+        if self.is_enhanced:
             dcm = self._dicom
         else:
             dcm = self.instances[self.current_slice].dicom_dataset
@@ -710,11 +712,11 @@ class Series(ImageCollection):
         return values
 
     @overload
-    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: Literal[False] = False) -> TagEntries | None: ...
+    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: Literal[False] = False) -> pydicom.DataElement | list[pydicom.DataElement] | None: ...
     @overload
     def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: Literal[True] = True) -> pydicom.DataElement | None: ...
 
-    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: bool = False) -> TagEntries | pydicom.DataElement | None:
+    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement] | None:
         """
         Gets the value of a DICOM tag for a specific instance in the series.
 
@@ -783,7 +785,7 @@ class Instance(FileImageSet):
                  slice_number: int,
                  filepath: Path | None = None,
                  is_frame: bool = False,
-                 dimension_index_values: list | tuple | None = None,
+                 dimension_index_values: list[int] | tuple[int, ...] | None = None,
                  open_dicom: pydicom.Dataset | None = None,) -> None:
         self.series: Series = series
 
@@ -841,7 +843,9 @@ class Instance(FileImageSet):
             return False
 
     def __str__(self) -> str:
-        return str(self.slice_number)
+        if self.dimension_index_values is None:
+            return str(self.slice_number)
+        return str(self.dimension_index_values)
 
     def __hash__(self) -> int:
         # from docs: A class that overrides __eq__() and does not define __hash__()
@@ -857,9 +861,11 @@ class Instance(FileImageSet):
         return "IN" + self.id_string
 
     @property
-    def sort_value(self) -> int:
+    def sort_value(self) -> int | tuple[int, ...]:
         """Returns the sort value of the instance."""
-        return self.slice_number
+        if self.dimension_index_values is None:
+            return self.slice_number
+        return self.dimension_index_values
 
     @property
     def raw_array(self
@@ -1096,11 +1102,11 @@ class Instance(FileImageSet):
         return dcm
 
     @overload
-    def get_tag(self, tag: Tag, get_first: Literal[False] = False) -> TagEntries | None: ...
+    def get_tag(self, tag: Tag, get_first: Literal[False] = False) -> pydicom.DataElement | list[pydicom.DataElement] | None: ...
     @overload
     def get_tag(self, tag: Tag, get_first: Literal[True] = True) -> pydicom.DataElement | None: ...
 
-    def get_tag(self, tag: Tag, get_first: bool = False) -> TagEntries | pydicom.DataElement | None:
+    def get_tag(self, tag: Tag, get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement] | None:
         """
         Gets the DICOM tag for the instance.
 
