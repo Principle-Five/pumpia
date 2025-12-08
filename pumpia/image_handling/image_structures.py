@@ -198,7 +198,7 @@ class ArrayImage(BaseImageSet):
     @property
     def current_slice(self) -> int:
         """
-        The current slice number.
+        The current slice number, starting from 0.
         """
         return self._current_slice
 

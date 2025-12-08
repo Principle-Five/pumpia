@@ -3,7 +3,7 @@ Base classes and functions for DICOM handling.
 """
 import dataclasses as dc
 from dataclasses import dataclass
-from typing import overload, Literal
+from typing import overload, Literal, Any
 import pydicom
 
 
@@ -114,7 +114,7 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement]:
     """
     Returns the dicom element from the pydicom Dataset defined by tag.
-    If the Dataset is a stack then the frame can be provided for frame specific elements.
+    If the Dataset is an enhanced dicom then the frame can be provided for frame specific elements.
 
     Parameters
     ----------
@@ -188,3 +188,56 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             element = element[0]
 
     return element
+
+
+@overload
+def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
+              tag: Tag,
+              frame: int | None = None,
+              get_first: Literal[False] = False) -> Any | list[Any]: ...
+
+
+@overload
+def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
+              tag: Tag,
+              frame: int | None = None,
+              get_first: Literal[True] = True) -> Any: ...
+
+
+def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
+              tag: Tag,
+              frame: int | None = None,
+              get_first: bool = False) -> Any | list[Any]:
+    """
+    Returns the value of the dicom element from the pydicom Dataset defined by tag.
+    If the Dataset is an enhanced dicom then the frame can be provided for frame specific elements.
+
+    Parameters
+    ----------
+    dicom_image : Dataset | DataElement
+        pydicom Dataset/DataElement to be searched
+    tag : Tag
+        tag of element to be returned
+    frame : int, optional
+        frame number (starting at 1) if relevant, by default None
+    get_first : bool, optional
+        whether to get the first value for a matching tag in dicom_image
+
+    Returns
+    -------
+    DataElement | list[DataElement]
+        pydicom DataElement of the provided tag, or a list of pydicom DataElements for the provided tag.
+        Use DataElement.value attribute to get the value of the element.
+
+    Raises
+    ------
+    KeyError
+        raised if an element is not found.
+    """
+    tag_object = get_tag(dicom_image, tag, frame, get_first)
+    if isinstance(tag_object, list):
+        value = [t.value for t in tag_object]
+    else:
+        value = tag_object.value
+
+    return value
