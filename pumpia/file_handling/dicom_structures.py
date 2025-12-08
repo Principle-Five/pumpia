@@ -621,17 +621,13 @@ class Series(ImageCollection):
             return super().level
 
     @property
-    def pixel_size(self) -> tuple[float, float, float] | None:
-        """Returns the pixel size of the current instance in mm as a tuple of 3 floats.
-        Returns None if this cannot be found using the Pixel Spacing and SliceThickness tags.
-        (slice_thickness, row_spacing, column_spacing)
+    def pixel_spacing(self) -> tuple[float, float] | None:
+        """Returns the pixel spacing of the current instance in mm as a tuple of 2 floats.
+        Returns None if this cannot be found using the Pixel Spacing tag.
+        (row_spacing, column_spacing)
         """
         try:
             pixel_spacing = self.get_tag(_CoreTags.PixelSpacing, get_first=True)
-        except KeyError:
-            return None
-        try:
-            slice_thickness = self.get_tag(_CoreTags.SliceThickness, get_first=True)
         except KeyError:
             return None
 
@@ -639,10 +635,6 @@ class Series(ImageCollection):
             return None
         else:
             pixel_spacing = pixel_spacing.value
-        if slice_thickness is None:
-            return None
-        else:
-            slice_thickness = slice_thickness.value
 
         try:
             row_spacing = pixel_spacing[0]
@@ -650,7 +642,24 @@ class Series(ImageCollection):
         except TypeError:
             return None
 
-        return (slice_thickness, row_spacing, column_spacing)
+        return (row_spacing, column_spacing)
+
+    @property
+    def slice_thickness(self) -> float | None:
+        """Returns the slice thickness of the current instance in mm.
+        Returns None if this cannot be found using the SliceThickness tag.
+        """
+        try:
+            slice_thickness = self.get_tag(_CoreTags.SliceThickness, get_first=True)
+        except KeyError:
+            return None
+
+        if slice_thickness is None:
+            return None
+        else:
+            slice_thickness = slice_thickness.value
+
+        return slice_thickness
 
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
@@ -1060,17 +1069,13 @@ class Instance(FileImageSet):
             return super().level
 
     @property
-    def pixel_size(self) -> tuple[float, float, float] | None:
-        """Returns the pixel size of the instance in mm as a tuple of 3 floats.
-        Returns None if this cannot be found using the Pixel Spacing and SliceThickness tags.
-        (slice_thickness, row_spacing, column_spacing)
+    def pixel_spacing(self) -> tuple[float, float] | None:
+        """Returns the pixel spacing of the current instance in mm as a tuple of 2 floats.
+        Returns None if this cannot be found using the Pixel Spacing tag.
+        (row_spacing, column_spacing)
         """
         try:
             pixel_spacing = self.get_tag(_CoreTags.PixelSpacing, get_first=True)
-        except KeyError:
-            return None
-        try:
-            slice_thickness = self.get_tag(_CoreTags.SliceThickness, get_first=True)
         except KeyError:
             return None
 
@@ -1078,10 +1083,6 @@ class Instance(FileImageSet):
             return None
         else:
             pixel_spacing = pixel_spacing.value
-        if slice_thickness is None:
-            return None
-        else:
-            slice_thickness = slice_thickness.value
 
         try:
             row_spacing = pixel_spacing[0]
@@ -1089,7 +1090,24 @@ class Instance(FileImageSet):
         except TypeError:
             return None
 
-        return (slice_thickness, row_spacing, column_spacing)
+        return (row_spacing, column_spacing)
+
+    @property
+    def slice_thickness(self) -> float | None:
+        """Returns the slice thickness of the current instance in mm.
+        Returns None if this cannot be found using the SliceThickness tag.
+        """
+        try:
+            slice_thickness = self.get_tag(_CoreTags.SliceThickness, get_first=True)
+        except KeyError:
+            return None
+
+        if slice_thickness is None:
+            return None
+        else:
+            slice_thickness = slice_thickness.value
+
+        return slice_thickness
 
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
