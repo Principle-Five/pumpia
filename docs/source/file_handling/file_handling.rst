@@ -28,7 +28,7 @@ For :py:class:`Series <pumpia.file_handling.dicom_structures.Series>` these will
 :doc:`dicom_tags`
 -----------------
 DICOM tag handling is different to pydicom to allow for the handling of classic and enhanced DICOM files.
-These are accessed through the ``get_tag`` method for a
+These are accessed through the ``get_tag`` or ``get_value`` method for a
 :py:class:`Series <pumpia.file_handling.dicom_structures.Series>` or :py:class:`Instance <pumpia.file_handling.dicom_structures.Instance>`.
 The user must pass in a :py:class:`Tag <pumpia.file_handling.dicom_tags.Tag>`, these represent DICOM tags.
 DICOM tags given in the DICOM standard are available through the :py:mod:`dicom_tags <pumpia.file_handling.dicom_tags>` module.
@@ -47,7 +47,7 @@ For example given an MRI instance ``mr_image`` the following would get the echo 
 
     from pumpia.file_handling.dicom_tags import MRTags
 
-    echo_time = mr_image.get_tag(MRTags.EchoTime)
+    echo_time = mr_image.get_value(MRTags.EchoTime)
 
 
 Contents

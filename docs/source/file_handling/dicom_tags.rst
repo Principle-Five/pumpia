@@ -3,6 +3,8 @@ DICOM Tags
 
 .. autofunction:: pumpia.file_handling.dicom_tags.get_tag
 
+.. autofunction:: pumpia.file_handling.dicom_tags.get_value
+
 .. autoclass:: pumpia.file_handling.dicom_tags.Tag
 
 **pumpia.file_handling.dicom_tags.DicomTags**

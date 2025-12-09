@@ -24,7 +24,7 @@ from pumpia.file_handling.dicom_structures import Patient, Study, Series, Instan
 from pumpia.file_handling.general_structures import GeneralImage
 from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet, ImageCollection
 from pumpia.image_handling.roi_structures import BaseROI
-from pumpia.file_handling.dicom_tags import DicomTags, get_tag
+from pumpia.file_handling.dicom_tags import _CoreTags, get_value
 from pumpia.utilities.dicom_utils import show_dicom_tags
 from pumpia.utilities.file_utils import get_file_tree_dict, TreePathDict
 from pumpia.utilities.typing import DirectionType
@@ -393,68 +393,78 @@ class Manager:
             The loaded series or instance.
         """
         # load patient
-        patient_id = get_tag(open_dicom, DicomTags.PatientID).value
+        patient_id = get_value(open_dicom, _CoreTags.PatientID, get_first=True)
         patient_id_str = "DICOM : " + patient_id
         if patient_id_str in self.patients:
             for pt in self.patients:
                 if pt == patient_id_str:
                     patient = pt
         else:
-            patient_name = get_tag(open_dicom, DicomTags.PatientName).value
+            patient_name = get_value(open_dicom, _CoreTags.PatientName, get_first=True)
             patient = Patient(patient_id=patient_id, name=patient_name)
             self.patients.add(patient)
 
         # load study
-        study_id = get_tag(open_dicom, DicomTags.StudyInstanceUID).value
+        study_id = get_value(open_dicom, _CoreTags.StudyInstanceUID, get_first=True)
         study_id_str = patient.id_string + " : " + study_id
         if study_id_str in patient.studies:
             for sd in patient.studies:
                 if sd == study_id_str:
                     study = sd
         else:
-            study_date = get_tag(open_dicom, DicomTags.StudyDate).value
+            study_date = get_value(open_dicom, _CoreTags.StudyDate, get_first=True)
+            study_time = get_value(open_dicom, _CoreTags.StudyTime, get_first=True)
+
             try:
-                study_desc = get_tag(
-                    open_dicom, DicomTags.StudyDescription).value
+                study_desc = get_value(
+                    open_dicom, _CoreTags.StudyDescription, get_first=True)
             except KeyError:
                 study_desc = ""
-            study_date = datetime.date(int(study_date[:4]),
-                                       int(study_date[4:6]),
-                                       int(study_date[6:]))
+            study_datetime = datetime.datetime(int(study_date[:4]),
+                                               int(study_date[4:6]),
+                                               int(study_date[6:]),
+                                               int(study_time[:2]))
+            if len(study_time) > 2:
+                study_datetime = study_datetime.replace(minute=int(study_time[2:4]))
+                if len(study_time) > 4:
+                    study_datetime = study_datetime.replace(second=int(study_time[4:6]))
+                    if len(study_time) > 6:
+                        microseconds = study_time[7:].ljust(6, "0")
+                        study_datetime = study_datetime.replace(microsecond=int(microseconds))
+
             study = Study(patient=patient,
                           study_id=study_id,
-                          study_date=study_date,
+                          study_datetime=study_datetime,
                           study_desc=study_desc)
             patient.add_study(study)
 
         # load series
         try:
-            series_description = get_tag(
-                open_dicom, DicomTags.SeriesDescription).value
+            series_description = get_value(
+                open_dicom, _CoreTags.SeriesDescription, get_first=True)
         except KeyError:
             series_description = ""
-        series_number = get_tag(open_dicom, DicomTags.SeriesNumber).value
-        series_id = get_tag(open_dicom, DicomTags.SeriesInstanceUID).value
+        series_number = get_value(open_dicom, _CoreTags.SeriesNumber, get_first=True)
+        series_id = get_value(open_dicom, _CoreTags.SeriesInstanceUID, get_first=True)
         try:
             acquisition_number = int(
-                open_dicom[DicomTags.AcquisitionNumber.get()].value)
+                open_dicom[_CoreTags.AcquisitionNumber.as_tuple].value)
         except KeyError:
             acquisition_number = 0
 
         try:
-            no_of_frames = get_tag(
-                open_dicom, DicomTags.NumberOfFrames).value
-            if no_of_frames == 1:
-                is_stack = False
-            else:
-                is_stack = True
+            no_of_frames = get_value(
+                open_dicom, _CoreTags.NumberOfFrames,
+                get_first=True)
+            is_enhanced = True
         except KeyError:
-            is_stack = False
+            is_enhanced = False
 
-        instance_number = get_tag(open_dicom,
-                                  DicomTags.InstanceNumber).value
+        instance_number = get_value(open_dicom,
+                                    _CoreTags.InstanceNumber,
+                                    get_first=True)
 
-        if is_stack:
+        if is_enhanced:
             series_id_str = (study.id_string
                              + " : " + series_id
                              + "-" + str(acquisition_number)
@@ -467,14 +477,14 @@ class Manager:
                 if sr == series_id_str:
                     series = sr
         else:
-            if is_stack:
+            if is_enhanced:
                 series = Series(study=study,
                                 series_id=series_id,
                                 series_description=series_description,
                                 series_number=series_number,
                                 acquisition_number=acquisition_number,
                                 instance_number=instance_number,
-                                is_stack=is_stack,
+                                is_enhanced=is_enhanced,
                                 open_dicom=open_dicom,
                                 filepath=file)
             else:
@@ -483,24 +493,26 @@ class Manager:
                                 series_description=series_description,
                                 series_number=series_number,
                                 acquisition_number=acquisition_number,
-                                is_stack=is_stack)
+                                is_enhanced=is_enhanced)
             study.add_series(series)
 
         # load instance
-        if is_stack:
+        if is_enhanced:
             for frame_number in range(1, no_of_frames + 1):
-                instance_id_str = series.id_string + " : " + str(frame_number)
-                if instance_id_str in series.instances:
-                    for ins in series.instances:
-                        if ins == instance_id_str:
-                            instance = ins
+                try:
+                    dimension_index_values = get_value(open_dicom,
+                                                       _CoreTags.DimensionIndexValues,
+                                                       frame_number,
+                                                       get_first=True)
+                except KeyError:
+                    dimension_index_values = None
+
+                if dimension_index_values is None:
+                    instance_id_str = series.id_string + " : " + str(frame_number)
                 else:
-                    try:
-                        dimension_index_values = get_tag(open_dicom,
-                                                         DicomTags.DimensionIndexValues,
-                                                         frame_number).value
-                    except KeyError:
-                        dimension_index_values = None
+                    instance_id_str = series.id_string + " : " + str(dimension_index_values)
+
+                if not instance_id_str in series.instances:
                     instance = Instance(series=series,
                                         slice_number=frame_number,
                                         filepath=file,
@@ -510,6 +522,9 @@ class Manager:
                         series.add_instance(instance)
                     except ValueError:
                         pass
+
+            return series
+
         else:
             instance_id_str = series.id_string + " : " + str(instance_number)
             if instance_id_str in series.instances:
@@ -527,9 +542,6 @@ class Manager:
                 except ValueError:
                     pass
 
-        if is_stack:
-            return series
-        else:
             return instance
 
     def update_trees(self):

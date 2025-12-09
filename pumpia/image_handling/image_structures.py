@@ -198,7 +198,7 @@ class ArrayImage(BaseImageSet):
     @property
     def current_slice(self) -> int:
         """
-        The current slice number.
+        The current slice number, starting from 0.
         """
         return self._current_slice
 
@@ -424,18 +424,11 @@ class ArrayImage(BaseImageSet):
         self._user_level = value
 
     @property
-    def pixel_size(self) -> tuple[float, float, float]:
-        """
-        The pixel size of the image (slice_thickness, row_spacing, column_spacing)
-        """
-        return (1.0, 1.0, 1.0)
-
-    @property
     def aspect(self) -> float:
         """
         The aspect ratio of the image.
         """
-        return self.pixel_size[2] / self.pixel_size[1]
+        return 1
 
     @property
     def z_profile(self) -> np.ndarray[tuple[int], np.dtype]:
@@ -697,10 +690,6 @@ class ImageCollection(ArrayImage):
         self._user_level = value
         for i in self.image_set:
             i.user_level = value
-
-    @property
-    def pixel_size(self) -> tuple[float, float, float]:
-        return self.image_set[self.current_slice].pixel_size
 
     @property
     def aspect(self) -> float:

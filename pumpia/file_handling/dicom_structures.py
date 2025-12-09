@@ -10,13 +10,14 @@ import datetime
 from copy import copy
 from pathlib import Path
 from collections.abc import Callable
-from typing import Literal
+from typing import Any, Literal, overload
 import pydicom
 from pydicom.errors import InvalidDicomError
 from pydicom import dcmread
 from pydicom.pixels.processing import convert_color_space
 import numpy as np
-from pumpia.file_handling.dicom_tags import DicomTags, Tag, get_tag
+
+from pumpia.file_handling.dicom_tags import _CoreTags, Tag, get_tag, get_value
 from pumpia.image_handling.image_structures import FileImageSet, ImageCollection
 
 
@@ -90,7 +91,7 @@ class Patient:
     @property
     def studies(self) -> list['Study']:
         """Returns the list of studies for the patient."""
-        return sorted(self._studies, key=lambda x: x.study_date, reverse=True)
+        return sorted(self._studies, key=lambda x: x.study_datetime, reverse=True)
 
     @property
     def tag(self) -> str:
@@ -124,8 +125,8 @@ class Study:
         The patient associated with the study.
     study_id : str
         The ID of the study.
-    study_date : datetime.date
-        The date of the study.
+    study_datetime : datetime.datetime
+        The date and time of the study.
     study_desc : str
         The description of the study.
 
@@ -135,8 +136,8 @@ class Study:
         The patient associated with the study.
     study_id : str
         The ID of the study.
-    study_date : datetime.date
-        The date of the study.
+    study_datetime : datetime.datetime
+        The date and time of the study.
     study_description : str
         The description of the study.
     series : list[Series]
@@ -153,11 +154,11 @@ class Study:
     def __init__(self,
                  patient: Patient,
                  study_id: str,
-                 study_date: datetime.date,
+                 study_datetime: datetime.datetime,
                  study_desc: str) -> None:
         self.patient: Patient = patient
         self.study_id: str = study_id
-        self.study_date: datetime.date = study_date
+        self.study_datetime: datetime.datetime = study_datetime
         self.study_description: str = study_desc
         self._series: set[Series] = set()
 
@@ -189,7 +190,7 @@ class Study:
 
     def __str__(self) -> str:
         """Returns the string representation of the study."""
-        return self.study_date.strftime("%d/%m/%Y") + ": " + self.study_description
+        return self.study_datetime.strftime("%d/%m/%Y, %H:%M:%S ") + "- " + self.study_description
 
     @property
     def id_string(self) -> str:
@@ -242,9 +243,9 @@ class Series(ImageCollection):
         The acquisition number of the series.
     instance_number : int
         The instance number of the series.
-        Required if series is a stack, ignored otherwise.
-    is_stack : bool, optional
-        Whether the series is a stack (default is False).
+        Required if series is from an enhanced dicom file, ignored otherwise.
+    is_enhanced : bool, optional
+        Whether the series is from an enhanced dicom file (default is False).
     open_dicom : pydicom.Dataset, optional
         The open DICOM dataset (default is None).
     filepath : Path, optional
@@ -262,11 +263,11 @@ class Series(ImageCollection):
         The acquisition number of the series.
     instance_number : int
         The instance number of the series.
-        Int if series is a stack, None otherwise.
+        Int if series is from an enhanced dicom file, None otherwise.
     series_description : str
         The description of the series.
-    is_stack : bool
-        Whether the series is a stack.
+    is_enhanced : bool
+        Whether the series is from an enhanced dicom file.
     loaded : bool
         Whether the series is loaded.
     dicom_dataset : pydicom.Dataset | None
@@ -277,9 +278,9 @@ class Series(ImageCollection):
     -------
     add_instance(instance: 'Instance')
         Adds an instance to the series.
-    get_tags(tag: Tag) -> list
-        Gets the values of a dicom tag for all instances in the series.
     get_tag(tag: Tag, instance_number: int)
+        Gets the tag for a specific instance in the series.
+    get_value(tag: Tag, instance_number: int)
         Gets the value of a tag for a specific instance in the series.
     """
 
@@ -290,7 +291,7 @@ class Series(ImageCollection):
                  series_number: int,
                  acquisition_number: int,
                  instance_number: int | None = None,
-                 is_stack: bool = False,
+                 is_enhanced: bool = False,
                  open_dicom: pydicom.Dataset | None = None,
                  filepath: Path | None = None) -> None:
         self.study: Study = study
@@ -298,30 +299,30 @@ class Series(ImageCollection):
         self.series_number: int = series_number
         self.acquisition_number: int = acquisition_number
         self.series_description: str = series_description
-        self.is_stack: bool = is_stack
+        self.is_enhanced: bool = is_enhanced
 
-        if self.is_stack:
+        if self.is_enhanced:
             if instance_number is None:
-                raise ValueError("instance number must be provided for stack")
+                raise ValueError("instance number must be provided for an enhanced dicom file")
             self.instance_number: int | None = instance_number
         else:
             self.instance_number = None
 
         self._filepath: Path | None = copy(filepath)
 
-        if self.is_stack:
+        if self.is_enhanced:
             if self._filepath is None:
                 raise FileNotFoundError(
-                    "a valid filepath must be provided for stack")
+                    "a valid filepath must be provided for an enhanced dicom file")
             if open_dicom is None:
                 try:
                     open_dicom = dcmread(self._filepath)
                 except InvalidDicomError as exc:
                     raise InvalidDicomError(
                         "filepath must be a valid DICOM file") from exc
-            num_samples = get_tag(open_dicom, DicomTags.SamplesPerPixel).value
+            num_samples = get_value(open_dicom, _CoreTags.SamplesPerPixel, get_first=True)
             try:
-                photo_interp = get_tag(open_dicom, DicomTags.PhotometricInterpretation).value
+                photo_interp = get_value(open_dicom, _CoreTags.PhotometricInterpretation, get_first=True)
             except KeyError:
                 photo_interp = None
             if num_samples == 1:
@@ -348,7 +349,7 @@ class Series(ImageCollection):
             return False
 
     def __str__(self) -> str:
-        if self.is_stack:
+        if self.is_enhanced:
             return (str(self.series_number)
                     + "-" + str(self.acquisition_number)
                     + "-" + str(self.instance_number)
@@ -364,7 +365,7 @@ class Series(ImageCollection):
 
     @property
     def id_string(self) -> str:
-        if self.is_stack:
+        if self.is_enhanced:
             return (self.study.id_string
                     + " : " + self.series_id
                     + "-" + str(self.acquisition_number)
@@ -381,7 +382,7 @@ class Series(ImageCollection):
     @property
     def sort_value(self) -> tuple[int, int] | tuple[int, int, int]:
         """Returns the sort value of the series."""
-        if self.is_stack and self.instance_number is not None:
+        if self.is_enhanced and self.instance_number is not None:
             return (self.series_number, self.acquisition_number, self.instance_number)
         else:
             return (self.series_number, self.acquisition_number)
@@ -395,6 +396,13 @@ class Series(ImageCollection):
             return self.current_image.filepath
         else:
             return self._filepath
+
+    @property
+    def current_instance_number(self) -> int:
+        """Returns the current instance number
+        or frame number for enhanced dicoms
+        (starting at 1)."""
+        return self.current_slice + 1
 
     @property
     def current_image(self) -> 'Instance':
@@ -417,26 +425,29 @@ class Series(ImageCollection):
                                   np.dtype]:
         """Returns the raw array of the series as stored in the dicom file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        if self.is_stack and self._dicom is not None:
-            return self._dicom.pixel_array
+        if self.is_enhanced and self._dicom is not None:
+            array = self._dicom.pixel_array
+            if array.ndim == 2:
+                return np.expand_dims(array, axis=0)
+            return array
         else:
             return np.concatenate([a.raw_array for a in self.instances])  # type: ignore
 
     @property
     def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """Returns an array suitable for passing to the viewer"""
-        if self.is_stack:
+        if self.is_enhanced:
             raw_array = self.raw_array
             if not self.is_colour:
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
             else:
                 try:
-                    photo_interp = self.get_tag(DicomTags.PhotometricInterpretation)
+                    photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
                     if isinstance(photo_interp, str):
                         if photo_interp != "RGB":
                             return convert_color_space(self.raw_array,
@@ -446,15 +457,15 @@ class Series(ImageCollection):
                             return raw_array
                     else:
                         try:
-                            slope = self.get_tag(DicomTags.RescaleSlope)
-                            intercept = self.get_tag(DicomTags.RescaleIntercept)
+                            slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                            intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                             return raw_array * slope + intercept
                         except KeyError:
                             return raw_array
                 except (KeyError, NotImplementedError):
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
@@ -470,18 +481,18 @@ class Series(ImageCollection):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if self.is_stack:
+        if self.is_enhanced:
             raw_array = np.astype(self.raw_array, float)
             if not self.is_colour:
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
             else:
                 try:
-                    photo_interp = self.get_tag(DicomTags.PhotometricInterpretation)
+                    photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
                     if isinstance(photo_interp, str):
                         if photo_interp != "RGB":
                             return np.astype(convert_color_space(self.raw_array,
@@ -492,15 +503,15 @@ class Series(ImageCollection):
                             return raw_array
                     else:
                         try:
-                            slope = self.get_tag(DicomTags.RescaleSlope)
-                            intercept = self.get_tag(DicomTags.RescaleIntercept)
+                            slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                            intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                             return raw_array * slope + intercept
                         except KeyError:
                             return raw_array
                 except (KeyError, NotImplementedError):
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
@@ -509,9 +520,6 @@ class Series(ImageCollection):
 
     @property
     def current_slice_array(self) -> np.ndarray[tuple[int, int, int] | tuple[int, int], np.dtype]:
-        """
-        The array representation of the current slice.
-        """
         return self.instances[self.current_slice].current_slice_array
 
     @property
@@ -521,8 +529,8 @@ class Series(ImageCollection):
         This is **not** normally the maximum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_value(_CoreTags.WindowWidth, get_first=True)
+            window_center = self.get_value(_CoreTags.WindowCenter, get_first=True)
             if window_center is not None and window_width is not None:
                 vmax = window_center + (window_width / 2)
             else:
@@ -540,8 +548,8 @@ class Series(ImageCollection):
         This is **not** normally the minimum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_value(_CoreTags.WindowWidth, get_first=True)
+            window_center = self.get_value(_CoreTags.WindowCenter, get_first=True)
             if window_center is not None and window_width is not None:
                 vmin = window_center - (window_width / 2)
             else:
@@ -557,9 +565,9 @@ class Series(ImageCollection):
         """Returns the default window width from the window width tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            window = self.get_tag(DicomTags.WindowWidth)
+            window = self.get_value(_CoreTags.WindowWidth, get_first=True)
             if window is not None:
-                return float(window)
+                return window
             else:
                 return super().window
         except KeyError:
@@ -574,9 +582,9 @@ class Series(ImageCollection):
         """Returns the default level (window centre) from the window center tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            level = self.get_tag(DicomTags.WindowCenter)
+            level = self.get_value(_CoreTags.WindowCenter, get_first=True)
             if level is not None:
-                return float(level)
+                return level
             else:
                 return super().level
         except KeyError:
@@ -585,36 +593,46 @@ class Series(ImageCollection):
             return super().level
 
     @property
-    def pixel_size(self) -> tuple[float, float, float]:
-        """Returns the pixel size of the series in mm as a tuple of 3 floats.
-        (slice_thickness, row_spacing, column_spacing)
+    def pixel_spacing(self) -> tuple[float, float] | None:
+        """Returns the pixel spacing of the current instance in mm as a tuple of 2 floats.
+        Returns None if this cannot be found using the Pixel Spacing tag.
+        (row_spacing, column_spacing)
         """
         try:
-            pixel_spacing = self.get_tag(DicomTags.PixelSpacing)
+            pixel_spacing = self.get_value(_CoreTags.PixelSpacing, get_first=True)
         except KeyError:
-            pixel_spacing = (1, 1)
-        try:
-            slice_thickness = self.get_tag(DicomTags.SliceThickness)
-        except KeyError:
-            slice_thickness = 1
+            return None
 
         if pixel_spacing is None:
-            pixel_spacing = (1, 1)
-        if slice_thickness is None:
-            slice_thickness = 1
+            return None
 
         try:
             row_spacing = pixel_spacing[0]
             column_spacing = pixel_spacing[1]
         except TypeError:
-            return (slice_thickness, 1, 1)
+            return None
 
-        return (slice_thickness, row_spacing, column_spacing)
+        return (row_spacing, column_spacing)
+
+    @property
+    def slice_thickness(self) -> float | None:
+        """Returns the slice thickness of the current instance in mm.
+        Returns None if this cannot be found using the SliceThickness tag.
+        """
+        try:
+            slice_thickness = self.get_value(_CoreTags.SliceThickness, get_first=True)
+        except KeyError:
+            return None
+
+        if slice_thickness is None:
+            return None
+
+        return slice_thickness
 
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
         """Returns the pydicom dataset of the series."""
-        if self.is_stack:
+        if self.is_enhanced:
             dcm = self._dicom
         else:
             dcm = self.instances[self.current_slice].dicom_dataset
@@ -650,27 +668,41 @@ class Series(ImageCollection):
         else:
             raise ValueError("Image must be an Instance")
 
-    def get_tags(self, tag: Tag) -> list:
+    @overload
+    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: Literal[False] = False) -> pydicom.DataElement | list[pydicom.DataElement]: ...
+    @overload
+    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: Literal[True] = True) -> pydicom.DataElement: ...
+
+    def get_tag(self, tag: Tag, instance_number: int | None = None, get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement]:
         """
-        Gets the values of a DICOM tag for all instances in the series.
+        Gets the DICOM tag for a specific instance in the series.
 
         Parameters
         ----------
         tag : Tag
-            The tag to get values for.
+            The tag to get the value for.
+        instance_number : int | None
+            The instance number to get the tag value for (starting at 1),
+            this is either the slice number or frame number depending on if it is an enhanced DICOM.
+            If None uses the current instance (default is None).
 
         Returns
         -------
-        list
-            The list of values for the tag.
+        The value of the tag.
         """
-        values = []
-        for instance in self.instances:
-            values.append(instance.get_tag(tag))
+        if instance_number is None:
+            instance_number = self.current_instance_number
+        if 0 < instance_number and instance_number <= self.num_slices:
+            return self.instances[instance_number - 1].get_tag(tag, get_first)
+        else:
+            raise IndexError("instance_number not valid")
 
-        return values
+    @overload
+    def get_value(self, tag: Tag, instance_number: int | None = None, get_first: Literal[False] = False) -> Any | list[Any] | None: ...
+    @overload
+    def get_value(self, tag: Tag, instance_number: int | None = None, get_first: Literal[True] = True) -> Any | None: ...
 
-    def get_tag(self, tag: Tag, instance_number: int | None = None):
+    def get_value(self, tag: Tag, instance_number: int | None = None, get_first: bool = False) -> Any | list[Any] | None:
         """
         Gets the value of a DICOM tag for a specific instance in the series.
 
@@ -679,7 +711,8 @@ class Series(ImageCollection):
         tag : Tag
             The tag to get the value for.
         instance_number : int | None
-            The instance number to get the tag value for.
+            The instance number to get the tag value for (starting at 1),
+            this is either the slice number or frame number depending on if it is an enhanced DICOM.
             If None uses the current instance (default is None).
 
         Returns
@@ -687,9 +720,9 @@ class Series(ImageCollection):
         The value of the tag.
         """
         if instance_number is None:
-            instance_number = self.current_slice
-        if instance_number < self.num_slices:
-            return self.instances[instance_number].get_tag(tag)
+            instance_number = self.current_instance_number
+        if 0 < instance_number and instance_number <= self.num_slices:
+            return self.instances[instance_number - 1].get_value(tag, get_first)
         else:
             raise IndexError("instance_number not valid")
 
@@ -704,7 +737,7 @@ class Instance(FileImageSet):
     series : Series
         The series associated with the instance.
     slice_number : int
-        The slice number of the instance.
+        The slice number of the instance, equivalent to the frame number for enhanced dicom.
         For a frame this will be the frame number, otherwise this will be the instance number.
     filepath : Path, optional
         The file path of the instance (default is None).
@@ -731,6 +764,8 @@ class Instance(FileImageSet):
     Methods
     -------
     get_tag(tag: Tag)
+        Gets the tag for the instance.
+    get_value(tag: Tag)
         Gets the value of a tag for the instance.
     """
 
@@ -739,7 +774,7 @@ class Instance(FileImageSet):
                  slice_number: int,
                  filepath: Path | None = None,
                  is_frame: bool = False,
-                 dimension_index_values: list | tuple | None = None,
+                 dimension_index_values: list[int] | tuple[int, ...] | None = None,
                  open_dicom: pydicom.Dataset | None = None,) -> None:
         self.series: Series = series
 
@@ -772,9 +807,9 @@ class Instance(FileImageSet):
                 except InvalidDicomError as exc:
                     raise InvalidDicomError(
                         "filepath must be a valid DICOM file") from exc
-            num_samples = get_tag(open_dicom, DicomTags.SamplesPerPixel).value
+            num_samples = get_value(open_dicom, _CoreTags.SamplesPerPixel, get_first=True)
             try:
-                photo_interp = get_tag(open_dicom, DicomTags.PhotometricInterpretation).value
+                photo_interp = get_value(open_dicom, _CoreTags.PhotometricInterpretation, get_first=True)
             except KeyError:
                 photo_interp = None
             if num_samples == 1:
@@ -797,7 +832,9 @@ class Instance(FileImageSet):
             return False
 
     def __str__(self) -> str:
-        return str(self.slice_number)
+        if self.dimension_index_values is None:
+            return str(self.slice_number)
+        return str(self.dimension_index_values)
 
     def __hash__(self) -> int:
         # from docs: A class that overrides __eq__() and does not define __hash__()
@@ -813,9 +850,11 @@ class Instance(FileImageSet):
         return "IN" + self.id_string
 
     @property
-    def sort_value(self) -> int:
+    def sort_value(self) -> int | tuple[int, ...]:
         """Returns the sort value of the instance."""
-        return self.slice_number
+        if self.dimension_index_values is None:
+            return self.slice_number
+        return self.dimension_index_values
 
     @property
     def raw_array(self
@@ -835,17 +874,16 @@ class Instance(FileImageSet):
     def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """Returns an array suitable for passing to the viewer"""
         raw_array = self.raw_array
-        if self.get_tag(DicomTags.SamplesPerPixel) == 1:
+        if not self.is_colour:
             try:
-                slope = self.get_tag(DicomTags.RescaleSlope)
-                intercept = self.get_tag(DicomTags.RescaleIntercept)
+                slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                 return raw_array * slope + intercept
             except KeyError:
                 return raw_array
         else:
             try:
-                photo_interp = self.get_tag(
-                    DicomTags.PhotometricInterpretation)
+                photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
                 if isinstance(photo_interp, str):
                     if photo_interp != "RGB":
                         return convert_color_space(self.raw_array,
@@ -855,15 +893,15 @@ class Instance(FileImageSet):
                         return raw_array
                 else:
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
             except (KeyError, NotImplementedError):
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
@@ -878,17 +916,16 @@ class Instance(FileImageSet):
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
         raw_array = np.astype(self.raw_array, float)
-        if self.get_tag(DicomTags.SamplesPerPixel) == 1:
+        if not self.is_colour:
             try:
-                slope = self.get_tag(DicomTags.RescaleSlope)
-                intercept = self.get_tag(DicomTags.RescaleIntercept)
+                slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                 return raw_array * slope + intercept
             except KeyError:
                 return raw_array
         else:
             try:
-                photo_interp = self.get_tag(
-                    DicomTags.PhotometricInterpretation)
+                photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
                 if isinstance(photo_interp, str):
                     if photo_interp != "RGB":
                         return np.astype(convert_color_space(self.raw_array,
@@ -898,15 +935,15 @@ class Instance(FileImageSet):
                         return raw_array
                 else:
                     try:
-                        slope = self.get_tag(DicomTags.RescaleSlope)
-                        intercept = self.get_tag(DicomTags.RescaleIntercept)
+                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                         return raw_array * slope + intercept
                     except KeyError:
                         return raw_array
             except (KeyError, NotImplementedError):
                 try:
-                    slope = self.get_tag(DicomTags.RescaleSlope)
-                    intercept = self.get_tag(DicomTags.RescaleIntercept)
+                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
+                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
                     return raw_array * slope + intercept
                 except KeyError:
                     return raw_array
@@ -918,8 +955,8 @@ class Instance(FileImageSet):
         This is **not** normally the maximum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_value(_CoreTags.WindowWidth, get_first=True)
+            window_center = self.get_value(_CoreTags.WindowCenter, get_first=True)
             if window_center is not None and window_width is not None:
                 vmax = window_center + (window_width / 2)
             else:
@@ -937,8 +974,8 @@ class Instance(FileImageSet):
         This is **not** normally the minimum value in the image,
         however if the relevant tags are not available then this is the fallback."""
         try:
-            window_width = self.get_tag(DicomTags.WindowWidth)
-            window_center = self.get_tag(DicomTags.WindowCenter)
+            window_width = self.get_value(_CoreTags.WindowWidth, get_first=True)
+            window_center = self.get_value(_CoreTags.WindowCenter, get_first=True)
             if window_center is not None and window_width is not None:
                 vmin = window_center - (window_width / 2)
             else:
@@ -954,7 +991,11 @@ class Instance(FileImageSet):
         """Returns the default window width from the window width tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            return self.get_tag(DicomTags.WindowWidth)
+            window = self.get_value(_CoreTags.WindowWidth, get_first=True)
+            if window is not None:
+                return window
+            else:
+                return super().window
         except KeyError:
             return super().window
         except IndexError:
@@ -965,38 +1006,52 @@ class Instance(FileImageSet):
         """Returns the default level (window centre) from the window center tag.
         If this is not available then it is calculated from the array min and max values."""
         try:
-            return self.get_tag(DicomTags.WindowCenter)
+            level = self.get_value(_CoreTags.WindowCenter, get_first=True)
+            if level is not None:
+                return level
+            else:
+                return super().level
         except KeyError:
             return super().level
         except IndexError:
             return super().level
 
     @property
-    def pixel_size(self) -> tuple[float, float, float]:
-        """Returns the pixel size of the instance in mm as a tuple of 3 floats.
-        (slice_thickness, row_spacing, column_spacing)
+    def pixel_spacing(self) -> tuple[float, float] | None:
+        """Returns the pixel spacing of the current instance in mm as a tuple of 2 floats.
+        Returns None if this cannot be found using the Pixel Spacing tag.
+        (row_spacing, column_spacing)
         """
         try:
-            pixel_spacing = self.get_tag(DicomTags.PixelSpacing)
+            pixel_spacing = self.get_value(_CoreTags.PixelSpacing, get_first=True)
         except KeyError:
-            pixel_spacing = (1, 1)
-        try:
-            slice_thickness = self.get_tag(DicomTags.SliceThickness)
-        except KeyError:
-            slice_thickness = 1
+            return None
 
         if pixel_spacing is None:
-            pixel_spacing = (1, 1)
-        if slice_thickness is None:
-            slice_thickness = 1
+            return None
 
         try:
             row_spacing = pixel_spacing[0]
             column_spacing = pixel_spacing[1]
         except TypeError:
-            return (slice_thickness, 1, 1)
+            return None
 
-        return (slice_thickness, row_spacing, column_spacing)
+        return (row_spacing, column_spacing)
+
+    @property
+    def slice_thickness(self) -> float | None:
+        """Returns the slice thickness of the current instance in mm.
+        Returns None if this cannot be found using the SliceThickness tag.
+        """
+        try:
+            slice_thickness = self.get_value(_CoreTags.SliceThickness, get_first=True)
+        except KeyError:
+            return None
+
+        if slice_thickness is None:
+            return None
+
+        return slice_thickness
 
     @property
     def dicom_dataset(self) -> pydicom.Dataset | None:
@@ -1008,7 +1063,42 @@ class Instance(FileImageSet):
 
         return dcm
 
-    def get_tag(self, tag: Tag):
+    @overload
+    def get_tag(self, tag: Tag, get_first: Literal[False] = False) -> pydicom.DataElement | list[pydicom.DataElement]: ...
+    @overload
+    def get_tag(self, tag: Tag, get_first: Literal[True] = True) -> pydicom.DataElement: ...
+
+    def get_tag(self, tag: Tag, get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement]:
+        """
+        Gets the DICOM tag for the instance.
+
+        Parameters
+        ----------
+        tag : Tag
+            The tag to get the value for.
+
+        """
+        if self.is_frame:
+            dataset = self.series.dicom_dataset
+            if dataset is not None:
+                value = get_tag(dataset, tag, self.slice_number, get_first)
+            else:
+                raise AttributeError("Series has no dicom_dataset loaded.")
+        else:
+            dataset = self.dicom_dataset
+            if dataset is not None:
+                value = get_tag(dataset, tag, get_first=get_first)
+            else:
+                raise AttributeError("Instance has no dicom_dataset loaded.")
+
+        return value
+
+    @overload
+    def get_value(self, tag: Tag, get_first: Literal[False] = False) -> Any | list[Any]: ...
+    @overload
+    def get_value(self, tag: Tag, get_first: Literal[True] = True) -> Any: ...
+
+    def get_value(self, tag: Tag, get_first: bool = False) -> Any | list[Any]:
         """
         Gets the value of a DICOM tag for the instance.
 
@@ -1017,22 +1107,20 @@ class Instance(FileImageSet):
         tag : Tag
             The tag to get the value for.
 
-        Returns
-        -------
-        The value of the tag.
+        get_first : bool, optional
+            Whether to get the first value for a matching tag
         """
-        value = None
         if self.is_frame:
             dataset = self.series.dicom_dataset
             if dataset is not None:
-                value = get_tag(dataset, tag, self.slice_number).value
+                value = get_value(dataset, tag, self.slice_number, get_first)
             else:
-                value = None
+                raise AttributeError("Series has no dicom_dataset loaded.")
         else:
             dataset = self.dicom_dataset
             if dataset is not None:
-                value = get_tag(dataset, tag).value
+                value = get_value(dataset, tag, get_first=get_first)
             else:
-                value = None
+                raise AttributeError("Instance has no dicom_dataset loaded.")
 
         return value
