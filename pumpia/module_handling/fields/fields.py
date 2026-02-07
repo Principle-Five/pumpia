@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload, Self
 from datetime import date
 
 from pumpia.module_handling.fields.simple import (BaseIO,
@@ -17,32 +17,35 @@ if TYPE_CHECKING:
 
 
 class Fields:
-    def __init__(self) -> None:
-        self.fields: dict[str, BaseIO] = {}
-
-    def __getattr__(self, name: str) -> BaseIO:
-        try:
-            return self.fields[name]
-        except KeyError as exc:
-            raise AttributeError(f"No attribute or field called {name}.") from exc
-
-    def __setattr__(self, name: str, value: BaseIO) -> None:
-        self.fields[name] = value
+    def __init__(self, obj: BaseModule) -> None:
+        self.fields_dict: dict[str, BaseIO] = {}
+        self.obj: BaseModule = obj
 
 
 class _FieldsMeta:
     def __init__(self) -> None:
-        self.private_name = "_"
+        self.field_types: dict[str, BaseField] = {}
 
-    def __set_name__(self, owner, name: str):
-        self.private_name = '_' + name
+    @property
+    def field_names(self) -> list[str]:
+        return list(self.field_types.keys())
 
-    def __get__(self, obj, owner=None) -> Fields:
+    @overload
+    def __get__(self, obj: BaseModule, owner=None) -> Fields: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
+
+    def __get__(self, obj: BaseModule | None, owner=None) -> Fields | Self:
+        if obj is None:
+            return self
+
         try:
-            return getattr(obj, self.private_name)
+            return getattr(obj, "fields")
         except AttributeError:
-            fields = Fields()
-            setattr(obj, self.private_name, fields)
+            fields = Fields(obj)
+            for name, field in self.field_types:
+                setattr(fields, name, field)
+            setattr(obj, "fields", fields)
             return fields
 
 
@@ -94,40 +97,64 @@ class BaseField[ValT, IOType:BaseIO](ABC):
 
     @property
     @abstractmethod
-    def IObase(self) -> type[IOType]:
+    def IO_base(self) -> type[IOType]:
         pass
 
-    def __set_name__(self, owner, name: str):
+    def __set_name__(self, owner: type[BaseModule], name: str):
         self.name = name
+        owner.fields.field_types[name] = self
 
-    def __get__(self, obj: BaseModule, owner=None) -> ValT:
-        try:
-            field: IOType = getattr(obj.fields, self.name)
+    @overload
+    def __get__(self, obj: BaseModule, owner=None) -> ValT: ...
+    @overload
+    def __get__(self, obj: Fields, owner=None) -> IOType: ...
 
-        except AttributeError:
-            field = self.IObase(initial_value=self.initial_value,
-                                parent=obj,
-                                verbose_name=self.verbose_name,
-                                label_style=self.label_style,
-                                entry_style=self.entry_style,
-                                hidden=self.hidden,
-                                read_only=self.read_only)
-            setattr(obj.fields, self.name, field)
-        return field.value
+    def __get__(self, obj: BaseModule | Fields, owner=None) -> ValT | IOType:
+        if isinstance(obj, Fields):
+            try:
+                field: IOType = obj.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
+
+            except KeyError:
+                field = self.IO_base(initial_value=self.initial_value,
+                                     parent=obj.obj,
+                                     verbose_name=self.verbose_name,
+                                     label_style=self.label_style,
+                                     entry_style=self.entry_style,
+                                     hidden=self.hidden,
+                                     read_only=self.read_only)
+                obj.fields_dict[self.name] = field
+
+            return field
+
+        else:
+            try:
+                field: IOType = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
+
+            except KeyError:
+                field = self.IO_base(initial_value=self.initial_value,
+                                     parent=obj,
+                                     verbose_name=self.verbose_name,
+                                     label_style=self.label_style,
+                                     entry_style=self.entry_style,
+                                     hidden=self.hidden,
+                                     read_only=self.read_only)
+                obj.fields.fields_dict[self.name] = field
+
+            return field.value
 
     def __set__(self, obj: BaseModule, value: ValT):
         try:
-            field: IOType = getattr(obj.fields, self.name)
+            field: IOType = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
 
         except AttributeError:
-            field = self.IObase(initial_value=self.initial_value,
-                                parent=obj,
-                                verbose_name=self.verbose_name,
-                                label_style=self.label_style,
-                                entry_style=self.entry_style,
-                                hidden=self.hidden,
-                                read_only=self.read_only)
-            setattr(obj.fields, self.name, field)
+            field = self.IO_base(initial_value=self.initial_value,
+                                 parent=obj,
+                                 verbose_name=self.verbose_name,
+                                 label_style=self.label_style,
+                                 entry_style=self.entry_style,
+                                 hidden=self.hidden,
+                                 read_only=self.read_only)
+            obj.fields.fields_dict[self.name] = field
 
         field.value = value
 
@@ -167,44 +194,66 @@ class OptionField[DictValT](BaseField[str, OptionIO[DictValT]]):
         self.allow_inv_mapping = allow_inv_mapping
 
     @property
-    def IObase(self) -> type[OptionIO[DictValT]]:
+    def IO_base(self) -> type[OptionIO[DictValT]]:
         return OptionIO
 
-    def __set_name__(self, owner, name: str):
-        self.name = name
+    @overload
+    def __get__(self, obj: BaseModule, owner=None) -> DictValT: ...
+    @overload
+    def __get__(self, obj: Fields, owner=None) -> OptionIO: ...
 
-    def __get__(self, obj: BaseModule, owner=None) -> DictValT:
-        try:
-            field: OptionIO[DictValT] = getattr(obj.fields, self.name)
+    def __get__(self, obj: BaseModule | Fields, owner=None) -> DictValT | OptionIO:
+        if isinstance(obj, Fields):
+            try:
+                field: OptionIO[DictValT] = obj.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
 
-        except AttributeError:
-            field = self.IObase(initial=self.initial_value,
-                                options_map=self.options_map,
-                                parent=obj,
-                                verbose_name=self.verbose_name,
-                                label_style=self.label_style,
-                                entry_style=self.entry_style,
-                                allow_inv_mapping=self.allow_inv_mapping,
-                                hidden=self.hidden,
-                                read_only=self.read_only)
-            setattr(obj.fields, self.name, field)
-        return field.value
+            except KeyError:
+
+                field = self.IO_base(initial=self.initial_value,
+                                     options_map=self.options_map,
+                                     parent=obj.obj,
+                                     verbose_name=self.verbose_name,
+                                     label_style=self.label_style,
+                                     entry_style=self.entry_style,
+                                     allow_inv_mapping=self.allow_inv_mapping,
+                                     hidden=self.hidden,
+                                     read_only=self.read_only)
+                obj.fields_dict[self.name] = field
+
+            return field
+        else:
+            try:
+                field: OptionIO[DictValT] = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
+
+            except KeyError:
+                field = self.IO_base(initial=self.initial_value,
+                                     options_map=self.options_map,
+                                     parent=obj,
+                                     verbose_name=self.verbose_name,
+                                     label_style=self.label_style,
+                                     entry_style=self.entry_style,
+                                     allow_inv_mapping=self.allow_inv_mapping,
+                                     hidden=self.hidden,
+                                     read_only=self.read_only)
+                obj.fields.fields_dict[self.name] = field
+
+            return field.value
 
     def __set__(self, obj: BaseModule, value: DictValT | str):
         try:
-            field: BaseIO = getattr(obj.fields, self.name)
+            field: OptionIO[DictValT] = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
 
-        except AttributeError:
-            field = self.IObase(initial=self.initial_value,
-                                options_map=self.options_map,
-                                parent=obj,
-                                verbose_name=self.verbose_name,
-                                label_style=self.label_style,
-                                entry_style=self.entry_style,
-                                allow_inv_mapping=self.allow_inv_mapping,
-                                hidden=self.hidden,
-                                read_only=self.read_only)
-            setattr(obj.fields, self.name, field)
+        except KeyError:
+            field = self.IO_base(initial=self.initial_value,
+                                 options_map=self.options_map,
+                                 parent=obj,
+                                 verbose_name=self.verbose_name,
+                                 label_style=self.label_style,
+                                 entry_style=self.entry_style,
+                                 allow_inv_mapping=self.allow_inv_mapping,
+                                 hidden=self.hidden,
+                                 read_only=self.read_only)
+            obj.fields.fields_dict[self.name] = field
 
         field.value = value
 
@@ -215,7 +264,7 @@ class BoolField(BaseField[bool, BoolIO]):
     Has the same attributes and methods as BaseInput unless stated below.
     """
     @property
-    def IObase(self) -> type[BoolIO]:
+    def IO_base(self) -> type[BoolIO]:
         return BoolIO
 
 
@@ -225,7 +274,7 @@ class StringField(BaseField[str, StringIO]):
     Has the same attributes and methods as BaseInput unless stated below.
     """
     @property
-    def IObase(self) -> type[StringIO]:
+    def IO_base(self) -> type[StringIO]:
         return StringIO
 
 
@@ -235,7 +284,7 @@ class IntField(BaseField[int, IntIO]):
     Has the same attributes and methods as BaseInput unless stated below.
     """
     @property
-    def IObase(self) -> type[IntIO]:
+    def IO_base(self) -> type[IntIO]:
         return IntIO
 
 
@@ -245,7 +294,7 @@ class PercField(BaseField[float, PercIO]):
     Has the same attributes and methods as BaseInput unless stated below.
     """
     @property
-    def IObase(self) -> type[PercIO]:
+    def IO_base(self) -> type[PercIO]:
         return PercIO
 
 
@@ -256,7 +305,7 @@ class FloatField(BaseField[float, FloatIO]):
     """
 
     @property
-    def IObase(self) -> type[FloatIO]:
+    def IO_base(self) -> type[FloatIO]:
         return FloatIO
 
 
@@ -267,5 +316,5 @@ class DateField(BaseField[date, DateIO]):
     """
 
     @property
-    def IObase(self) -> type[DateIO]:
+    def IO_base(self) -> type[DateIO]:
         return DateIO
