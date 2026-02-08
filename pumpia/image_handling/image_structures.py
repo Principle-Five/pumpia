@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from pathlib import Path
 from copy import copy
-from typing import TYPE_CHECKING, overload, Literal
+from typing import TYPE_CHECKING, Literal
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -123,43 +123,28 @@ class ArrayImage(BaseImageSet):
         Resets the image properties to their default values.
     """
 
-    @overload
     def __init__(self,
-                 shape: tuple[int, int, int, int],
+                 shape: tuple[int, int, int, int] | tuple[int, int, int] | tuple[int, int],
                  num_samples: int = 1,
                  mode: str | None = None
                  ) -> None:
-        ...
 
-    @overload
-    def __init__(self,
-                 shape: tuple[int, int, int],
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
+        self.shape: tuple[int, int, int]
+        if len(shape) == 4:
+            self.shape = shape[:-1]
+            self.num_samples = shape[-1]
+        elif len(shape) == 3 and num_samples <= 1:
+            self.shape = shape
+            self.num_samples: int = num_samples
+        elif len(shape) == 3 and num_samples > 1:
+            self.shape = (1, shape[0], shape[1])
+            self.num_samples = shape[-1]
+        elif len(shape) == 2:
+            self.shape = (1, shape[0], shape[1])
+            self.num_samples: int = num_samples
+        else:
+            raise ValueError("wrong dimensions for array")
 
-    @overload
-    def __init__(self,
-                 shape: tuple[int, int],
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
-
-    @overload
-    def __init__(self,
-                 shape: tuple[int, ...],
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
-
-    def __init__(self,
-                 shape: tuple[int, ...],
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
         self._current_slice: int = 0
         self._rois: set['BaseROI'] = set()
         self.x: float = 0
@@ -168,21 +153,7 @@ class ArrayImage(BaseImageSet):
         self.rotation: float = 0
         self._user_window: float | None = None
         self._user_level: float | None = None
-        self.num_samples: int = num_samples
         self.mode: str | None = mode
-
-        if len(shape) == 4:
-            self.shape: tuple[int, int, int] = shape[:-1]
-            self.num_samples = shape[-1]
-        elif len(shape) == 3 and not self.is_multisample:
-            self.shape: tuple[int, int, int] = shape
-        elif len(shape) == 3 and self.is_multisample:
-            self.shape: tuple[int, int, int] = (1, shape[0], shape[1])
-            self.num_samples = shape[-1]
-        elif len(shape) == 2:
-            self.shape: tuple[int, int, int] = (1, shape[0], shape[1])
-        else:
-            raise ValueError("wrong dimensions for array")
 
     @property
     def is_multisample(self) -> bool:
@@ -498,35 +469,8 @@ class FileImageSet(ArrayImage):
         The file path of the image.
     """
 
-    @overload
     def __init__(self,
-                 shape: tuple[int, int, int, int],
-                 filepath: Path,
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
-
-    @overload
-    def __init__(self,
-                 shape: tuple[int, int, int],
-                 filepath: Path,
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
-
-    @overload
-    def __init__(self,
-                 shape: tuple[int, int],
-                 filepath: Path,
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
-
-    def __init__(self,
-                 shape: tuple[int, ...],
+                 shape: tuple[int, int, int, int] | tuple[int, int, int] | tuple[int, int],
                  filepath: Path,
                  num_samples: int = 1,
                  mode: str | None = None
@@ -580,26 +524,8 @@ class ImageCollection(ArrayImage):
         Adds an image to the collection.
     """
 
-    @overload
-    def __init__(self, shape: tuple[int, int, int, int],
-                 num_samples: int = 1,
-                 mode: str | None = None
-                 ) -> None:
-        ...
-
-    @overload
-    def __init__(self, shape: tuple[int, int, int],
-                 num_samples: int = 1,
-                 mode: str | None = None) -> None:
-        ...
-
-    @overload
-    def __init__(self, shape: tuple[int, int],
-                 num_samples: int = 1,
-                 mode: str | None = None) -> None:
-        ...
-
-    def __init__(self, shape: tuple[int, ...],
+    def __init__(self,
+                 shape: tuple[int, int, int, int] | tuple[int, int, int] | tuple[int, int],
                  num_samples: int = 1,
                  mode: str | None = None) -> None:
         super().__init__(shape, num_samples, mode)
