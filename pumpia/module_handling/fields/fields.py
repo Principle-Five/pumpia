@@ -21,6 +21,10 @@ class Fields:
         self.fields_dict: dict[str, BaseIO] = {}
         self.obj: BaseModule = obj
 
+    def __iter__(self):
+        for field in self.fields_dict.values():
+            yield field
+
 
 class _FieldsMeta:
     def __init__(self) -> None:
@@ -43,7 +47,7 @@ class _FieldsMeta:
             return getattr(obj, "fields")
         except AttributeError:
             fields = Fields(obj)
-            for name, field in self.field_types:
+            for name, field in self.field_types.items():
                 setattr(fields, name, field)
             setattr(obj, "fields", fields)
             return fields
@@ -108,9 +112,13 @@ class BaseField[ValT, IOType:BaseIO](ABC):
     def __get__(self, obj: BaseModule, owner=None) -> ValT: ...
     @overload
     def __get__(self, obj: Fields, owner=None) -> IOType: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
 
-    def __get__(self, obj: BaseModule | Fields, owner=None) -> ValT | IOType:
-        if isinstance(obj, Fields):
+    def __get__(self, obj: BaseModule | Fields | None, owner=None) -> ValT | IOType | Self:
+        if obj is None:
+            return self
+        elif isinstance(obj, Fields):
             try:
                 field: IOType = obj.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
 
@@ -146,7 +154,7 @@ class BaseField[ValT, IOType:BaseIO](ABC):
         try:
             field: IOType = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
 
-        except AttributeError:
+        except KeyError:
             field = self.IO_base(initial_value=self.initial_value,
                                  parent=obj,
                                  verbose_name=self.verbose_name,
@@ -201,9 +209,14 @@ class OptionField[DictValT](BaseField[str, OptionIO[DictValT]]):
     def __get__(self, obj: BaseModule, owner=None) -> DictValT: ...
     @overload
     def __get__(self, obj: Fields, owner=None) -> OptionIO: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
 
-    def __get__(self, obj: BaseModule | Fields, owner=None) -> DictValT | OptionIO:
-        if isinstance(obj, Fields):
+    def __get__(self, obj: BaseModule | Fields | None, owner=None) -> DictValT | OptionIO | Self:
+        if obj is None:
+            return self
+
+        elif isinstance(obj, Fields):
             try:
                 field: OptionIO[DictValT] = obj.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
 
