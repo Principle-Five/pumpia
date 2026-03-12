@@ -25,7 +25,8 @@ from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.module_handling.in_outs.simple import BaseIO
 from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
-from pumpia.module_handling.modules import BaseModule
+from pumpia.module_handling.fields.groups import FieldGroup, _FieldGroupsMeta
+from pumpia.module_handling.modules import BaseModule, _ModulesMeta
 from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext
 
@@ -415,6 +416,8 @@ class BaseCollection(ABC, ttk.Frame):
 
     context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
     name: str | None = None
+    modules = _ModulesMeta()
+    field_groups = _FieldGroupsMeta()
 
     @overload
     def __init__(
@@ -463,7 +466,6 @@ class BaseCollection(ABC, ttk.Frame):
         self.viewers: list[BaseViewer] = []
         self.viewer_count: int = 0
         self._module_groups: dict[WindowGroup, list[BaseModule]] = {}
-        self.modules: list[BaseModule] = []
         self.output_frame_count: int = 0
         self.command_buttons_count: int = 0
 

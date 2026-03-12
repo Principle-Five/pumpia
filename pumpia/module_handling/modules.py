@@ -8,7 +8,7 @@ from abc import ABC
 import tkinter as tk
 from tkinter import ttk
 from copy import copy
-from typing import overload, Self, Literal, Any
+from typing import overload, Self, Literal, Any, TYPE_CHECKING
 from collections.abc import Callable
 
 from pumpia.utilities.typing import DirectionType
@@ -29,6 +29,50 @@ from pumpia.module_handling.in_outs.roi_ios import BaseInputROI
 from pumpia.module_handling.fields.fields import _FieldsMeta
 from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext, SimpleContext
+
+if TYPE_CHECKING:
+    from pumpia.module_handling.module_collections import BaseCollection
+
+
+class _Modules:
+    def __init__(self, obj: BaseCollection) -> None:
+        self.modules_dict: dict[str, BaseModule] = {}
+        self.obj: BaseCollection = obj
+
+    def __iter__(self):
+        for module in self.modules_dict.values():
+            yield module
+
+
+class _ModulesMeta:
+    def __init__(self) -> None:
+        self.module_types: dict[str, BaseModule] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+
+    @property
+    def module_names(self) -> list[str]:
+        return list(self.module_types.keys())
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        self.private_name = "_" + name
+
+    @overload
+    def __get__(self, obj: BaseCollection, owner=None) -> _Modules: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> _Modules | Self:
+        if obj is None:
+            return self
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            modules = _Modules(obj)
+            setattr(obj, self.private_name, modules)
+            return modules
 
 
 class BaseModule(ABC, ttk.Frame):
@@ -116,7 +160,7 @@ class BaseModule(ABC, ttk.Frame):
     context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
     show_draw_rois_button: bool = False
     show_analyse_button: bool = False
-    name: str | None = None
+    title: str = "PumpIA Module"
     fields = _FieldsMeta()
 
     @overload
@@ -159,11 +203,13 @@ class BaseModule(ABC, ttk.Frame):
                  verbose_name: str | None = None,
                  direction: DirectionType = "Horizontal",
                  **kw):
-        self.context_manager: BaseContextManager | None = context_manager
-        self.manager: Manager | None = manager
         self.parent: tk.Misc | None = parent
+        self.manager: Manager | None = manager
+        self.context_manager: BaseContextManager | None = context_manager
+
         self._kw = kw
         self.verbose_name = verbose_name
+        self.name: str = ""
 
         self._is_setup: bool = False
 
@@ -190,6 +236,29 @@ class BaseModule(ABC, ttk.Frame):
 
         if self.manager is not None and self.parent is not None:
             self.setup()
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        if self.verbose_name is None:
+            self.verbose_name = name.replace("_", " ").title()
+        owner.modules.module_types[name] = self
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.modules.modules_dict[self.name]  # pyright: ignore[reportReturnType]
+        except KeyError:
+            module = type(self)(parent=self.parent,
+                                manager=self.manager,
+                                context_manager=self.context_manager,
+                                verbose_name=self.verbose_name,
+                                direction=self.direction,
+                                **self._kw)
+            module.name = self.name
+            obj.modules.modules_dict[self.name] = module
+            return module
 
     @property
     def is_setup(self) -> bool:
@@ -246,7 +315,7 @@ class BaseModule(ABC, ttk.Frame):
             if self.verbose_name is None:
                 super().__init__(self.parent, **self._kw)
             else:
-                super().__init__(self.parent, name=self.verbose_name.lower(), ** self._kw)
+                super().__init__(self.parent, name=self.verbose_name.lower(), **self._kw)
 
             self.columnconfigure(0, weight=1)
             self.rowconfigure(0, weight=1)
@@ -564,7 +633,7 @@ class BaseModule(ABC, ttk.Frame):
             The direction child widgets in the module (default is "Horizontal").
         """
         app = tk.Tk()
-        app.title(cls.name)
+        app.title(cls.title)
         cls.setup_window(app, direction)
         app.mainloop()
 
