@@ -8,12 +8,12 @@ from pumpia.module_handling.module_collections import BaseCollection
 
 class _FieldGroups:
     def __init__(self, obj: BaseCollection) -> None:
-        self.groups_dict: dict[str, FieldGroup] = {}
         self.obj: BaseCollection = obj
+        self.groups_dict: dict[str, FieldGroup] = {}
 
     def __iter__(self):
-        for module in self.groups_dict.values():
-            yield module
+        for group in self.groups_dict.values():
+            yield group
 
 
 class _FieldGroupsMeta:
@@ -62,12 +62,37 @@ class FieldGroup:
     linked_ios: list[BaseIO]
     """
 
-    def __init__(self, fields: list[BaseField]):
-        self.name: str = ""
+    def __init__(self, *fields: BaseField, verbose_name: str | None = None):
+        self.verbose_name: str | None = verbose_name
         self.module_fields: list[tuple[str, str]] = [(field.module.name, field.name)
                                                      for field in fields
                                                      if field.module is not None]
+        self.name: str = ""
 
     def __set_name__(self, owner: type[BaseCollection], name: str):
         self.name = name
+        if self.verbose_name is None:
+            self.verbose_name = name.replace("_", " ").title()
         owner.field_groups.groups[name] = self
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.field_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
+        except KeyError as exc:
+            fields: list[BaseField] = []
+            for module_name, field_name in self.module_fields:
+                fields.append(getattr(getattr(obj, module_name), field_name))
+
+            value_type = fields[0].value_type
+            for field in fields[1:]:
+                if field.value_type is not value_type:
+                    raise ValueError(f"Field values are not the same type for group {self.name}") from exc
+                field.value = fields[0].value_store
+
+            group = type(self)(*[], verbose_name=self.verbose_name)
+            group.module_fields = self.module_fields
+            obj.field_groups.groups_dict[self.name] = group
+            return group
