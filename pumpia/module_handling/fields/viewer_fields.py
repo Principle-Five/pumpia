@@ -11,9 +11,22 @@ from pumpia.widgets.viewers import (BaseViewer,
                                     MonochromeDicomViewer)
 
 from pumpia.image_handling.image_structures import BaseImageSet
+from pumpia.module_handling.modules import BaseModule
+from pumpia.module_handling.module_collections import BaseCollection
 
 
-class BaseViewerIO():
+class _ViewerFieldsMeta:
+    def __init__(self) -> None:
+        self.fields: dict[str, BaseViewerField] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+
+    @property
+    def viewer_names(self) -> list[str]:
+        return list(self.fields.keys())
+
+
+class BaseViewerField():
     """
     Base class for viewer input / output handling.
 
@@ -60,43 +73,48 @@ class BaseViewerIO():
         self.allow_changing_rois: bool = allow_changing_rois
         self.validation_command: Callable[[BaseImageSet], bool] | None = validation_command
         self.main = main
+        self.name: str = ""
+
+    def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
+        self.name = name
+        owner.viewer_fields.fields[name] = self
 
 
-class ViewerIO(BaseViewerIO, Viewer):
+class ViewerField(BaseViewerField, Viewer):
     """
     Represents a viewer input / output.
-    Has the same attributes and methods as BaseViewerIO unless stated below.
+    Has the same attributes and methods as BaseViewerField unless stated below.
     """
     viewer_type: type[Viewer] = Viewer
 
 
-class ArrayViewerIO(BaseViewerIO, ArrayViewer):
+class ArrayViewerField(BaseViewerField, ArrayViewer):
     """
     Represents an array viewer input / output.
-    Has the same attributes and methods as BaseViewerIO unless stated below.
+    Has the same attributes and methods as BaseViewerField unless stated below.
     """
     viewer_type: type[ArrayViewer] = ArrayViewer
 
 
-class MonochromeViewerIO(BaseViewerIO, MonochromeViewer):
+class MonochromeViewerField(BaseViewerField, MonochromeViewer):
     """
     Represents a monochrome viewer input / output.
-    Has the same attributes and methods as BaseViewerIO unless stated below.
+    Has the same attributes and methods as BaseViewerField unless stated below.
     """
     viewer_type: type[MonochromeViewer] = MonochromeViewer
 
 
-class DicomViewerIO(BaseViewerIO, DicomViewer):
+class DicomViewerField(BaseViewerField, DicomViewer):
     """
     Represents a DICOM viewer input / output.
-    Has the same attributes and methods as BaseViewerIO unless stated below.
+    Has the same attributes and methods as BaseViewerField unless stated below.
     """
     viewer_type: type[DicomViewer] = DicomViewer
 
 
-class MonochromeDicomViewerIO(BaseViewerIO, DicomViewer):
+class MonochromeDicomViewerField(BaseViewerField, DicomViewer):
     """
     Represents a DICOM viewer input / output for monochrome images.
-    Has the same attributes and methods as BaseViewerIO unless stated below.
+    Has the same attributes and methods as BaseViewerField unless stated below.
     """
     viewer_type: type[MonochromeDicomViewer] = MonochromeDicomViewer

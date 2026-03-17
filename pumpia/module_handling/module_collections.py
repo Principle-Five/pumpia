@@ -27,6 +27,7 @@ from pumpia.module_handling.in_outs.simple import BaseIO
 from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
 from pumpia.module_handling.fields.groups import FieldGroup, _FieldGroupsMeta
 from pumpia.module_handling.fields.windows import FieldWindow, _FieldWindowsMeta
+from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
 from pumpia.module_handling.modules import BaseModule, _ModulesMeta
 from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext
@@ -420,6 +421,7 @@ class BaseCollection(ABC, ttk.Frame):
     modules = _ModulesMeta()
     field_groups = _FieldGroupsMeta()
     field_windows = _FieldWindowsMeta()
+    viewer_fields = _ViewerFieldsMeta()
 
     @overload
     def __init__(
