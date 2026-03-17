@@ -27,6 +27,7 @@ from pumpia.module_handling.in_outs.simple import BaseInput, BaseOutput
 from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
 from pumpia.module_handling.in_outs.roi_ios import BaseInputROI
 from pumpia.module_handling.fields.fields import _FieldsMeta
+from pumpia.module_handling.fields.windows import FieldWindow, _FieldWindowsMeta
 from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext, SimpleContext
 
@@ -162,6 +163,7 @@ class BaseModule(ABC, ttk.Frame):
     show_analyse_button: bool = False
     title: str = "PumpIA Module"
     fields = _FieldsMeta()
+    field_windows = _FieldWindowsMeta()
 
     @overload
     def __init__(

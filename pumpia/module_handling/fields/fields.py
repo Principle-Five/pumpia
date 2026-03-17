@@ -208,6 +208,26 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
             self._label_var.set(val)
 
     @property
+    def parent(self) -> tk.Misc | None:
+        return self._parent
+
+    @parent.setter
+    def parent(self, value: tk.Misc):
+        """
+        Sets the parent of the input/output.
+        Can only be set once.
+
+        Parameters
+        ----------
+        parent : tk.Misc
+            The parent of the input/output.
+        """
+        if self._parent is None:
+            self._parent = value
+        else:
+            raise ValueError("Parent already set")
+
+    @property
     def value_store(self) -> BaseValue[ValT, TkVarT]:
         if self._value is None:
             if self._parent is None:
@@ -268,20 +288,6 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         if self._label_var is None:
             self._label_var = tk.StringVar(self._parent, value=self.verbose_name)
         return self._label_var
-
-    def set_parent(self, parent: tk.Misc):
-        """
-        Sets the parent of the input/output.
-
-        Parameters
-        ----------
-        parent : tk.Misc
-            The parent of the input/output.
-        """
-        if self._parent is None:
-            self._parent = parent
-        else:
-            raise ValueError("Parent already set")
 
     def reset_value(self):
         """

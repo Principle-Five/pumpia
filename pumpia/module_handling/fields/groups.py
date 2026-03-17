@@ -64,9 +64,10 @@ class FieldGroup:
 
     def __init__(self, *fields: BaseField, verbose_name: str | None = None):
         self.verbose_name: str | None = verbose_name
-        self.module_fields: list[tuple[str, str]] = [(field.module.name, field.name)
-                                                     for field in fields
-                                                     if field.module is not None]
+        self.module_field_names: list[tuple[str, str]] = [(field.module.name, field.name)
+                                                          for field in fields
+                                                          if field.module is not None]
+        self.fields: list[BaseField] = []
         self.name: str = ""
 
     def __set_name__(self, owner: type[BaseCollection], name: str):
@@ -83,7 +84,7 @@ class FieldGroup:
             return obj.field_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
         except KeyError as exc:
             fields: list[BaseField] = []
-            for module_name, field_name in self.module_fields:
+            for module_name, field_name in self.module_field_names:
                 fields.append(getattr(getattr(obj, module_name), field_name))
 
             value_type = fields[0].value_type
@@ -93,6 +94,7 @@ class FieldGroup:
                 field.value = fields[0].value_store
 
             group = type(self)(*[], verbose_name=self.verbose_name)
-            group.module_fields = self.module_fields
+            group.module_field_names = self.module_field_names
+            group.fields = fields
             obj.field_groups.groups_dict[self.name] = group
             return group
