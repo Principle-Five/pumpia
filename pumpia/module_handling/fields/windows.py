@@ -66,7 +66,9 @@ class FieldWindow:
     linked_ios: list[BaseIO]
     """
 
-    def __init__(self, *fields: BaseField, verbose_name: str | None = None, show_copy_buttons: bool = True):
+    def __init__(self, *fields: BaseField,
+                 verbose_name: str | None = None,
+                 show_copy_buttons: bool = True):
         self.verbose_name: str | None = verbose_name
         self.show_copy_buttons: bool = show_copy_buttons
         self.module_field_names: list[tuple[str | None, str]] = [(field.module.name, field.name)

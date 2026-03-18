@@ -25,8 +25,8 @@ from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.module_handling.in_outs.simple import BaseIO
 from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
-from pumpia.module_handling.fields.groups import FieldGroup, _FieldGroupsMeta
-from pumpia.module_handling.fields.windows import FieldWindow, _FieldWindowsMeta
+from pumpia.module_handling.fields.groups import _FieldGroupsMeta
+from pumpia.module_handling.fields.windows import _FieldWindowsMeta
 from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
 from pumpia.module_handling.modules import BaseModule, _ModulesMeta
 from pumpia.module_handling.manager import Manager
@@ -602,7 +602,6 @@ class BaseCollection(ABC, ttk.Frame):
                 if isinstance(v, BaseModule):
                     attr = copy(v)
                     setattr(self, k, attr)
-                    self.modules.append(attr)
                     show_draw_rois_button = show_draw_rois_button or attr.show_draw_rois_button
                     show_analyse_button = show_analyse_button or attr.show_analyse_button
                     if attr.verbose_name is None:

@@ -3,7 +3,7 @@ Contains inputs/outputs for ROIs
 """
 
 from collections.abc import Callable
-from typing import Any
+from typing import overload, Any, Self
 import tkinter as tk
 from tkinter import ttk
 from pumpia.module_handling.manager import Manager
@@ -16,9 +16,51 @@ from pumpia.image_handling.roi_structures import (BaseROI,
                                                   Angle,
                                                   PointROI)
 from pumpia.image_handling.image_structures import ArrayImage
+from pumpia.module_handling.modules import BaseModule
 
 
-class BaseInputROI[ROI:BaseROI]:
+class _ROIFields:
+    def __init__(self, obj: BaseModule) -> None:
+        self.obj: BaseModule = obj
+        self.rois_dict: dict[str, BaseROIField] = {}
+
+    def __iter__(self):
+        for window in self.rois_dict.values():
+            yield window
+
+
+class _ROIFieldsMeta:
+    def __init__(self) -> None:
+        self.rois: dict[str, BaseROIField] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+
+    @property
+    def roi_names(self) -> list[str]:
+        return list(self.rois.keys())
+
+    def __set_name__(self, owner: type[BaseModule], name: str):
+        self.name = name
+        self.private_name = "_" + name
+
+    @overload
+    def __get__(self, obj: BaseModule, owner=None) -> _ROIFields: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
+
+    def __get__(self, obj: BaseModule | None, owner=None) -> _ROIFields | Self:
+        if obj is None:
+            return self
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            windows = _ROIFields(obj)
+            setattr(obj, self.private_name, windows)
+            return windows
+
+
+class BaseROIField[ROI:BaseROI]:
     """
     Base class for input handling of ROIs.
 
@@ -35,7 +77,7 @@ class BaseInputROI[ROI:BaseROI]:
     ----------
     name: str | None
     roi: BaseROI | None
-    post_register_command: Callable[[BaseInputROI, bool|None], Any]
+    post_register_command: Callable[[BaseROIField, bool|None], Any]
         Command called after ROI is registered.
         This should accept an ROI and a boolean indicating if it was a manual draw.
     label_var: tk.StringVar
@@ -60,7 +102,8 @@ class BaseInputROI[ROI:BaseROI]:
                  default_type: ManualROIType = "ROI ellipse",
                  allow_manual_draw: bool = True,
                  button_style: str | None = None):
-        self._name = name
+        self._name: str | None = name
+        self._private_name: str = ""
         self.roi: ROI | None = None
         self.default_type: ManualROIType = default_type
         self.viewer: BaseViewer | None = None
@@ -72,7 +115,27 @@ class BaseInputROI[ROI:BaseROI]:
         self._button_style: str | None = button_style
         self._manager: Manager | None = None
         self._postdraw_command: Callable[[BaseROI | None], Any] | None = None
-        self.post_register_command: Callable[[BaseInputROI, bool], Any] | None = None
+        self.post_register_command: Callable[[BaseROIField, bool], Any] | None = None
+
+    def __set_name__(self, owner: type[BaseModule], name: str):
+        self._private_name = name
+        if self.name is None:
+            self.name = name.replace("_", " ").title()
+        owner.rois.rois[self._private_name] = self
+
+    def __get__(self, obj: BaseModule | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.rois.rois_dict[self._private_name]  # pyright: ignore[reportReturnType]
+        except KeyError:
+            roi_field = type(self)(name=self.name,
+                                   default_type=self.default_type,
+                                   allow_manual_draw=self.allow_manual_draw,
+                                   button_style=self._button_style)
+            obj.rois.rois_dict[self._private_name] = roi_field
+            return roi_field
 
     @property
     def name(self) -> str | None:
@@ -215,9 +278,12 @@ class BaseInputROI[ROI:BaseROI]:
                 else:
                     self._finish_draw()
             else:
-                raise AttributeError("`viewer` attribute must not be None for manual redraw.")
+                if self.viewer is None:
+                    raise AttributeError("`viewer` attribute must not be None for manual redraw.")
+                else:
+                    raise ValueError("viewer must have suitable image loaded")
         else:
-            raise AttributeError("`name` not set.")
+            raise AttributeError("`verbose_name` not set.")
 
     def _finish_draw(self, roi: BaseROI | None = None):
         """
@@ -230,17 +296,17 @@ class BaseInputROI[ROI:BaseROI]:
             self._postdraw_command = None
 
 
-class InputGeneralROI(BaseInputROI[BaseROI]):
+class GeneralROIField(BaseROIField[BaseROI]):
     """
     Represents a general ROI input.
-    Has the same attributes and methods as BaseInputROI unless stated below.
+    Has the same attributes and methods as BaseROIField unless stated below.
     """
 
 
-class InputRectangleROI(BaseInputROI[RectangleROI]):
+class RectangleROIField(BaseROIField[RectangleROI]):
     """
     Represents a RectangleROI input.
-    Has the same attributes and methods as BaseInputROI unless stated below.
+    Has the same attributes and methods as BaseROIField unless stated below.
     """
 
     def __init__(self,
@@ -254,10 +320,10 @@ class InputRectangleROI(BaseInputROI[RectangleROI]):
                          button_style=button_style)
 
 
-class InputEllipseROI(BaseInputROI[EllipseROI]):
+class EllipseROIField(BaseROIField[EllipseROI]):
     """
     Represents an EllipseROI input.
-    Has the same attributes and methods as BaseInputROI unless stated below.
+    Has the same attributes and methods as BaseROIField unless stated below.
     """
 
     def __init__(self,
@@ -271,10 +337,10 @@ class InputEllipseROI(BaseInputROI[EllipseROI]):
                          button_style=button_style)
 
 
-class InputLineROI(BaseInputROI[LineROI]):
+class LineROIField(BaseROIField[LineROI]):
     """
     Represents a LineROI input.
-    Has the same attributes and methods as BaseInputROI unless stated below.
+    Has the same attributes and methods as BaseROIField unless stated below.
     """
 
     def __init__(self,
@@ -288,10 +354,10 @@ class InputLineROI(BaseInputROI[LineROI]):
                          button_style=button_style)
 
 
-class InputAngle(BaseInputROI[Angle]):
+class AngleROIField(BaseROIField[Angle]):
     """
     Represents an Angle ROI input.
-    Has the same attributes and methods as BaseInputROI unless stated below.
+    Has the same attributes and methods as BaseROIField unless stated below.
     """
 
     def __init__(self,
@@ -305,10 +371,10 @@ class InputAngle(BaseInputROI[Angle]):
                          button_style=button_style)
 
 
-class InputPointROI(BaseInputROI[PointROI]):
+class PointROIField(BaseROIField[PointROI]):
     """
     Represents a PointROI input.
-    Has the same attributes and methods as BaseInputROI unless stated below.
+    Has the same attributes and methods as BaseROIField unless stated below.
     """
 
     def __init__(self,

@@ -4,6 +4,8 @@ Classes:
  * PhantomModule
 """
 
+from pumpia.module_handling.context import BaseContext, SimpleContext
+from pumpia.module_handling.manager import Manager
 from abc import ABC
 import tkinter as tk
 from tkinter import ttk
@@ -27,10 +29,9 @@ from pumpia.module_handling.in_outs.simple import BaseInput, BaseOutput
 from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
 from pumpia.module_handling.in_outs.roi_ios import BaseInputROI
 from pumpia.module_handling.fields.fields import _FieldsMeta
-from pumpia.module_handling.fields.windows import FieldWindow, _FieldWindowsMeta
+from pumpia.module_handling.fields.windows import _FieldWindowsMeta
 from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
-from pumpia.module_handling.manager import Manager
-from pumpia.module_handling.context import BaseContext, SimpleContext
+from pumpia.module_handling.fields.roi_fields import _ROIFieldsMeta
 
 if TYPE_CHECKING:
     from pumpia.module_handling.module_collections import BaseCollection
@@ -166,6 +167,7 @@ class BaseModule(ABC, ttk.Frame):
     fields = _FieldsMeta()
     field_windows = _FieldWindowsMeta()
     viewer_fields = _ViewerFieldsMeta()
+    rois = _ROIFieldsMeta()
 
     @overload
     def __init__(
@@ -225,7 +227,6 @@ class BaseModule(ABC, ttk.Frame):
         self.main_viewer: BaseViewer | None = None
         self.viewers: list[BaseViewer] = []
 
-        self.rois: list[BaseInputROI] = []
         self.analysed: bool = False
 
         self.input_count: int = 0
@@ -524,7 +525,6 @@ class BaseModule(ABC, ttk.Frame):
                         setattr(self, k, attr)
                         if attr.name is None:
                             attr.name = k.replace("_", " ").title()
-                        self.rois.append(attr)
                         attr.set_manager(self.manager)
                         attr.set_parent(self.roi_frame)
                         attr.post_register_command = self._post_roi_register_manual_wrapper
