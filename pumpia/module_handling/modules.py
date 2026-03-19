@@ -364,6 +364,7 @@ class BaseModule(ABC, ttk.Frame):
 
             self.input_frame = ttk.Labelframe(self.io_frame, text="Inputs")
             self.output_frame = ttk.Labelframe(self.io_frame, text="Outputs")
+            self.fields_frame = ttk.Labelframe(self.io_frame, text="Fields")
             self.roi_frame = ttk.Labelframe(self.io_frame, text="ROIs")
             self.button_frame = ttk.Labelframe(self.io_frame, text="Commands")
             self.command_buttons: list[ttk.Button] = []

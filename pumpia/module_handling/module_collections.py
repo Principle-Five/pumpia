@@ -255,7 +255,48 @@ class OutputFrame(ttk.Labelframe):
                                         sticky="nsew")
 
 
-class WindowGroup(ttk.Panedwindow):
+class _ModuleGroups:
+    def __init__(self, obj: BaseCollection) -> None:
+        self.obj: BaseCollection = obj
+        self.groups_dict: dict[str, ModuleGroup] = {}
+
+    def __iter__(self):
+        for group in self.groups_dict.values():
+            yield group
+
+
+class _ModuleGroupsMeta:
+    def __init__(self) -> None:
+        self.groups: dict[str, ModuleGroup] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+
+    @property
+    def group_names(self) -> list[str]:
+        return list(self.groups.keys())
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        self.private_name = "_" + name
+
+    @overload
+    def __get__(self, obj: BaseCollection, owner=None) -> _ModuleGroups: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> _ModuleGroups | Self:
+        if obj is None:
+            return self
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            groups = _ModuleGroups(obj)
+            setattr(obj, self.private_name, groups)
+            return groups
+
+
+class ModuleGroup(ttk.Panedwindow):
     """
     A window for showing multiple modules.
 
@@ -290,9 +331,8 @@ class WindowGroup(ttk.Panedwindow):
     @overload
     def __init__(
         self,
-        modules: list[BaseModule],
+        *modules: BaseModule,
         verbose_name: str | None = None,
-        *,
         direction: DirectionType = "V",
         border: ScreenUnits = ...,
         borderwidth: ScreenUnits = ...,
@@ -309,29 +349,56 @@ class WindowGroup(ttk.Panedwindow):
     @overload
     def __init__(
         self,
-        modules: list[BaseModule],
+        *modules: BaseModule,
         verbose_name: str | None = None,
-        *,
         direction: DirectionType = "V",
         **kwargs) -> None: ...
 
     # pylint: disable-next=super-init-not-called
     def __init__(self,
-                 modules: list[BaseModule],
+                 *modules: BaseModule,
                  verbose_name: str | None = None,
-                 *,
                  direction: DirectionType = "V",
                  **kw) -> None:
-        self.modules = modules
-        self.verbose_name = verbose_name
+        self.module_names: list[str] = [module.name for module in modules]
+        self.modules: list[BaseModule] = []
+        self.verbose_name: str | None = verbose_name
+        self.name: str = ""
+
         if direction[0].lower() == "h":
-            self.direction = "horizontal"
+            self.direction: DirectionType = "horizontal"
         else:
-            self.direction = "vertical"
+            self.direction: DirectionType = "vertical"
         self.kw = kw
         self.kw["orient"] = self.direction
 
-    def setup(self, parent: tk.Misc, verbose_name: str | None = None):
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        if self.verbose_name is None:
+            self.verbose_name = name.replace("_", " ").title()
+        owner.module_groups.groups[name] = self
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.module_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
+        except KeyError:
+            modules: list[BaseModule] = []
+            for module_name in self.module_names:
+                modules.append(getattr(obj, module_name))
+
+            group = type(self)(*[],
+                               verbose_name=self.verbose_name,
+                               direction=self.direction,
+                               kw=self.kw)
+            group.module_names = self.module_names
+            group.modules = modules
+            obj.module_groups.groups_dict[self.name] = group
+            return group
+
+    def setup(self, parent: tk.Misc):
         """
         Sets up the window group.
         verbose_name must be set before calling this method or provided as arguments.
@@ -341,11 +408,7 @@ class WindowGroup(ttk.Panedwindow):
         ----------
         parent : tk.Misc
             The parent widget.
-        verbose_name : str or None, optional
-            The verbose name of the group (default is None).
         """
-        if verbose_name is not None:
-            self.verbose_name = verbose_name
 
         if self.verbose_name is None:
             raise ValueError("name needs to be provided or set as string")
@@ -422,6 +485,7 @@ class BaseCollection(ABC, ttk.Frame):
     field_groups = _FieldGroupsMeta()
     field_windows = _FieldWindowsMeta()
     viewer_fields = _ViewerFieldsMeta()
+    module_groups = _ModuleGroupsMeta()
 
     @overload
     def __init__(

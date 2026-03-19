@@ -113,14 +113,15 @@ class FieldWindow:
             frame = ttk.Labelframe(parent, text=self.name)
         else:
             frame = ttk.Labelframe(parent, text=self.verbose_name)
-        final_row: int = -1
-        for row, field in enumerate(self.fields):
+        row: int = 0
+        for field in self.fields:
             field.parent = frame
-            label = field.new_label(frame)
-            label.grid(column=0, row=row, sticky=tk.NSEW)
-            entry = field.new_entry(frame)
-            entry.grid(column=1, row=row, sticky=tk.NSEW)
-            final_row = row
+            if not field.hidden:
+                label = field.new_label(frame)
+                label.grid(column=0, row=row, sticky=tk.NSEW)
+                entry = field.new_entry(frame)
+                entry.grid(column=1, row=row, sticky=tk.NSEW)
+                row += 1
 
         if show_copy_buttons or ((show_copy_buttons is None)
                                  and self.show_copy_buttons):
@@ -130,8 +131,8 @@ class FieldWindow:
             v_button = ttk.Button(frame,
                                   text="Copy Vertical",
                                   command=self.copy_vertical)
-            h_button.grid(column=0, row=final_row + 1, columnspan=2, sticky=tk.NSEW)
-            v_button.grid(column=0, row=final_row + 2, columnspan=2, sticky=tk.NSEW)
+            h_button.grid(column=0, row=row, columnspan=2, sticky=tk.NSEW)
+            v_button.grid(column=0, row=row + 1, columnspan=2, sticky=tk.NSEW)
 
         return frame
 
