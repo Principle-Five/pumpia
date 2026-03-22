@@ -15,7 +15,9 @@ class BaseValue[ValT, TkVarT:tk.Variable](ABC):
     def __init__(self, parent: tk.Misc, initial_value: ValT) -> None:
         self._value: ValT = initial_value
         self.var: TkVarT = self.var_type(parent)
+        self.var.set(self._value)
         self._var_trace = self.var.trace_add("write", self._var_to_val)
+        self.error: bool = False
 
     @property
     @abstractmethod
@@ -35,7 +37,11 @@ class BaseValue[ValT, TkVarT:tk.Variable](ABC):
         self.var.set(val)
 
     def _var_to_val(self, *_):
-        self._value = self.var.get()
+        try:
+            self._value = self.var.get()
+            self.error = False
+        except (ValueError, tk.TclError):
+            self.error = True
 
 
 class StringValue(BaseValue[str, tk.StringVar]):

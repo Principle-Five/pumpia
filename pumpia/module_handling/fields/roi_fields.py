@@ -3,7 +3,7 @@ Contains inputs/outputs for ROIs
 """
 
 from collections.abc import Callable
-from typing import overload, Any, Self
+from typing import overload, Any, Self, TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk
 from pumpia.module_handling.manager import Manager
@@ -16,7 +16,9 @@ from pumpia.image_handling.roi_structures import (BaseROI,
                                                   Angle,
                                                   PointROI)
 from pumpia.image_handling.image_structures import ArrayImage
-from pumpia.module_handling.modules import BaseModule
+
+if TYPE_CHECKING:
+    from pumpia.module_handling.modules import BaseModule
 
 
 class _ROIFields:
@@ -34,6 +36,7 @@ class _ROIFieldsMeta:
         self.rois: dict[str, BaseROIField] = {}
         self.name: str = ""
         self.private_name: str = "_"
+        self.base_owner: type[BaseModule] | None = None
 
     @property
     def roi_names(self) -> list[str]:
@@ -42,6 +45,7 @@ class _ROIFieldsMeta:
     def __set_name__(self, owner: type[BaseModule], name: str):
         self.name = name
         self.private_name = "_" + name
+        self.base_owner = owner
 
     @overload
     def __get__(self, obj: BaseModule, owner=None) -> _ROIFields: ...
@@ -50,7 +54,15 @@ class _ROIFieldsMeta:
 
     def __get__(self, obj: BaseModule | None, owner=None) -> _ROIFields | Self:
         if obj is None:
-            return self
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
 
         try:
             return getattr(obj, self.private_name)
@@ -123,19 +135,26 @@ class BaseROIField[ROI:BaseROI]:
             self.name = name.replace("_", " ").title()
         owner.rois.rois[self._private_name] = self
 
-    def __get__(self, obj: BaseModule | None, owner=None) -> Self:
+    def __get__(self, obj: BaseModule | None, owner: type[BaseModule]) -> Self:
         if obj is None:
             return self
 
         try:
             return obj.rois.rois_dict[self._private_name]  # pyright: ignore[reportReturnType]
-        except KeyError:
+        except KeyError as exc:
+            if obj.manager is None:
+                raise ValueError("object manager needs to be set") from exc
             roi_field = type(self)(name=self.name,
                                    default_type=self.default_type,
                                    allow_manual_draw=self.allow_manual_draw,
                                    button_style=self._button_style)
+            roi_field.set_manager(obj.manager)
+            roi_field.set_parent(obj.roi_frame)
+            roi_field.post_register_command = obj._post_roi_register_manual_wrapper
             obj.rois.rois_dict[self._private_name] = roi_field
             return roi_field
+        except AttributeError:
+            return self
 
     @property
     def name(self) -> str | None:

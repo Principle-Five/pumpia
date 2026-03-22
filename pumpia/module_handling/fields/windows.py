@@ -1,13 +1,16 @@
 """
 Contains groupings of inputs/outputs.
 """
-from typing import overload, Self
+from typing import overload, Self, TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk
 from pumpia.utilities.tkinter_utils import tk_copy
 from pumpia.module_handling.fields.fields import BaseField
-from pumpia.module_handling.modules import BaseModule
-from pumpia.module_handling.module_collections import BaseCollection
+
+
+if TYPE_CHECKING:
+    from pumpia.module_handling.modules import BaseModule
+    from pumpia.module_handling.module_collections import BaseCollection
 
 
 class _FieldWindows:
@@ -25,6 +28,7 @@ class _FieldWindowsMeta:
         self.windows: dict[str, FieldWindow] = {}
         self.name: str = ""
         self.private_name: str = "_"
+        self.base_owner: type[BaseCollection | BaseModule] | None = None
 
     @property
     def window_names(self) -> list[str]:
@@ -33,15 +37,24 @@ class _FieldWindowsMeta:
     def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
         self.name = name
         self.private_name = "_" + name
+        self.base_owner = owner
 
     @overload
-    def __get__(self, obj: BaseCollection | BaseModule, owner=None) -> _FieldWindows: ...
+    def __get__(self, obj: BaseCollection | BaseModule, owner: type[BaseCollection | BaseModule]) -> _FieldWindows: ...
     @overload
-    def __get__(self, obj: None, owner=None) -> Self: ...
+    def __get__(self, obj: None, owner: type[BaseCollection | BaseModule]) -> Self: ...
 
-    def __get__(self, obj: BaseCollection | BaseModule | None, owner=None) -> _FieldWindows | Self:
+    def __get__(self, obj: BaseCollection | BaseModule | None, owner: type[BaseCollection | BaseModule]) -> _FieldWindows | Self:
         if obj is None:
-            return self
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
 
         try:
             return getattr(obj, self.private_name)
@@ -71,11 +84,7 @@ class FieldWindow:
                  show_copy_buttons: bool = True):
         self.verbose_name: str | None = verbose_name
         self.show_copy_buttons: bool = show_copy_buttons
-        self.module_field_names: list[tuple[str | None, str]] = [(field.module.name, field.name)
-                                                                 if field.module is not None
-                                                                 else (None, field.name)
-                                                                 for field in fields]
-        self.fields: list[BaseField] = []
+        self.fields: list[BaseField] = list(fields)
         self.name: str = ""
 
     def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
@@ -92,19 +101,22 @@ class FieldWindow:
             return obj.field_windows.windows_dict[self.name]  # pyright: ignore[reportReturnType]
         except KeyError:
             fields: list[BaseField] = []
-            if isinstance(obj, BaseCollection):
-                for module_name, field_name in self.module_field_names:
-                    if module_name is not None:
-                        fields.append(getattr(getattr(obj, module_name), field_name))
-            else:
-                for _, field_name in self.module_field_names:
-                    fields.append(getattr(obj, field_name))
+            module_field_names = [(field.module.name, field.name)
+                                  if field.module is not None
+                                  else (None, field.name)
+                                  for field in self.fields]
+            for module_name, field_name in module_field_names:
+                if module_name is not None:
+                    fields.append(getattr(getattr(obj, module_name).fields, field_name))
+                else:
+                    fields.append(getattr(obj.fields, field_name))  # pyright: ignore[reportAttributeAccessIssue]
 
-            window = type(self)(*[], verbose_name=self.verbose_name)
-            window.module_field_names = self.module_field_names
-            window.fields = fields
+            window = type(self)(*fields, verbose_name=self.verbose_name)
+
             obj.field_windows.windows_dict[self.name] = window
             return window
+        except AttributeError:
+            return self
 
     def get_frame(self, parent: tk.Misc, show_copy_buttons: bool | None = None) -> ttk.Labelframe:
         if len(self.fields) == 0:
@@ -115,7 +127,9 @@ class FieldWindow:
             frame = ttk.Labelframe(parent, text=self.verbose_name)
         row: int = 0
         for field in self.fields:
-            field.parent = frame
+            if field.parent is None:
+                field.parent = frame
+
             if not field.hidden:
                 label = field.new_label(frame)
                 label.grid(column=0, row=row, sticky=tk.NSEW)

@@ -1,9 +1,11 @@
 """
 Contains groupings of inputs/outputs.
 """
-from typing import overload, Self
+from typing import overload, Self, TYPE_CHECKING
 from pumpia.module_handling.fields.fields import BaseField
-from pumpia.module_handling.module_collections import BaseCollection
+
+if TYPE_CHECKING:
+    from pumpia.module_handling.module_collections import BaseCollection
 
 
 class _FieldGroups:
@@ -21,6 +23,7 @@ class _FieldGroupsMeta:
         self.groups: dict[str, FieldGroup] = {}
         self.name: str = ""
         self.private_name: str = "_"
+        self.base_owner: type[BaseCollection] | None = None
 
     @property
     def group_names(self) -> list[str]:
@@ -29,15 +32,24 @@ class _FieldGroupsMeta:
     def __set_name__(self, owner: type[BaseCollection], name: str):
         self.name = name
         self.private_name = "_" + name
+        self.base_owner = owner
 
     @overload
-    def __get__(self, obj: BaseCollection, owner=None) -> _FieldGroups: ...
+    def __get__(self, obj: BaseCollection, owner: type[BaseCollection]) -> _FieldGroups: ...
     @overload
-    def __get__(self, obj: None, owner=None) -> Self: ...
+    def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
 
-    def __get__(self, obj: BaseCollection | None, owner=None) -> _FieldGroups | Self:
+    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _FieldGroups | Self:
         if obj is None:
-            return self
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
 
         try:
             return getattr(obj, self.private_name)
@@ -64,10 +76,7 @@ class FieldGroup:
 
     def __init__(self, *fields: BaseField, verbose_name: str | None = None):
         self.verbose_name: str | None = verbose_name
-        self.module_field_names: list[tuple[str, str]] = [(field.module.name, field.name)
-                                                          for field in fields
-                                                          if field.module is not None]
-        self.fields: list[BaseField] = []
+        self.fields: list[BaseField] = list(fields)
         self.name: str = ""
 
     def __set_name__(self, owner: type[BaseCollection], name: str):
@@ -83,9 +92,9 @@ class FieldGroup:
         try:
             return obj.field_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
         except KeyError as exc:
-            fields: list[BaseField] = []
-            for module_name, field_name in self.module_field_names:
-                fields.append(getattr(getattr(obj, module_name), field_name))
+            fields: list[BaseField] = [getattr(getattr(obj, field.module.name).fields, field.name)
+                                       for field in self.fields
+                                       if field.module is not None]
 
             value_type = fields[0].value_type
             for field in fields[1:]:
@@ -93,8 +102,8 @@ class FieldGroup:
                     raise ValueError(f"Field values are not the same type for group {self.name}") from exc
                 field.value = fields[0].value_store
 
-            group = type(self)(*[], verbose_name=self.verbose_name)
-            group.module_field_names = self.module_field_names
-            group.fields = fields
+            group = type(self)(*fields, verbose_name=self.verbose_name)
             obj.field_groups.groups_dict[self.name] = group
             return group
+        except AttributeError:
+            return self

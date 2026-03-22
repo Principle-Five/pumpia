@@ -4,7 +4,7 @@ Contains simple fields.
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import TYPE_CHECKING, overload, Self
+from typing import TYPE_CHECKING, overload, Self, Literal
 from datetime import date
 import tkinter as tk
 from tkinter import ttk
@@ -30,12 +30,28 @@ class _Fields:
         for field in self.fields_dict.values():
             yield field
 
+    @overload
+    def __getattr__(self, name: Literal["module"]) -> BaseModule: ...
+    @overload
+    def __getattr__(self, name: Literal["fields_dict"]) -> dict[str, BaseField]: ...
+    @overload
+    def __getattr__(self, name: str) -> BaseField: ...
+
+    def __getattr__(self, name: str) -> BaseModule | BaseField | dict[str, BaseField]:
+        if name == "module":
+            return self.module
+        elif name == "fields_dict":
+            return self.fields_dict
+        else:
+            return self.fields_dict[name]
+
 
 class _FieldsMeta:
     def __init__(self) -> None:
         self.field_types: dict[str, BaseField] = {}
         self.name: str = ""
         self.private_name: str = "_"
+        self.base_owner: type[BaseModule] | None = None
 
     @property
     def field_names(self) -> list[str]:
@@ -44,20 +60,31 @@ class _FieldsMeta:
     def __set_name__(self, owner: type[BaseModule], name: str):
         self.name = name
         self.private_name = "_" + name
+        self.base_owner = owner
 
     @overload
-    def __get__(self, obj: BaseModule, owner=None) -> _Fields: ...
+    def __get__(self, obj: BaseModule, owner: type[BaseModule]) -> _Fields: ...
     @overload
-    def __get__(self, obj: None, owner=None) -> Self: ...
+    def __get__(self, obj: None, owner: type[BaseModule]) -> Self: ...
 
-    def __get__(self, obj: BaseModule | None, owner=None) -> _Fields | Self:
+    def __get__(self, obj: BaseModule | None, owner: type[BaseModule]) -> _Fields | Self:
         if obj is None:
-            return self
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
 
         try:
             return getattr(obj, self.private_name)
         except AttributeError:
             fields = _Fields(obj)
+            for name, field in self.field_types.items():
+                setattr(fields, name, field)
             setattr(obj, self.private_name, fields)
             return fields
 
@@ -100,7 +127,8 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         self._name: str | None = verbose_name
         self._label_style: str | None = label_style
 
@@ -114,6 +142,8 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
         self.read_only: bool = read_only
         self._entry_style: str | None = entry_style
+
+        self.reset_on_analysis: bool = reset_on_analysis
 
         self.name: str = ""
         self.module: BaseModule | None = None
@@ -144,11 +174,14 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
                                    label_style=self._label_style,
                                    entry_style=self._entry_style,
                                    hidden=self.hidden,
-                                   read_only=self.read_only)
+                                   read_only=self.read_only,
+                                   reset_on_analysis=self.reset_on_analysis)
                 field.name = self.name
                 field.module = obj.module
                 obj.fields_dict[self.name] = field
                 return field
+            except AttributeError:
+                return self
 
         else:
             try:
@@ -161,11 +194,14 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
                                    label_style=self._label_style,
                                    entry_style=self._entry_style,
                                    hidden=self.hidden,
-                                   read_only=self.read_only)
+                                   read_only=self.read_only,
+                                   reset_on_analysis=self.reset_on_analysis)
                 field.name = self.name
                 field.module = obj
                 obj.fields.fields_dict[self.name] = field
-                return field.value
+                return field.initial_value
+            except AttributeError:
+                return self
 
     def __set__(self, obj: BaseModule, value: ValT):
         try:
@@ -178,7 +214,8 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
                                label_style=self._label_style,
                                entry_style=self._entry_style,
                                hidden=self.hidden,
-                               read_only=self.read_only)
+                               read_only=self.read_only,
+                               reset_on_analysis=self.reset_on_analysis)
             field.name = self.name
             field.module = obj
             obj.fields.fields_dict[self.name] = field
@@ -244,6 +281,8 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         """
         The value of the input/output.
         """
+        if self.value_store.error:
+            raise ValueError(f"Error in value of {self.verbose_name}")
         return self.value_store.value
 
     @value.setter
@@ -291,7 +330,7 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     def reset_value(self):
         """
-        Resets the IO to the initial value.
+        Resets the field to the initial value.
         """
         self.value = self.initial_value
 
@@ -341,14 +380,16 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                  entry_style=None,
                  allow_inv_mapping: bool = False,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         super().__init__(initial_value=initial,
                          parent=parent,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
 
         self._entries: list[ttk.Combobox] = []
 
@@ -384,13 +425,15 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                                    entry_style=self._entry_style,
                                    allow_inv_mapping=self.allow_inv_mapping,
                                    hidden=self.hidden,
-                                   read_only=self.read_only)
+                                   read_only=self.read_only,
+                                   reset_on_analysis=self.reset_on_analysis)
                 obj.fields_dict[self.name] = field
 
             return field
         else:
             try:
                 field = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
+                return field.value
 
             except KeyError:
                 field = type(self)(initial=self.initial_value,
@@ -401,10 +444,10 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                                    entry_style=self._entry_style,
                                    allow_inv_mapping=self.allow_inv_mapping,
                                    hidden=self.hidden,
-                                   read_only=self.read_only)
+                                   read_only=self.read_only,
+                                   reset_on_analysis=self.reset_on_analysis)
                 obj.fields.fields_dict[self.name] = field
-
-            return field.value
+                return self.options_map[field.initial_value]
 
     def __set__(self, obj: BaseModule, value: DictValT | str):
         try:
@@ -419,7 +462,8 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                                entry_style=self._entry_style,
                                allow_inv_mapping=self.allow_inv_mapping,
                                hidden=self.hidden,
-                               read_only=self.read_only)
+                               read_only=self.read_only,
+                               reset_on_analysis=self.reset_on_analysis)
             obj.fields.fields_dict[self.name] = field
 
         field.value = value
@@ -451,8 +495,7 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
         else:
             raise ValueError("Value not in options")
 
-    @property
-    def entry(self) -> ttk.Combobox:
+    def new_entry(self, parent: tk.Misc) -> ttk.Entry:
         """
         The Combobox widget of the input.
         """
@@ -462,12 +505,12 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
         else:
             state = "readonly"
         if self._entry_style is None:
-            entry = self.widget(self._parent,
+            entry = self.widget(parent,
                                 textvariable=var,
                                 values=self.options,
                                 state=state)
         else:
-            entry = self.widget(self._parent,
+            entry = self.widget(parent,
                                 textvariable=var,
                                 values=self.options,
                                 style=self._entry_style,
@@ -490,14 +533,16 @@ class BoolField(BaseField[bool, tk.BooleanVar]):
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         super().__init__(initial_value,
                          parent=parent,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
         self._entries: list[ttk.Checkbutton] = []
 
     @property
@@ -518,7 +563,7 @@ class BoolField(BaseField[bool, tk.BooleanVar]):
         """
         var = self.value_var
         if self.read_only:
-            state = "readonly"
+            state = "disabled"
         else:
             state = "normal"
         if self._entry_style is None:
@@ -543,14 +588,16 @@ class StringField(BaseField[str, tk.StringVar]):
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         super().__init__(initial_value,
                          parent=parent,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
 
     @property
     def value_type(self) -> type[StringValue]:
@@ -571,14 +618,16 @@ class IntField(BaseField[int, tk.IntVar]):
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         super().__init__(initial_value,
                          parent=parent,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
 
     @property
     def widget(self) -> type[IntEntry]:
@@ -603,7 +652,8 @@ class PercField(BaseField[float, tk.IntVar]):
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         if isinstance(initial_value, float) and initial_value > 100:
             raise ValueError("Initial value must be less that 100")
         super().__init__(initial_value,
@@ -612,7 +662,8 @@ class PercField(BaseField[float, tk.IntVar]):
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
 
     @property
     def widget(self) -> type[PercEntry]:
@@ -637,14 +688,16 @@ class FloatField(BaseField[float, tk.DoubleVar]):
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         super().__init__(initial_value,
                          parent=parent,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
 
     @property
     def widget(self) -> type[FloatEntry]:
@@ -662,21 +715,23 @@ class DateField(BaseField[date, DateVar]):
     """
 
     def __init__(self,
-                 initial_value=date.today(),
+                 initial_value: date | Callable[[], date] = date.today,
                  parent: tk.Misc | None = None,
                  *,
                  verbose_name: str | None = None,
                  label_style: str | None = None,
                  entry_style: str | None = None,
                  hidden: bool = False,
-                 read_only: bool = False):
+                 read_only: bool = False,
+                 reset_on_analysis: bool = False):
         super().__init__(initial_value,
                          parent=parent,
                          verbose_name=verbose_name,
                          label_style=label_style,
                          entry_style=entry_style,
                          hidden=hidden,
-                         read_only=read_only)
+                         read_only=read_only,
+                         reset_on_analysis=reset_on_analysis)
 
     @property
     def widget(self) -> type[DateEntry]:
