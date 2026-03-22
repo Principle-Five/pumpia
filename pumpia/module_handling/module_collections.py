@@ -411,15 +411,15 @@ class BaseCollection(ABC, ttk.Frame):
             frame = window.get_frame(self.output_frame)
             if self.direction == "horizontal":
                 frame.grid(column=0,
-                           row=field_count,
+                           row=self.output_frame_count,
                            columnspan=2,
                            sticky="nsew")
             else:
-                frame.grid(column=2 * field_count,
+                frame.grid(column=2 * self.output_frame_count,
                            row=0,
                            columnspan=2,
                            sticky="nsew")
-            field_count += 1
+            self.output_frame_count += 1
 
         for group_name in type(self).field_groups.group_names:
             getattr(self, group_name)

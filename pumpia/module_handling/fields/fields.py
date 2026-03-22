@@ -83,8 +83,6 @@ class _FieldsMeta:
             return getattr(obj, self.private_name)
         except AttributeError:
             fields = _Fields(obj)
-            for name, field in self.field_types.items():
-                setattr(fields, name, field)
             setattr(obj, self.private_name, fields)
             return fields
 
@@ -414,8 +412,7 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
 
         elif isinstance(obj, _Fields):
             try:
-                field: Self = obj.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
-
+                return obj.fields_dict[self.name]   # pyright: ignore[reportReturnType]
             except KeyError:
                 field = type(self)(initial=self.initial_value,
                                    options_map=self.options_map,
@@ -427,14 +424,17 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                                    hidden=self.hidden,
                                    read_only=self.read_only,
                                    reset_on_analysis=self.reset_on_analysis)
+                field.name = self.name
+                field.module = obj.module
                 obj.fields_dict[self.name] = field
+                return field
+            except AttributeError:
+                return self
 
-            return field
         else:
             try:
                 field = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
                 return field.value
-
             except KeyError:
                 field = type(self)(initial=self.initial_value,
                                    options_map=self.options_map,
@@ -447,7 +447,11 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                                    read_only=self.read_only,
                                    reset_on_analysis=self.reset_on_analysis)
                 obj.fields.fields_dict[self.name] = field
+                field.name = self.name
+                field.module = obj
                 return self.options_map[field.initial_value]
+            except AttributeError:
+                return self
 
     def __set__(self, obj: BaseModule, value: DictValT | str):
         try:
@@ -464,6 +468,8 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
                                hidden=self.hidden,
                                read_only=self.read_only,
                                reset_on_analysis=self.reset_on_analysis)
+            field.name = self.name
+            field.module = obj
             obj.fields.fields_dict[self.name] = field
 
         field.value = value
@@ -486,8 +492,11 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
         return self.options_map[value]
 
     @value.setter
-    def value(self, val: DictValT | str):
-        if val in self.options:
+    def value(self, val: DictValT | str | BaseValue[str, tk.StringVar]):
+        if isinstance(val, BaseValue):
+            self._value = val
+            self._value_var_setter()
+        elif val in self.options:
             super().value = val  # pyright: ignore[reportAttributeAccessIssue]
         elif self.allow_inv_mapping and val in self._inv_map:
             val = self._inv_map[val]  # pyright: ignore[reportArgumentType]
@@ -654,7 +663,7 @@ class PercField(BaseField[float, tk.IntVar]):
                  hidden: bool = False,
                  read_only: bool = False,
                  reset_on_analysis: bool = False):
-        if isinstance(initial_value, float) and initial_value > 100:
+        if isinstance(initial_value, float) and (initial_value > 100 or initial_value < 0):
             raise ValueError("Initial value must be less that 100")
         super().__init__(initial_value,
                          parent=parent,

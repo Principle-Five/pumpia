@@ -24,8 +24,8 @@ from pumpia.widgets.context_managers import (BaseContextManager,
                                              SimpleContextManagerGenerator,
                                              ManualPhantomManagerGenerator)
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
-from pumpia.module_handling.fields.fields import _FieldsMeta, BaseField
-from pumpia.module_handling.fields.windows import _FieldWindowsMeta
+from pumpia.module_handling.fields.fields import _FieldsMeta
+from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
 from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
 from pumpia.module_handling.fields.roi_fields import _ROIFieldsMeta, BaseROIField
 
@@ -242,6 +242,9 @@ class BaseModule(ABC, ttk.Frame):
         self.command_buttons_count: int = 0
         self._start_manual_draw: bool = False
 
+        for field_name in type(self).fields.field_names:
+            getattr(self, field_name)
+
         if self.manager is not None and self.parent is not None:
             self.setup()
 
@@ -450,35 +453,36 @@ class BaseModule(ABC, ttk.Frame):
                                                     sticky="nsew")
                     self.command_buttons_count += 1
 
-            for window_name in type(self).field_windows.window_names:
-                getattr(self, window_name)
-
             field_count = 0
 
-            for field_name in type(self).fields.field_names:
-                field: BaseField = getattr(self.fields, field_name)
+            frames = []
+            for window_name in type(self).field_windows.window_names:
+                window: FieldWindow = getattr(self, window_name)
+                frames.append(window.get_frame(self.fields_frame))
+
+            for field in self.fields:
                 if field.parent is None:
                     field.parent = self.fields_frame
-                    label = field.new_label(self.fields_frame)
-                    entry = field.new_entry(self.fields_frame)
-                    if self.direction == "horizontal":
-                        label.grid(column=0,
-                                   row=field_count,
-                                   sticky="nsew")
-                        entry.grid(column=1,
-                                   row=field_count,
-                                   sticky="nsew")
-                    else:
-                        label.grid(column=2 * field_count,
-                                   row=0,
-                                   sticky="nsew")
-                        entry.grid(column=2 * field_count + 1,
-                                   row=0,
-                                   sticky="nsew")
-                    field_count += 1
+                    if not field.hidden:
+                        label = field.new_label(self.fields_frame)
+                        entry = field.new_entry(self.fields_frame)
+                        if self.direction == "horizontal":
+                            label.grid(column=0,
+                                       row=field_count,
+                                       sticky="nsew")
+                            entry.grid(column=1,
+                                       row=field_count,
+                                       sticky="nsew")
+                        else:
+                            label.grid(column=2 * field_count,
+                                       row=0,
+                                       sticky="nsew")
+                            entry.grid(column=2 * field_count + 1,
+                                       row=0,
+                                       sticky="nsew")
+                        field_count += 1
 
-            for window in self.field_windows:
-                frame = window.get_frame(self.fields_frame)
+            for frame in frames:
                 if self.direction == "horizontal":
                     frame.grid(column=0,
                                row=field_count,
