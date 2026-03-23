@@ -79,12 +79,17 @@ class FieldWindow:
     linked_ios: list[BaseIO]
     """
 
-    def __init__(self, *fields: BaseField,
+    def __init__(self,
+                 *fields: BaseField,
+                 field_names: list[str | None] | None = None,
                  verbose_name: str | None = None,
                  show_copy_buttons: bool = True):
+        if isinstance(field_names, list) and len(field_names) != len(fields):
+            raise TypeError("field_names not the same length as fields")
         self.verbose_name: str | None = verbose_name
         self.show_copy_buttons: bool = show_copy_buttons
         self.fields: list[BaseField] = list(fields)
+        self.field_names: list[str | None] | None = field_names
         self.name: str = ""
 
     def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
@@ -111,7 +116,10 @@ class FieldWindow:
                 else:
                     fields.append(getattr(obj.fields, field_name))  # pyright: ignore[reportAttributeAccessIssue]
 
-            window = type(self)(*fields, verbose_name=self.verbose_name)
+            window = type(self)(*fields,
+                                field_names=self.field_names,
+                                verbose_name=self.verbose_name,
+                                show_copy_buttons=self.show_copy_buttons)
 
             obj.field_windows.windows_dict[self.name] = window
             return window
@@ -126,12 +134,15 @@ class FieldWindow:
         else:
             frame = ttk.Labelframe(parent, text=self.verbose_name)
         row: int = 0
-        for field in self.fields:
+        for field_num, field in enumerate(self.fields):
             if field.parent is None:
                 field.parent = frame
 
             if not field.hidden:
                 label = field.new_label(frame)
+                if (self.field_names is not None
+                        and self.field_names[field_num] is not None):
+                    field.label_var.set(self.field_names[field_num])  # pyright: ignore[reportArgumentType]
                 label.grid(column=0, row=row, sticky=tk.NSEW)
                 entry = field.new_entry(frame)
                 entry.grid(column=1, row=row, sticky=tk.NSEW)

@@ -145,9 +145,10 @@ class BaseROIField[ROI:BaseROI]:
             if obj.manager is None:
                 raise ValueError("object manager needs to be set") from exc
             roi_field = type(self)(name=self.name,
-                                   default_type=self.default_type,
                                    allow_manual_draw=self.allow_manual_draw,
                                    button_style=self._button_style)
+            # following required outside innit-subclasses dont take default_type as arg
+            roi_field.default_type = self.default_type
             roi_field.set_manager(obj.manager)
             roi_field.set_parent(obj.roi_frame)
             roi_field.post_register_command = obj._post_roi_register_manual_wrapper

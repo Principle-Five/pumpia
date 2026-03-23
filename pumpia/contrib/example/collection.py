@@ -1,9 +1,9 @@
 from pumpia.contrib.example.module import ExampleModule
 from pumpia.module_handling.collections import (BaseCollection,
-                                                OutputFrame,
-                                                WindowGroup)
-from pumpia.module_handling.in_outs.viewer_ios import ArrayViewerIO
-from pumpia.module_handling.in_outs.groups import IOGroup
+                                                ModuleGroup)
+from pumpia.module_handling.fields.viewer_fields import ArrayViewerField
+from pumpia.module_handling.fields.groups import FieldGroup
+from pumpia.module_handling.fields.windows import FieldWindow
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.image_handling.image_structures import ImageCollection
 from pumpia.utilities.tkinter_utils import tk_copy
@@ -18,21 +18,17 @@ class ExampleCollection(BaseCollection):
     """
     name = "Example Collection"
 
-    viewer1 = ArrayViewerIO(row=0, column=0)
-    viewer2 = ArrayViewerIO(row=0, column=1, main=True)
+    viewer1 = ArrayViewerField(row=0, column=0)
+    viewer2 = ArrayViewerField(row=0, column=1, main=True)
 
     module1 = ExampleModule()
     module2 = ExampleModule()
 
-    average_output = OutputFrame()
+    average_output = FieldWindow(module1.fields.average, module2.fields.average, field_names=["Average 1", "Average 2"])
+    size_group = FieldGroup(module1.fields.size, module2.fields.size)
 
     # makes sure the two modules are in the same window in the collection
-    group = WindowGroup([module1, module2])
-
-    def load_outputs(self):
-        self.average_output.register_output(self.module1.average, verbose_name="Average 1")
-        self.average_output.register_output(self.module2.average, verbose_name="Average 2")
-        IOGroup([self.module1.size, self.module2.size])
+    group = ModuleGroup(module1, module2)
 
     def on_image_load(self, viewer: BaseViewer) -> None:
         # loads the image loaded into a viewer into the relevant modules viewer
@@ -60,4 +56,4 @@ class ExampleCollection(BaseCollection):
         """
         Copy the values of the averages to the clipboard, comma seperated.
         """
-        tk_copy(", ".join([str(self.module1.average.value), str(self.module2.average.value)]))
+        tk_copy(", ".join([str(self.module1.average), str(self.module2.average)]))
