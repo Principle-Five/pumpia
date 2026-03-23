@@ -258,9 +258,6 @@ class BaseCollection(ABC, ttk.Frame):
 
     Methods
     -------
-    load_outputs()
-        User should override this method to load outputs into the OutputFrame objects in collection
-        and link input and output variables in IOGroup objects.
     load_commands()
         User can override this method to register command buttons for the collection.
     register_command(text: str, command: Callable[[], Any])

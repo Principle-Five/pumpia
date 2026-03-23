@@ -4,9 +4,9 @@ Example
 import math
 
 from pumpia.module_handling.modules import BaseModule
-from pumpia.module_handling.module_collections import (BaseCollection,
-                                                       OutputFrame,
-                                                       WindowGroup)
+from pumpia.module_handling.collections import (BaseCollection,
+                                                OutputFrame,
+                                                WindowGroup)
 from pumpia.module_handling.in_outs.roi_ios import BaseInputROI, InputEllipseROI
 from pumpia.module_handling.in_outs.viewer_ios import ArrayViewerIO
 from pumpia.module_handling.in_outs.simple import PercInput, FloatOutput, IntOutput

@@ -155,51 +155,30 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
     @overload
     def __get__(self, obj: BaseModule, owner=None) -> ValT: ...
     @overload
-    def __get__(self, obj: None | _Fields, owner=None) -> Self: ...
+    def __get__(self, obj: None, owner=None) -> Self: ...
 
-    def __get__(self, obj: BaseModule | _Fields | None, owner=None) -> ValT | Self:
+    def __get__(self, obj: BaseModule | None, owner=None) -> ValT | Self:
         if obj is None:
             return self
 
-        elif isinstance(obj, _Fields):
-            try:
-                return obj.fields_dict[self.name]  # pyright: ignore[reportReturnType]
+        try:
+            return obj.fields.fields_dict[self.name].value
 
-            except KeyError:
-                field = type(self)(initial_value=self.initial_value,
-                                   parent=None,
-                                   verbose_name=self.verbose_name,
-                                   label_style=self._label_style,
-                                   entry_style=self._entry_style,
-                                   hidden=self.hidden,
-                                   read_only=self.read_only,
-                                   reset_on_analysis=self.reset_on_analysis)
-                field.name = self.name
-                field.module = obj.module
-                obj.fields_dict[self.name] = field
-                return field
-            except AttributeError:
-                return self
-
-        else:
-            try:
-                return obj.fields.fields_dict[self.name].value
-
-            except KeyError:
-                field = type(self)(initial_value=self.initial_value,
-                                   parent=None,
-                                   verbose_name=self.verbose_name,
-                                   label_style=self._label_style,
-                                   entry_style=self._entry_style,
-                                   hidden=self.hidden,
-                                   read_only=self.read_only,
-                                   reset_on_analysis=self.reset_on_analysis)
-                field.name = self.name
-                field.module = obj
-                obj.fields.fields_dict[self.name] = field
-                return field.initial_value
-            except AttributeError:
-                return self
+        except KeyError:
+            field = type(self)(initial_value=self.initial_value,
+                               parent=None,
+                               verbose_name=self.verbose_name,
+                               label_style=self._label_style,
+                               entry_style=self._entry_style,
+                               hidden=self.hidden,
+                               read_only=self.read_only,
+                               reset_on_analysis=self.reset_on_analysis)
+            field.name = self.name
+            field.module = obj
+            obj.fields.fields_dict[self.name] = field
+            return field.initial_value
+        except AttributeError:
+            return self
 
     def __set__(self, obj: BaseModule, value: ValT):
         try:
@@ -404,54 +383,32 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
     @overload
     def __get__(self, obj: BaseModule, owner=None) -> DictValT: ...
     @overload
-    def __get__(self, obj: None | _Fields, owner=None) -> Self: ...
+    def __get__(self, obj: None, owner=None) -> Self: ...
 
-    def __get__(self, obj: BaseModule | _Fields | None, owner=None) -> DictValT | Self:
+    def __get__(self, obj: BaseModule | None, owner=None) -> DictValT | Self:
         if obj is None:
             return self
 
-        elif isinstance(obj, _Fields):
-            try:
-                return obj.fields_dict[self.name]   # pyright: ignore[reportReturnType]
-            except KeyError:
-                field = type(self)(initial=self.initial_value,
-                                   options_map=self.options_map,
-                                   parent=None,
-                                   verbose_name=self.verbose_name,
-                                   label_style=self._label_style,
-                                   entry_style=self._entry_style,
-                                   allow_inv_mapping=self.allow_inv_mapping,
-                                   hidden=self.hidden,
-                                   read_only=self.read_only,
-                                   reset_on_analysis=self.reset_on_analysis)
-                field.name = self.name
-                field.module = obj.module
-                obj.fields_dict[self.name] = field
-                return field
-            except AttributeError:
-                return self
-
-        else:
-            try:
-                field = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
-                return field.value
-            except KeyError:
-                field = type(self)(initial=self.initial_value,
-                                   options_map=self.options_map,
-                                   parent=None,
-                                   verbose_name=self.verbose_name,
-                                   label_style=self._label_style,
-                                   entry_style=self._entry_style,
-                                   allow_inv_mapping=self.allow_inv_mapping,
-                                   hidden=self.hidden,
-                                   read_only=self.read_only,
-                                   reset_on_analysis=self.reset_on_analysis)
-                obj.fields.fields_dict[self.name] = field
-                field.name = self.name
-                field.module = obj
-                return self.options_map[field.initial_value]
-            except AttributeError:
-                return self
+        try:
+            field = obj.fields.fields_dict[self.name]  # pyright: ignore[reportAssignmentType]
+            return field.value
+        except KeyError:
+            field = type(self)(initial=self.initial_value,
+                               options_map=self.options_map,
+                               parent=None,
+                               verbose_name=self.verbose_name,
+                               label_style=self._label_style,
+                               entry_style=self._entry_style,
+                               allow_inv_mapping=self.allow_inv_mapping,
+                               hidden=self.hidden,
+                               read_only=self.read_only,
+                               reset_on_analysis=self.reset_on_analysis)
+            obj.fields.fields_dict[self.name] = field
+            field.name = self.name
+            field.module = obj
+            return self.options_map[field.initial_value]
+        except AttributeError:
+            return self
 
     def __set__(self, obj: BaseModule, value: DictValT | str):
         try:

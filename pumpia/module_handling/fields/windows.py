@@ -10,7 +10,7 @@ from pumpia.module_handling.fields.fields import BaseField
 
 if TYPE_CHECKING:
     from pumpia.module_handling.modules import BaseModule
-    from pumpia.module_handling.module_collections import BaseCollection
+    from pumpia.module_handling.collections import BaseCollection
 
 
 class _FieldWindows:

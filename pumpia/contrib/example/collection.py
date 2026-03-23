@@ -1,7 +1,7 @@
 from pumpia.contrib.example.module import ExampleModule
-from pumpia.module_handling.module_collections import (BaseCollection,
-                                                       OutputFrame,
-                                                       WindowGroup)
+from pumpia.module_handling.collections import (BaseCollection,
+                                                OutputFrame,
+                                                WindowGroup)
 from pumpia.module_handling.in_outs.viewer_ios import ArrayViewerIO
 from pumpia.module_handling.in_outs.groups import IOGroup
 from pumpia.widgets.viewers import BaseViewer

@@ -30,7 +30,7 @@ from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
 from pumpia.module_handling.fields.roi_fields import _ROIFieldsMeta, BaseROIField
 
 if TYPE_CHECKING:
-    from pumpia.module_handling.module_collections import BaseCollection
+    from pumpia.module_handling.collections import BaseCollection
 
 
 class _Modules:
