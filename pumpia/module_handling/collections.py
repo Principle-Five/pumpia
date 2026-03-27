@@ -16,8 +16,7 @@ from pumpia.utilities.typing import DirectionType
 from pumpia.image_handling.image_structures import ArrayImage
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.widgets.context_managers import (BaseContextManager,
-                                             BaseContextManagerGenerator,
-                                             SimpleContextManagerGenerator,
+                                             SimpleContextManager,
                                              PhantomContextManager)
 from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
@@ -243,6 +242,8 @@ class BaseCollection(ABC, ttk.Frame):
     ----------
     manager : Manager
         The manager object for this collection.
+    context_manager : BaseContextManager
+        The context manager object for this collection.
     direction : str
         The direction of the child widgets in this collection.
     main_viewer : BaseViewer | None
@@ -276,8 +277,8 @@ class BaseCollection(ABC, ttk.Frame):
         Runs the application.
     """
 
-    context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
-    name: str | None = None
+    context_manager: BaseContextManager = SimpleContextManager()
+    name: str = "Pumpia Collection"
     modules = _ModulesMeta()
     field_groups = _FieldGroupsMeta()
     field_windows = _FieldWindowsMeta()
@@ -365,9 +366,7 @@ class BaseCollection(ABC, ttk.Frame):
         self.context_frame = ScrolledWindow(self.main_window)
         self.context_buttons_frame = ttk.Frame(self.context_frame)
         self.context_buttons_frame.grid(column=0, row=0, sticky="nsew")
-        self.context_manager: BaseContextManager = self.context_manager_generator(
-            self.context_frame,
-            self.manager)
+        self.context_manager(parent=self.context_frame, manager=self.manager)
         self.context_manager.grid(column=0, row=1, sticky="nsew")
         self.main_window.add(self.context_frame.outer_frame, text="Context")
 

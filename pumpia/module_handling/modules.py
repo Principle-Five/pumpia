@@ -19,10 +19,8 @@ from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.widgets.context_managers import (BaseContextManager,
                                              PhantomContextManager,
-                                             BaseContextManagerGenerator,
-                                             PhantomContextManagerGenerator,
-                                             SimpleContextManagerGenerator,
-                                             ManualPhantomManagerGenerator)
+                                             SimpleContextManager,
+                                             ManualPhantomManager)
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.module_handling.fields.fields import _FieldsMeta
 from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
@@ -108,7 +106,7 @@ class BaseModule(ABC, ttk.Frame):
 
     Attributes
     ----------
-    context_manager : BaseContextManager | None
+    context_manager : BaseContextManager
     manager : Manager | None
     parent : tk.Misc | None
     verbose_name : str | None
@@ -166,7 +164,7 @@ class BaseModule(ABC, ttk.Frame):
     run(direction: DirectionType = "Horizontal")
         Class method which runs the module independently.
     """
-    context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
+    context_manager: BaseContextManager = SimpleContextManager()
     show_draw_rois_button: bool = False
     show_analyse_button: bool = False
     show_copy_buttons: bool = False
@@ -218,7 +216,8 @@ class BaseModule(ABC, ttk.Frame):
                  **kw):
         self.parent: tk.Misc | None = parent
         self.manager: Manager | None = manager
-        self.context_manager: BaseContextManager | None = context_manager
+        if context_manager is not None:
+            self.context_manager = context_manager
 
         self._kw = kw
         self.verbose_name = verbose_name
@@ -317,8 +316,6 @@ class BaseModule(ABC, ttk.Frame):
                 self.parent = parent
             if manager is not None:
                 self.manager = manager
-            if context_manager is not None:
-                self.context_manager = context_manager
 
             if self.parent is None:
                 raise ValueError("parent needs to be set using set_parent or provided")
@@ -339,7 +336,7 @@ class BaseModule(ABC, ttk.Frame):
             self.viewer_frame = ttk.Frame(self.paned_window)
             self.paned_window.add(self.viewer_frame, weight=1)
 
-            if self.context_manager is None:
+            if context_manager is None:
                 self.main_window = ttk.Notebook(self.paned_window)
                 self.paned_window.add(self.main_window)
                 self.io_frame = ScrolledWindow(self.main_window)
@@ -355,17 +352,19 @@ class BaseModule(ABC, ttk.Frame):
                 self.get_context_button.grid(column=0, row=0, sticky="nsew")
 
                 if self.direction == "horizontal":
-                    self.context_manager = self.context_manager_generator(self.context_frame,
-                                                                          self.manager)
+                    self.context_manager.direction = "V"
+                    self.context_manager(parent=self.context_frame,
+                                         manager=self.manager)
                 else:
-                    self.context_manager = self.context_manager_generator(self.context_frame,
-                                                                          self.manager,
-                                                                          direction="H")
+                    self.context_manager.direction = "H"
+                    self.context_manager(parent=self.context_frame,
+                                         manager=self.manager)
                 self.context_manager.grid(column=0, row=1, sticky="nsew")  # type: ignore
 
                 self.main_window.add(self.context_frame.outer_frame, text="Context")
                 add_context_buttons = True
             else:
+                self.context_manager = context_manager
                 self.io_frame = ScrolledWindow(self.paned_window)
                 self.paned_window.add(self.io_frame.outer_frame)
                 add_context_buttons = False
@@ -899,122 +898,6 @@ class PhantomModule(BaseModule):
     Module for handling phantom images.
     Has the same attributes and methods as `BaseModule` unless stated below.
 
-    Uses `ManualPhantomManagerGenerator` as the default `context_manager_generator`.
-
-    Adds two buttons for showing the phantom boundary and bounding box compared with `BaseModule`.
+    Uses `ManualPhantomManager` as the default `context_manager`.
     """
-    context_manager_generator: PhantomContextManagerGenerator = ManualPhantomManagerGenerator()
-
-    @overload
-    def __init__(
-        self,
-        parent: tk.Misc | None = None,
-        manager: Manager | None = None,
-        context_manager: PhantomContextManager | None = None,
-        *,
-        verbose_name: str | None = None,
-        direction: DirectionType = "Horizontal",
-        border: ScreenUnits = ...,
-        borderwidth: ScreenUnits = ...,
-        class_: str = "",
-        cursor: Cursor = "",
-        height: ScreenUnits = 0,
-        name: str = ...,
-        padding: Padding = ...,
-        relief: Relief = ...,
-        style: str = "",
-        takefocus: TakeFocusValue = "",
-        width: ScreenUnits = 0,
-    ) -> None: ...
-
-    @overload
-    def __init__(self,
-                 parent: tk.Misc | None = None,
-                 manager: Manager | None = None,
-                 context_manager: PhantomContextManager | None = None,
-                 *,
-                 verbose_name: str | None = None,
-                 direction: DirectionType = "Horizontal",
-                 **kw): ...
-
-    # pylint: disable-next=super-init-not-called
-    def __init__(self,
-                 parent: tk.Misc | None = None,
-                 manager: Manager | None = None,
-                 # _init__ overwrite is to change type here
-                 context_manager: PhantomContextManager | None = None,
-                 *,
-                 verbose_name: str | None = None,
-                 direction: DirectionType = "Horizontal",
-                 **kw):
-        super().__init__(parent,
-                         manager,
-                         context_manager,
-                         verbose_name=verbose_name,
-                         direction=direction, ** kw)
-
-    @classmethod
-    def setup_window(cls,
-                     app: tk.Tk,
-                     direction: DirectionType = "Horizontal"):
-        app.columnconfigure(0, weight=1)
-        app.columnconfigure(1, weight=1)
-        app.rowconfigure(1, weight=1)
-        app.resizable(True, True)
-
-        man = Manager()
-
-        load_butt = ttk.Button(app, text="Load Folder",
-                               command=lambda: man.load_folder(False, app, 0, 2))
-        load_butt.grid(column=0, row=0, sticky="nsew")
-
-        load_butt = ttk.Button(app, text="Add Folder",
-                               command=lambda: man.load_folder(True, app, 0, 2))
-        load_butt.grid(column=1, row=0, sticky="nsew")
-
-        frame = ttk.Panedwindow(app, orient="vertical")
-        frame.grid(column=0, row=1, columnspan=2, sticky="nsew")
-
-        tree_frame = man.get_tree_frame(frame)
-        frame.add(tree_frame)
-
-        options_frame = ttk.Frame(frame)
-        frame.add(options_frame)
-
-        options_combo = man.get_mouse_options_combobox(options_frame)
-        options_combo.grid(column=0, row=0, sticky="nsew")
-
-        roi_options = man.get_roi_options_frame(options_frame, "h")
-        roi_options.grid(column=2, row=0, sticky="nsew")
-
-        context_frame = ScrolledWindow(frame)
-        context_options = cls.context_manager_generator(context_frame,
-                                                        man,
-                                                        direction="H")
-        context_options.grid(column=0, row=0, sticky="nsew")
-        frame.add(context_frame.outer_frame)
-
-        module = cls(frame, man, context_manager=context_options, direction=direction)
-        frame.add(module, weight=1)
-
-        if module.main_viewer is not None:
-
-            def bbox_command():
-                if module.main_viewer is not None:
-                    if isinstance(module.main_viewer.image, ArrayImage):
-                        context_options.get_bound_box_roi(module.main_viewer.image)
-
-            bbox_button = ttk.Button(context_frame,
-                                     command=bbox_command,
-                                     text="Draw Phantom Boundbox")
-            bbox_button.grid(column=1, row=0, sticky="nsew")
-
-            def boundary_command():
-                if module.main_viewer is not None:
-                    if isinstance(module.main_viewer.image, ArrayImage):
-                        context_options.get_boundary_roi(module.main_viewer.image)
-
-            boundary_button = ttk.Button(context_frame,
-                                         command=boundary_command,
-                                         text="Draw Phantom Boundary")
-            boundary_button.grid(column=2, row=0, sticky="nsew")
+    context_manager: PhantomContextManager = ManualPhantomManager()

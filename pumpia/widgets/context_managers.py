@@ -14,7 +14,7 @@ Classes:
 
 import tkinter as tk
 from tkinter import ttk
-from typing import overload, Literal
+from typing import overload, Literal, Self
 from abc import ABC, abstractmethod
 
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
@@ -60,11 +60,11 @@ class BaseContextManager(ABC, ttk.Labelframe):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
+                 *,
                  direction: DirectionType = "Vertical",
                  text: float | str = "Context Manager",
-                 *,
                  border: ScreenUnits = ...,
                  borderwidth: ScreenUnits = ...,  # undocumented
                  class_: str = "",
@@ -86,21 +86,73 @@ class BaseContextManager(ABC, ttk.Labelframe):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Context Manager",
                  **kw) -> None: ...
 
+    # pylint: disable-next=super-init-not-called
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Context Manager",
                  **kw) -> None:
-        super().__init__(parent, text=text, **kw)
         self.direction: DirectionType = direction
-        self.manager: Manager = manager
+        self.parent: tk.Misc | None = parent
+        self.manager: Manager | None = manager
+        self.text = text
+        self.kw = kw
+        self._is_setup: bool = False
+        self.private_name: str = ""
+
+        if self.manager is not None and self.parent is not None:
+            self()
+
+    def __call__(self,
+                 *,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None):
+        if not self._is_setup:
+            if parent is not None:
+                self.parent = parent
+            if manager is not None:
+                self.manager = manager
+
+            if self.parent is None:
+                raise ValueError("parent needs to be set using set_parent or provided")
+            if self.manager is None:
+                raise ValueError("manager needs to be set using set_manager or provided")
+
+            super().__init__(self.parent, text=self.text, **self.kw)
+            self._complete_setup()
+            self._is_setup = True
+
+    def _complete_setup(self):
+        """
+        Should be overwritten to position the widgets in the context manager.
+        Do not call directly, instead call the context manager object itself.
+        """
+
+    def __set_name__(self, owner, name: str):
+        self.private_name = "_" + name
+
+    def __get__(self, obj, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            context_manager = type(self)()
+            for k, v in vars(self).items():
+                setattr(context_manager, k, v)
+            setattr(obj, self.private_name, context_manager)
+            return context_manager
+
+    def __set__(self, obj, context_manager: Self):
+        setattr(obj, self.private_name, context_manager)
 
     @abstractmethod
     def get_context(self, image: ArrayImage) -> BaseContext:
@@ -138,11 +190,11 @@ class PhantomContextManager(BaseContextManager):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Phantom Context Manager",
                  *,
                  border: ScreenUnits = ...,
                  borderwidth: ScreenUnits = ...,  # undocumented
@@ -165,22 +217,22 @@ class PhantomContextManager(BaseContextManager):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Phantom Context Manager",
                  **kw) -> None: ...
 
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Phantom Context Manager",
                  **kw) -> None:
-        super().__init__(parent, manager=manager, direction=direction, text=text, **kw)
         self.shape: PhantomShapes = shape
+        super().__init__(parent, manager=manager, direction=direction, text=text, **kw)
 
     def _show_rectangles(self,
                          bounds: BoundBoxContext | PhantomContext,
@@ -209,12 +261,14 @@ class PhantomContextManager(BaseContextManager):
                            slice_num=image.current_slice,
                            name=name,
                            replace=True)
-        self.manager.add_roi(roi, update_viewers=True)
+        if self.manager is not None:
+            self.manager.add_roi(roi, update_viewers=True)
         if secondary_images is not None:
             for s_image in secondary_images:
                 if s_image != image:
                     copied_roi = roi.copy_to_image(s_image, s_image.current_slice, name, True)
-                    self.manager.add_roi(copied_roi, update_viewers=True)
+                    if self.manager is not None:
+                        self.manager.add_roi(copied_roi, update_viewers=True)
         return roi
 
     def _show_ellipses(self,
@@ -248,8 +302,8 @@ class PhantomContextManager(BaseContextManager):
                          slice_num=image.current_slice,
                          name=name,
                          replace=True)
-
-        self.manager.add_roi(roi, update_viewers=True)
+        if self.manager is not None:
+            self.manager.add_roi(roi, update_viewers=True)
         if secondary_images is not None:
             for s_image in secondary_images:
                 if s_image != image:
@@ -257,7 +311,8 @@ class PhantomContextManager(BaseContextManager):
                                                    s_image.current_slice,
                                                    name,
                                                    True)
-                    self.manager.add_roi(copied_roi, update_viewers=True)
+                    if self.manager is not None:
+                        self.manager.add_roi(copied_roi, update_viewers=True)
         return roi
 
     def get_bound_box_roi(self,
@@ -318,11 +373,11 @@ class ManualPhantomManager(PhantomContextManager):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Manual Phantom Context Manager",
                  *,
                  border: ScreenUnits = ...,
                  borderwidth: ScreenUnits = ...,  # undocumented
@@ -345,33 +400,55 @@ class ManualPhantomManager(PhantomContextManager):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Manual Phantom Context Manager",
                  **kw) -> None: ...
 
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Manual Phantom Context Manager",
                  **kw) -> None:
         super().__init__(parent, manager=manager, shape=shape, direction=direction, text=text, **kw)
 
+        self.shape_frame: ttk.Labelframe
+        self.boundary_frame: ttk.Labelframe
+
+        self.shape_radios: list[ttk.Radiobutton]
+        self.shape_var: tk.StringVar
+
+        self.xmin_var: tk.IntVar
+        self.xmax_var: tk.IntVar
+        self.ymin_var: tk.IntVar
+        self.ymax_var: tk.IntVar
+
+        self.xmin_label: ttk.Label
+        self.xmax_label: ttk.Label
+        self.ymin_label: ttk.Label
+        self.ymax_label: ttk.Label
+
+        self.xmin_entry: IntEntry
+        self.xmax_entry: IntEntry
+        self.ymin_entry: IntEntry
+        self.ymax_entry: IntEntry
+
+    def _complete_setup(self):
         self.shape_frame = ttk.Labelframe(self, text="Shape")
         self.boundary_frame = ttk.Labelframe(self, text="Boundary (pixels)")
 
         self.shape_radios: list[ttk.Radiobutton] = []
         self.shape_var = tk.StringVar(self)
-        if shape is None:
+        if self.shape is None:
             self.shape_var.set(self.shape_opts[1])
-        elif isinstance(shape, list):
-            self.shape_var.set(self.inv_shape_map[shape[0]])
+        elif isinstance(self.shape, list):
+            self.shape_var.set(self.inv_shape_map[self.shape[0]])
         else:
-            self.shape_var.set(self.inv_shape_map[shape])
+            self.shape_var.set(self.inv_shape_map[self.shape])
 
         for opt in self.shape_opts:
             if opt != self.inv_shape_map[None]:
@@ -474,8 +551,8 @@ class AutoPhantomManager(PhantomContextManager):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  mode: Literal["auto", "manual"] = "auto",
                  sensitivity: int = 3,
                  top_perc: int = 95,
@@ -485,7 +562,7 @@ class AutoPhantomManager(PhantomContextManager):
                  bubble_side: SideType = "top",
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Automatic Phantom Context Manager",
                  *,
                  border: ScreenUnits = ...,
                  borderwidth: ScreenUnits = ...,  # undocumented
@@ -508,8 +585,8 @@ class AutoPhantomManager(PhantomContextManager):
 
     @overload
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  mode: Literal["auto", "manual"] = "auto",
                  sensitivity: int = 3,
                  top_perc: int = 95,
@@ -519,12 +596,12 @@ class AutoPhantomManager(PhantomContextManager):
                  bubble_side: SideType = "top",
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Automatic Phantom Context Manager",
                  **kw) -> None: ...
 
     def __init__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
+                 parent: tk.Misc | None = None,
+                 manager: Manager | None = None,
                  mode: Literal["auto", "manual"] = "auto",
                  sensitivity: int = 3,
                  top_perc: int = 95,
@@ -534,23 +611,75 @@ class AutoPhantomManager(PhantomContextManager):
                  bubble_side: SideType = "top",
                  shape: PhantomShapes = None,
                  direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
+                 text: float | str = "Automatic Phantom Context Manager",
                  **kw) -> None:
+        self.mode: Literal["auto", "manual"] = mode
+        self.sensitivity: int = sensitivity
+        self.top_perc: int = top_perc
+        self.iterations: int = iterations
+        self.cull_perc: int = cull_perc
+        self.bubble_offset: int = bubble_offset
+        self.bubble_side: SideType = bubble_side
         super().__init__(parent, manager=manager, shape=shape, direction=direction, text=text, **kw)
 
+        self.general_frame: ttk.Labelframe
+        self.manual_frame: ttk.Labelframe
+        self.automatic_frame: ttk.Labelframe
+        self.mode_frame: ttk.Labelframe
+        self.auto_shape_frame: ttk.Labelframe
+        self.manual_shape_frame: ttk.Labelframe
+        self.fine_tune_frame: ManualPhantomManager
+
+        self.sensitivity_var: tk.DoubleVar
+        self.sensitivity_label: ttk.Label
+        self.sensitivity_entry: FloatEntry
+
+        self.top_perc_var: tk.DoubleVar
+        self.top_perc_label: ttk.Label
+        self.top_perc_entry: PercEntry
+
+        self.shape_checks: list[ttk.Checkbutton]
+        self.shape_vars: list[tk.StringVar]
+
+        self.shape_radios: list[ttk.Radiobutton]
+        self.man_shape_var: tk.StringVar
+
+        self.mode_var: tk.StringVar
+        self.auto_radio: ttk.Radiobutton
+        self.manual_radio: ttk.Radiobutton
+        self.fine_tune_radio: ttk.Radiobutton
+        self.on_image_radio: ttk.Radiobutton
+
+        self.bubble_offset_var: tk.IntVar
+        self.bubble_offset_label: ttk.Label
+        self.bubble_offset_entry: IntEntry
+
+        self.bubble_side_var: tk.StringVar
+        self.bubble_side_label: ttk.Label
+        self.bubble_side_combo: ttk.Combobox
+
+        self.iterations_var: tk.IntVar
+        self.iterations_label: ttk.Label
+        self.iterations_entry: IntEntry
+
+        self.cull_perc_var: tk.DoubleVar
+        self.cull_perc_label: ttk.Label
+        self.cull_perc_entry: PercEntry
+
+    def _complete_setup(self):
         self.general_frame = ttk.Labelframe(self, text="General")
         self.manual_frame = ttk.Labelframe(self, text="Manual")
         self.automatic_frame = ttk.Labelframe(self, text="Automatic")
         self.mode_frame = ttk.Labelframe(self.general_frame, text="Mode")
         self.auto_shape_frame = ttk.Labelframe(self.automatic_frame, text="Shapes")
         self.manual_shape_frame = ttk.Labelframe(self.manual_frame, text="Shape")
-        self.fine_tune_frame = ManualPhantomManager(self, manager, shape, direction, "Fine Tune")
+        self.fine_tune_frame = ManualPhantomManager(self, self.manager, self.shape, self.direction, "Fine Tune")
 
-        self.sensitivity_var = tk.DoubleVar(self, value=sensitivity)
+        self.sensitivity_var = tk.DoubleVar(self, value=self.sensitivity)
         self.sensitivity_label = ttk.Label(self.general_frame, text="Sensitivity:")
         self.sensitivity_entry = FloatEntry(self.general_frame, textvariable=self.sensitivity_var)
 
-        self.top_perc_var = tk.DoubleVar(self, value=top_perc)
+        self.top_perc_var = tk.DoubleVar(self, value=self.top_perc)
         self.top_perc_label = ttk.Label(self.general_frame, text="Maximum Percentage:")
         self.top_perc_entry = PercEntry(self.general_frame, textvariable=self.top_perc_var)
 
@@ -558,12 +687,12 @@ class AutoPhantomManager(PhantomContextManager):
         self.shape_vars: list[tk.StringVar] = []
         for opt in self.shape_opts:
             if (opt != self.inv_shape_map[None]
-                and ((isinstance(shape, list) and self.shape_map[opt] in shape)
-                     or self.shape_map[opt] == shape
-                     or shape is None)):
+                and ((isinstance(self.shape, list) and self.shape_map[opt] in self.shape)
+                     or self.shape_map[opt] == self.shape
+                     or self.shape is None)):
                 var = tk.StringVar(self, value=opt)
                 self.shape_vars.append(var)
-                if isinstance(shape, list) or shape is None:
+                if isinstance(self.shape, list) or self.shape is None:
                     button = ttk.Checkbutton(self.auto_shape_frame,
                                              offvalue="",
                                              onvalue=opt,
@@ -573,25 +702,25 @@ class AutoPhantomManager(PhantomContextManager):
 
         self.shape_radios: list[ttk.Radiobutton] = []
         self.man_shape_var = tk.StringVar(self)
-        if shape is None:
+        if self.shape is None:
             self.man_shape_var.set(self.shape_opts[1])
-        elif isinstance(shape, list):
-            self.man_shape_var.set(self.inv_shape_map[shape[0]])
+        elif isinstance(self.shape, list):
+            self.man_shape_var.set(self.inv_shape_map[self.shape[0]])
         else:
-            self.man_shape_var.set(self.inv_shape_map[shape])
+            self.man_shape_var.set(self.inv_shape_map[self.shape])
 
         for opt in self.shape_opts:
             if (opt != self.inv_shape_map[None]
-                and ((isinstance(shape, list) and self.shape_map[opt] in shape)
-                     or self.shape_map[opt] == shape
-                     or shape is None)):
+                and ((isinstance(self.shape, list) and self.shape_map[opt] in self.shape)
+                     or self.shape_map[opt] == self.shape
+                     or self.shape is None)):
                 button = ttk.Radiobutton(self.manual_shape_frame,
                                          value=opt,
                                          text=opt,
                                          variable=self.man_shape_var)
                 self.shape_radios.append(button)
 
-        self.mode_var = tk.StringVar(self, value=mode)
+        self.mode_var = tk.StringVar(self, value=self.mode)
         self.auto_radio = ttk.Radiobutton(self.mode_frame,
                                           text="Auto Fitting",
                                           variable=self.mode_var,
@@ -613,11 +742,11 @@ class AutoPhantomManager(PhantomContextManager):
                                               value="on image",
                                               command=self._update_mode)
 
-        self.bubble_offset_var = tk.IntVar(self, value=bubble_offset)
+        self.bubble_offset_var = tk.IntVar(self, value=self.bubble_offset)
         self.bubble_offset_label = ttk.Label(self.manual_frame, text="Bubble Offset (Px):")
         self.bubble_offset_entry = IntEntry(self.manual_frame, textvariable=self.bubble_offset_var)
 
-        self.bubble_side_var = tk.StringVar(self, inv_side_map[bubble_side])
+        self.bubble_side_var = tk.StringVar(self, inv_side_map[self.bubble_side])
         self.bubble_side_label = ttk.Label(self.manual_frame, text="Bubble Side:")
         self.bubble_side_combo = ttk.Combobox(self.manual_frame,
                                               textvariable=self.bubble_side_var,
@@ -625,11 +754,11 @@ class AutoPhantomManager(PhantomContextManager):
                                               height=4,
                                               state="readonly")
 
-        self.iterations_var = tk.IntVar(self, value=iterations)
+        self.iterations_var = tk.IntVar(self, value=self.iterations)
         self.iterations_label = ttk.Label(self.automatic_frame, text="Iterations:")
         self.iterations_entry = IntEntry(self.automatic_frame, textvariable=self.iterations_var)
 
-        self.cull_perc_var = tk.DoubleVar(self, value=cull_perc)
+        self.cull_perc_var = tk.DoubleVar(self, value=self.cull_perc)
         self.cull_perc_label = ttk.Label(self.automatic_frame, text="Cull Percentage:")
         self.cull_perc_entry = PercEntry(self.automatic_frame, textvariable=self.cull_perc_var)
 
@@ -821,171 +950,3 @@ class AutoPhantomManager(PhantomContextManager):
                                           "ellipse")
             except KeyError as exc:
                 raise ValueError("Image has not had boundaries found") from exc
-
-
-class BaseContextManagerGenerator[ContextManagerT: BaseContextManager](ABC):
-    """
-    Base class for context manager generators.
-    """
-
-    context_manager_type: type[ContextManagerT]
-
-    @overload
-    def __init__(self,
-                 *,
-                 direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
-                 border: ScreenUnits = ...,
-                 borderwidth: ScreenUnits = ...,  # undocumented
-                 class_: str = "",
-                 cursor: Cursor = "",
-                 height: ScreenUnits = 0,
-                 labelanchor: Literal["nw", "n", "ne",
-                                      "en", "e", "es",
-                                      "se", "s", "sw",
-                                      "ws", "w", "wn"] = ...,
-                 labelwidget: tk.Misc = ...,
-                 name: str = ...,
-                 padding: Padding = ...,
-                 relief: Relief = ...,  # undocumented
-                 style: str = "",
-                 takefocus: TakeFocusValue = "",
-                 underline: int = -1,
-                 width: ScreenUnits = 0,
-                 ) -> None: ...
-
-    @overload
-    def __init__(self,
-                 **kw) -> None: ...
-
-    def __init__(self,
-                 **kw) -> None:
-        self.kw = kw
-
-    def __call__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
-                 direction: DirectionType | None = None,) -> ContextManagerT:
-        """
-        Creates and returns a context manager.
-        """
-        if direction is not None:
-            self.kw["direction"] = direction
-        return self.context_manager_type(parent=parent,
-                                         manager=manager,
-                                         **self.kw)
-
-
-class SimpleContextManagerGenerator(BaseContextManagerGenerator[SimpleContextManager]):
-    """
-    Generator for SimpleContextManager.
-    """
-    context_manager_type = SimpleContextManager
-
-
-class PhantomContextManagerGenerator[ContextManagerT: PhantomContextManager](BaseContextManagerGenerator):
-    """
-    Generator for PhantomContextManager.
-    """
-
-    context_manager_type: type[ContextManagerT]
-
-    @overload
-    def __init__(self,
-                 *,
-                 shape: PhantomShapes = None,
-                 direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
-                 border: ScreenUnits = ...,
-                 borderwidth: ScreenUnits = ...,  # undocumented
-                 class_: str = "",
-                 cursor: Cursor = "",
-                 height: ScreenUnits = 0,
-                 labelanchor: Literal["nw", "n", "ne",
-                                      "en", "e", "es",
-                                      "se", "s", "sw",
-                                      "ws", "w", "wn"] = ...,
-                 labelwidget: tk.Misc = ...,
-                 name: str = ...,
-                 padding: Padding = ...,
-                 relief: Relief = ...,  # undocumented
-                 style: str = "",
-                 takefocus: TakeFocusValue = "",
-                 underline: int = -1,
-                 width: ScreenUnits = 0,
-                 ) -> None: ...
-
-    @overload
-    def __init__(self,
-                 **kw) -> None: ...
-
-    def __init__(self,
-                 **kw) -> None:
-        super().__init__(**kw)
-
-    def __call__(self,
-                 parent: tk.Misc,
-                 manager: Manager,
-                 direction: DirectionType | None = None,) -> ContextManagerT:
-        """
-        Creates and returns a phantom context manager.
-        """
-        if direction is not None:
-            self.kw["direction"] = direction
-        return self.context_manager_type(parent=parent,
-                                         manager=manager,
-                                         **self.kw)
-
-
-class ManualPhantomManagerGenerator(PhantomContextManagerGenerator[ManualPhantomManager]):
-    """
-    Generator for ManualPhantomManager.
-    """
-    context_manager_type = ManualPhantomManager
-
-
-class AutoPhantomManagerGenerator(PhantomContextManagerGenerator[AutoPhantomManager]):
-    """
-    Generator for AutoPhantomManager.
-    """
-    context_manager_type = AutoPhantomManager
-
-    @overload
-    def __init__(self,
-                 *,
-                 mode: Literal["auto", "manual"] = "auto",
-                 sensitivity: int = 3,
-                 top_perc: int = 95,
-                 iterations: int = 2,
-                 cull_perc: int = 80,
-                 bubble_offset: int = 0,
-                 bubble_side: SideType = "top",
-                 shape: PhantomShapes = None,
-                 direction: DirectionType = "Vertical",
-                 text: float | str = "Bound Box Options",
-                 border: ScreenUnits = ...,
-                 borderwidth: ScreenUnits = ...,  # undocumented
-                 class_: str = "",
-                 cursor: Cursor = "",
-                 height: ScreenUnits = 0,
-                 labelanchor: Literal["nw", "n", "ne",
-                                      "en", "e", "es",
-                                      "se", "s", "sw",
-                                      "ws", "w", "wn"] = ...,
-                 labelwidget: tk.Misc = ...,
-                 name: str = ...,
-                 padding: Padding = ...,
-                 relief: Relief = ...,  # undocumented
-                 style: str = "",
-                 takefocus: TakeFocusValue = "",
-                 underline: int = -1,
-                 width: ScreenUnits = 0,
-                 ) -> None: ...
-
-    @overload
-    def __init__(self,
-                 **kw) -> None: ...
-
-    def __init__(self,
-                 **kw) -> None:
-        super().__init__(**kw)
