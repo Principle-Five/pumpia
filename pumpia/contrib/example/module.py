@@ -21,7 +21,7 @@ class ExampleModule(BaseModule):
     """
     show_draw_rois_button = True
     show_analyse_button = True
-    name = "Example Module"
+    title = "Example Module"
 
     viewer = ArrayViewerField(row=0, column=0)
     size = PercField(80, verbose_name="Size (%)")

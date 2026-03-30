@@ -33,7 +33,7 @@ The :download:`example </../../pumpia/contrib/example/example.py>` below demonst
         """
         show_draw_rois_button = True
         show_analyse_button = True
-        name = "Example Module"
+        title = "Example Module"
 
         viewer = ArrayViewerField(row=0, column=0)
         size = PercField(80, verbose_name="Size (%)")
@@ -95,7 +95,7 @@ The :download:`example </../../pumpia/contrib/example/example.py>` below demonst
         This collection demonstrates the use of the PumpIA collections.
         It has 2 viewers in the main window and loads 2 `ExampleModule` instances into a second window.
         """
-        name = "Example Collection"
+        title = "Example Collection"
 
         viewer1 = ArrayViewerField(row=0, column=0)
         viewer2 = ArrayViewerField(row=0, column=1, main=True)

@@ -16,7 +16,7 @@ class ExampleCollection(BaseCollection):
     This collection demonstrates the use of the PumpIA collections.
     It has 2 viewers in the main window and loads 2 `ExampleModule` instances into a second window.
     """
-    name = "Example Collection"
+    title = "Example Collection"
 
     viewer1 = ArrayViewerField(row=0, column=0)
     viewer2 = ArrayViewerField(row=0, column=1, main=True)
