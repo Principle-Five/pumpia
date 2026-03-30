@@ -12,13 +12,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'PumpIA'
-copyright = '2025, Zack Ravetz'
+copyright = '2026, Zack Ravetz'
 author = 'Zack Ravetz'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.coverage', 'sphinx.ext.napoleon', 'sphinx.ext.autosectionlabel']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.autosummary',
+              'sphinx.ext.coverage',
+              'sphinx.ext.napoleon',
+              'sphinx.ext.autosectionlabel',
+              'sphinx.ext.githubpages']
 coverage_modules = ("pumpia",)
 templates_path = ['_templates']
 exclude_patterns = []
