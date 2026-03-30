@@ -25,13 +25,10 @@ jobs:
             token: ${{ steps.app-token.outputs.token }}
         - uses: actions/setup-python@v5
           with:
-            python-version: '3.12'
+            python-version: '3.14'
         - name: Install pumpia dependencies
           run: |
-            pip install -r requirements.txt
-        - name: Install dependencies
-          run: |
-            pip install sphinx sphinx_rtd_theme
+            pip install -r requirements-docs.txt
         - name: Sphinx build
           run: |
             sphinx-build docs/source docs/_build
