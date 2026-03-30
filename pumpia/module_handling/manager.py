@@ -319,7 +319,7 @@ class Manager:
             total_files = len(files)
             count_frame = tk.Frame(tk_parent)
             count_frame.grid(column=counter_column,
-                             row=counter_row, sticky="nsew")
+                             row=counter_row, sticky=tk.NSEW)
 
             count_label = ttk.Label(
                 count_frame, text=f"{file_count}/{total_files}", anchor="center")
@@ -328,11 +328,11 @@ class Manager:
                 count_frame, maximum=total_files)
 
             if counter_stack_direction[0].lower() == "h":
-                count_label.grid(column=0, row=0, sticky="nsew")
-                count_bar.grid(column=1, row=0, sticky="nsew")
+                count_label.grid(column=0, row=0, sticky=tk.NSEW)
+                count_bar.grid(column=1, row=0, sticky=tk.NSEW)
             else:
-                count_label.grid(column=0, row=0, sticky="nsew")
-                count_bar.grid(column=0, row=1, sticky="nsew")
+                count_label.grid(column=0, row=0, sticky=tk.NSEW)
+                count_bar.grid(column=0, row=1, sticky=tk.NSEW)
 
             tk_parent.update()
 
@@ -931,17 +931,17 @@ class Manager:
         current_tree['columns'] = ['measurements', 'file']
         current_tree.heading('measurements', text='Measurements')
         current_tree.heading('file', text='File')
-        current_tree.grid(row=0, column=0, sticky='nsew')
+        current_tree.grid(row=0, column=0, sticky=tk.NSEW)
 
         yscrollbar = ttk.Scrollbar(
             current_frame, orient=tk.VERTICAL, command=current_tree.yview)
         current_tree.configure(yscrollcommand=yscrollbar.set)
-        yscrollbar.grid(row=0, column=1, sticky='ns')
+        yscrollbar.grid(row=0, column=1, sticky=tk.NS)
 
         xscrollbar = ttk.Scrollbar(
             current_frame, orient=tk.HORIZONTAL, command=current_tree.xview)
         current_tree.configure(xscrollcommand=xscrollbar.set)
-        xscrollbar.grid(row=1, column=0, columnspan=2, sticky='ew')
+        xscrollbar.grid(row=1, column=0, columnspan=2, sticky=tk.EW)
 
         def popup_menu(event: tk.Event):
             menu = tk.Menu(current_frame, tearoff=False)
@@ -1058,9 +1058,9 @@ class Manager:
                 current_frame, variable=current_var, text=opt, value=opt))
 
             if direction[0].lower() == "h":
-                rad_buttons[-1].grid(row=0, column=index, sticky="nsew")
+                rad_buttons[-1].grid(row=0, column=index, sticky=tk.NSEW)
             else:
-                rad_buttons[-1].grid(row=index, column=0, sticky="nsew")
+                rad_buttons[-1].grid(row=index, column=0, sticky=tk.NSEW)
 
         return current_frame
 

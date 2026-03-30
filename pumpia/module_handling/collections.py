@@ -187,7 +187,7 @@ class ModuleGroup(ttk.Panedwindow):
                 module.setup(parent=lf,
                              manager=obj.manager,
                              context_manager=obj.context_manager)
-                module.grid(column=0, row=0, sticky="nsew")
+                module.grid(column=0, row=0, sticky=tk.NSEW)
                 group.add(lf, weight=1)
                 modules.append(getattr(obj, module_name))
 
@@ -340,7 +340,7 @@ class BaseCollection(ABC, ttk.Frame):
         self._tab_change_calls: dict[str, Callable[[], None]] = {}
 
         self.notebook = ttk.Notebook(self)
-        self.notebook.grid(column=0, row=0, sticky="nsew")
+        self.notebook.grid(column=0, row=0, sticky=tk.NSEW)
 
         self.main_frame = ttk.Panedwindow(self.notebook, orient=self.direction)
         self.notebook.add(self.main_frame, text="Main")
@@ -359,22 +359,22 @@ class BaseCollection(ABC, ttk.Frame):
         self.button_frame = ttk.Labelframe(self.output_frame, text="Commands")
         self.command_buttons: list[ttk.Button] = []
         if self.direction == "horizontal":
-            self.button_frame.grid(column=0, row=self.output_frame_count, sticky="nsew")
+            self.button_frame.grid(column=0, row=self.output_frame_count, sticky=tk.NSEW)
         else:
-            self.button_frame.grid(column=self.output_frame_count, row=0, sticky="nsew")
+            self.button_frame.grid(column=self.output_frame_count, row=0, sticky=tk.NSEW)
         self.output_frame_count += 1
 
         self.context_frame = ScrolledWindow(self.main_window)
         self.context_buttons_frame = ttk.Frame(self.context_frame)
-        self.context_buttons_frame.grid(column=0, row=0, sticky="nsew")
+        self.context_buttons_frame.grid(column=0, row=0, sticky=tk.NSEW)
         self.context_manager(parent=self.context_frame, manager=self.manager)
-        self.context_manager.grid(column=0, row=1, sticky="nsew")
+        self.context_manager.grid(column=0, row=1, sticky=tk.NSEW)
         self.main_window.add(self.context_frame.outer_frame, text="Context")
 
         self.get_context_button = ttk.Button(self.context_buttons_frame,
                                              text="Get Context",
                                              command=self.get_context)
-        self.get_context_button.grid(column=0, row=0, sticky="nsew")
+        self.get_context_button.grid(column=0, row=0, sticky=tk.NSEW)
 
         show_draw_rois_button: bool = False
         show_analyse_button: bool = False
@@ -410,12 +410,12 @@ class BaseCollection(ABC, ttk.Frame):
                 frame.grid(column=0,
                            row=self.output_frame_count,
                            columnspan=2,
-                           sticky="nsew")
+                           sticky=tk.NSEW)
             else:
                 frame.grid(column=2 * self.output_frame_count,
                            row=0,
                            columnspan=2,
-                           sticky="nsew")
+                           sticky=tk.NSEW)
             self.output_frame_count += 1
 
         for group_name in type(self).field_groups.group_names:
@@ -448,23 +448,23 @@ class BaseCollection(ABC, ttk.Frame):
                 if show_analyse_button:
                     self.rois_button.grid(column=0,
                                           row=self.command_buttons_count,
-                                          sticky="nsew")
+                                          sticky=tk.NSEW)
                 else:
                     self.rois_button.grid(column=0,
                                           row=self.command_buttons_count,
                                           columnspan=2,
-                                          sticky="nsew")
+                                          sticky=tk.NSEW)
 
             if show_analyse_button:
                 if show_draw_rois_button:
                     self.analyse_button.grid(column=1,
                                              row=self.command_buttons_count,
-                                             sticky="nsew")
+                                             sticky=tk.NSEW)
                 else:
                     self.analyse_button.grid(column=0,
                                              row=self.command_buttons_count,
                                              columnspan=2,
-                                             sticky="nsew")
+                                             sticky=tk.NSEW)
 
             if show_analyse_button or show_draw_rois_button:
                 self.command_buttons_count += 1
@@ -473,7 +473,7 @@ class BaseCollection(ABC, ttk.Frame):
                 self.create_and_run_button.grid(column=0,
                                                 row=self.command_buttons_count,
                                                 columnspan=2,
-                                                sticky="nsew")
+                                                sticky=tk.NSEW)
                 self.command_buttons_count += 1
 
         else:
@@ -481,23 +481,23 @@ class BaseCollection(ABC, ttk.Frame):
                 if show_analyse_button:
                     self.rois_button.grid(column=self.command_buttons_count,
                                           row=0,
-                                          sticky="nsew")
+                                          sticky=tk.NSEW)
                 else:
                     self.rois_button.grid(column=self.command_buttons_count,
                                           row=0,
                                           rowspan=2,
-                                          sticky="nsew")
+                                          sticky=tk.NSEW)
 
             if show_analyse_button:
                 if show_draw_rois_button:
                     self.analyse_button.grid(column=self.command_buttons_count,
                                              row=1,
-                                             sticky="nsew")
+                                             sticky=tk.NSEW)
                 else:
                     self.analyse_button.grid(column=self.command_buttons_count,
                                              row=0,
                                              rowspan=2,
-                                             sticky="nsew")
+                                             sticky=tk.NSEW)
 
             if show_analyse_button or show_draw_rois_button:
                 self.command_buttons_count += 1
@@ -506,7 +506,7 @@ class BaseCollection(ABC, ttk.Frame):
                 self.create_and_run_button.grid(column=self.command_buttons_count,
                                                 row=0,
                                                 rowspan=2,
-                                                sticky="nsew")
+                                                sticky=tk.NSEW)
                 self.command_buttons_count += 1
 
         if (self.main_viewer is not None
@@ -521,7 +521,7 @@ class BaseCollection(ABC, ttk.Frame):
             bbox_button = ttk.Button(self.context_buttons_frame,
                                      command=bbox_command,
                                      text="Draw Phantom Boundbox")
-            bbox_button.grid(column=0, row=1, sticky="nsew")
+            bbox_button.grid(column=0, row=1, sticky=tk.NSEW)
 
             def boundary_command():
                 if (self.main_viewer is not None
@@ -532,7 +532,7 @@ class BaseCollection(ABC, ttk.Frame):
             boundary_button = ttk.Button(self.context_buttons_frame,
                                          command=boundary_command,
                                          text="Draw Phantom Boundary")
-            boundary_button.grid(column=0, row=2, sticky="nsew")
+            boundary_button.grid(column=0, row=2, sticky=tk.NSEW)
 
         self.load_commands()
 
@@ -583,14 +583,14 @@ class BaseCollection(ABC, ttk.Frame):
             button.grid(column=0,
                         row=self.command_buttons_count,
                         columnspan=2,
-                        sticky="nsew")
+                        sticky=tk.NSEW)
             self.command_buttons_count += 1
 
         else:
             button.grid(column=self.command_buttons_count,
                         row=0,
                         rowspan=2,
-                        sticky="nsew")
+                        sticky=tk.NSEW)
             self.command_buttons_count += 1
 
     def on_image_load(self, viewer: BaseViewer) -> None:
@@ -716,14 +716,14 @@ class BaseCollection(ABC, ttk.Frame):
 
         load_butt = ttk.Button(app, text="Load Folder",
                                command=lambda: man.load_folder(False, app, 0, 2))
-        load_butt.grid(column=0, row=0, sticky="nsew")
+        load_butt.grid(column=0, row=0, sticky=tk.NSEW)
 
         load_butt = ttk.Button(app, text="Add Folder",
                                command=lambda: man.load_folder(True, app, 0, 2))
-        load_butt.grid(column=1, row=0, sticky="nsew")
+        load_butt.grid(column=1, row=0, sticky=tk.NSEW)
 
         frame = ttk.Panedwindow(app, orient="vertical")
-        frame.grid(column=0, row=1, columnspan=2, sticky="nsew")
+        frame.grid(column=0, row=1, columnspan=2, sticky=tk.NSEW)
 
         tree_frame = man.get_tree_frame(frame)
         frame.add(tree_frame)
@@ -732,10 +732,10 @@ class BaseCollection(ABC, ttk.Frame):
         frame.add(options_frame)
 
         options_combo = man.get_mouse_options_combobox(options_frame)
-        options_combo.grid(column=0, row=0, sticky="nsew")
+        options_combo.grid(column=0, row=0, sticky=tk.NSEW)
 
         roi_options = man.get_roi_options_frame(options_frame, "h")
-        roi_options.grid(column=2, row=0, sticky="nsew")
+        roi_options.grid(column=2, row=0, sticky=tk.NSEW)
 
         collection = cls(frame, man, direction=direction)
         frame.add(collection, weight=1)

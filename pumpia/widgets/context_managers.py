@@ -476,36 +476,36 @@ class ManualPhantomManager(PhantomContextManager):
         self.ymax_entry = IntEntry(self.boundary_frame, textvariable=self.ymax_var)
 
         if self.direction[0].lower() == "h":
-            self.boundary_frame.grid(column=0, row=0, sticky="nsew")
-            self.xmin_label.grid(column=0, row=0, sticky="nsew")
-            self.xmin_entry.grid(column=1, row=0, sticky="nsew")
-            self.xmax_label.grid(column=2, row=0, sticky="nsew")
-            self.xmax_entry.grid(column=3, row=0, sticky="nsew")
-            self.ymin_label.grid(column=4, row=0, sticky="nsew")
-            self.ymin_entry.grid(column=5, row=0, sticky="nsew")
-            self.ymax_label.grid(column=6, row=0, sticky="nsew")
-            self.ymax_entry.grid(column=7, row=0, sticky="nsew")
+            self.boundary_frame.grid(column=0, row=0, sticky=tk.NSEW)
+            self.xmin_label.grid(column=0, row=0, sticky=tk.NSEW)
+            self.xmin_entry.grid(column=1, row=0, sticky=tk.NSEW)
+            self.xmax_label.grid(column=2, row=0, sticky=tk.NSEW)
+            self.xmax_entry.grid(column=3, row=0, sticky=tk.NSEW)
+            self.ymin_label.grid(column=4, row=0, sticky=tk.NSEW)
+            self.ymin_entry.grid(column=5, row=0, sticky=tk.NSEW)
+            self.ymax_label.grid(column=6, row=0, sticky=tk.NSEW)
+            self.ymax_entry.grid(column=7, row=0, sticky=tk.NSEW)
 
-            self.shape_frame.grid(column=1, row=0, sticky="nsew")
+            self.shape_frame.grid(column=1, row=0, sticky=tk.NSEW)
 
             for c, radio in enumerate(self.shape_radios):
-                radio.grid(column=c, row=0, sticky="nsew")
+                radio.grid(column=c, row=0, sticky=tk.NSEW)
 
         else:
-            self.boundary_frame.grid(column=0, row=0, sticky="nsew")
-            self.xmin_label.grid(column=0, row=0, sticky="nsew")
-            self.xmin_entry.grid(column=1, row=0, sticky="nsew")
-            self.xmax_label.grid(column=0, row=1, sticky="nsew")
-            self.xmax_entry.grid(column=1, row=1, sticky="nsew")
-            self.ymin_label.grid(column=0, row=2, sticky="nsew")
-            self.ymin_entry.grid(column=1, row=2, sticky="nsew")
-            self.ymax_label.grid(column=0, row=3, sticky="nsew")
-            self.ymax_entry.grid(column=1, row=3, sticky="nsew")
+            self.boundary_frame.grid(column=0, row=0, sticky=tk.NSEW)
+            self.xmin_label.grid(column=0, row=0, sticky=tk.NSEW)
+            self.xmin_entry.grid(column=1, row=0, sticky=tk.NSEW)
+            self.xmax_label.grid(column=0, row=1, sticky=tk.NSEW)
+            self.xmax_entry.grid(column=1, row=1, sticky=tk.NSEW)
+            self.ymin_label.grid(column=0, row=2, sticky=tk.NSEW)
+            self.ymin_entry.grid(column=1, row=2, sticky=tk.NSEW)
+            self.ymax_label.grid(column=0, row=3, sticky=tk.NSEW)
+            self.ymax_entry.grid(column=1, row=3, sticky=tk.NSEW)
 
-            self.shape_frame.grid(column=0, row=1, sticky="nsew")
+            self.shape_frame.grid(column=0, row=1, sticky=tk.NSEW)
 
             for r, radio in enumerate(self.shape_radios):
-                radio.grid(column=0, row=r, sticky="nsew")
+                radio.grid(column=0, row=r, sticky=tk.NSEW)
 
     def get_context(self, image: ArrayImage) -> PhantomContext:
         """
@@ -765,66 +765,66 @@ class AutoPhantomManager(PhantomContextManager):
         self.cull_perc_entry = PercEntry(self.automatic_frame, textvariable=self.cull_perc_var)
 
         if self.direction[0].lower() == "h":
-            self.general_frame.grid(column=0, row=0, sticky="nsew")
+            self.general_frame.grid(column=0, row=0, sticky=tk.NSEW)
 
-            self.sensitivity_label.grid(column=0, row=0, sticky="nsew")
-            self.sensitivity_entry.grid(column=1, row=0, sticky="ew")
-            self.top_perc_label.grid(column=2, row=0, sticky="nsew")
-            self.top_perc_entry.grid(column=3, row=0, sticky="ew")
-            self.mode_frame.grid(column=4, row=0, sticky="nsew")
-            self.auto_radio.grid(column=0, row=0, sticky="nsew")
-            self.manual_radio.grid(column=0, row=1, sticky="nsew")
+            self.sensitivity_label.grid(column=0, row=0, sticky=tk.NSEW)
+            self.sensitivity_entry.grid(column=1, row=0, sticky=tk.EW)
+            self.top_perc_label.grid(column=2, row=0, sticky=tk.NSEW)
+            self.top_perc_entry.grid(column=3, row=0, sticky=tk.EW)
+            self.mode_frame.grid(column=4, row=0, sticky=tk.NSEW)
+            self.auto_radio.grid(column=0, row=0, sticky=tk.NSEW)
+            self.manual_radio.grid(column=0, row=1, sticky=tk.NSEW)
 
             # manual frame
-            self.bubble_offset_label.grid(column=0, row=0, sticky="nsew")
-            self.bubble_offset_entry.grid(column=1, row=0, sticky="nsew")
-            self.bubble_side_label.grid(column=2, row=0, sticky="nsew")
-            self.bubble_side_combo.grid(column=3, row=0, sticky="nsew")
-            self.manual_shape_frame.grid(column=4, row=0, sticky="nsew")
+            self.bubble_offset_label.grid(column=0, row=0, sticky=tk.NSEW)
+            self.bubble_offset_entry.grid(column=1, row=0, sticky=tk.NSEW)
+            self.bubble_side_label.grid(column=2, row=0, sticky=tk.NSEW)
+            self.bubble_side_combo.grid(column=3, row=0, sticky=tk.NSEW)
+            self.manual_shape_frame.grid(column=4, row=0, sticky=tk.NSEW)
 
             for c, radio in enumerate(self.shape_radios):
-                radio.grid(column=c, row=0, sticky="nsew")
+                radio.grid(column=c, row=0, sticky=tk.NSEW)
 
             # automatic frame
-            self.iterations_label.grid(column=2, row=0, sticky="nsew")
-            self.iterations_entry.grid(column=3, row=0, sticky="nsew")
-            self.cull_perc_label.grid(column=4, row=0, sticky="nsew")
-            self.cull_perc_entry.grid(column=5, row=0, sticky="nsew")
-            self.auto_shape_frame.grid(column=6, row=0, sticky="nsew")
+            self.iterations_label.grid(column=2, row=0, sticky=tk.NSEW)
+            self.iterations_entry.grid(column=3, row=0, sticky=tk.NSEW)
+            self.cull_perc_label.grid(column=4, row=0, sticky=tk.NSEW)
+            self.cull_perc_entry.grid(column=5, row=0, sticky=tk.NSEW)
+            self.auto_shape_frame.grid(column=6, row=0, sticky=tk.NSEW)
 
             for c, check in enumerate(self.shape_checks):
-                check.grid(column=c, row=0, sticky="nsew")
+                check.grid(column=c, row=0, sticky=tk.NSEW)
 
         else:
-            self.general_frame.grid(column=0, row=0, sticky="nsew")
+            self.general_frame.grid(column=0, row=0, sticky=tk.NSEW)
 
-            self.sensitivity_label.grid(column=0, row=0, sticky="nsew")
-            self.sensitivity_entry.grid(column=1, row=0, sticky="nsew")
-            self.top_perc_label.grid(column=0, row=1, sticky="nsew")
-            self.top_perc_entry.grid(column=1, row=1, sticky="nsew")
-            self.mode_frame.grid(column=0, row=2, columnspan=2, sticky="nsew")
-            self.auto_radio.grid(column=0, row=0, sticky="nsew")
-            self.manual_radio.grid(column=0, row=1, sticky="nsew")
+            self.sensitivity_label.grid(column=0, row=0, sticky=tk.NSEW)
+            self.sensitivity_entry.grid(column=1, row=0, sticky=tk.NSEW)
+            self.top_perc_label.grid(column=0, row=1, sticky=tk.NSEW)
+            self.top_perc_entry.grid(column=1, row=1, sticky=tk.NSEW)
+            self.mode_frame.grid(column=0, row=2, columnspan=2, sticky=tk.NSEW)
+            self.auto_radio.grid(column=0, row=0, sticky=tk.NSEW)
+            self.manual_radio.grid(column=0, row=1, sticky=tk.NSEW)
 
             # manual frame
-            self.bubble_offset_label.grid(column=0, row=0, sticky="nsew")
-            self.bubble_offset_entry.grid(column=1, row=0, sticky="nsew")
-            self.bubble_side_label.grid(column=0, row=1, sticky="nsew")
-            self.bubble_side_combo.grid(column=1, row=1, sticky="nsew")
-            self.manual_shape_frame.grid(column=0, row=2, columnspan=2, sticky="nsew")
+            self.bubble_offset_label.grid(column=0, row=0, sticky=tk.NSEW)
+            self.bubble_offset_entry.grid(column=1, row=0, sticky=tk.NSEW)
+            self.bubble_side_label.grid(column=0, row=1, sticky=tk.NSEW)
+            self.bubble_side_combo.grid(column=1, row=1, sticky=tk.NSEW)
+            self.manual_shape_frame.grid(column=0, row=2, columnspan=2, sticky=tk.NSEW)
 
             for r, radio in enumerate(self.shape_radios):
-                radio.grid(column=0, row=r, sticky="nsew")
+                radio.grid(column=0, row=r, sticky=tk.NSEW)
 
             # automatic frame
-            self.iterations_label.grid(column=0, row=1, sticky="nsew")
-            self.iterations_entry.grid(column=1, row=1, sticky="nsew")
-            self.cull_perc_label.grid(column=0, row=2, sticky="nsew")
-            self.cull_perc_entry.grid(column=1, row=2, sticky="nsew")
-            self.auto_shape_frame.grid(column=0, row=3, columnspan=2, sticky="nsew")
+            self.iterations_label.grid(column=0, row=1, sticky=tk.NSEW)
+            self.iterations_entry.grid(column=1, row=1, sticky=tk.NSEW)
+            self.cull_perc_label.grid(column=0, row=2, sticky=tk.NSEW)
+            self.cull_perc_entry.grid(column=1, row=2, sticky=tk.NSEW)
+            self.auto_shape_frame.grid(column=0, row=3, columnspan=2, sticky=tk.NSEW)
 
             for r, check in enumerate(self.shape_checks):
-                check.grid(column=0, row=r, sticky="nsew")
+                check.grid(column=0, row=r, sticky=tk.NSEW)
 
         self._update_mode()
 
@@ -886,25 +886,25 @@ class AutoPhantomManager(PhantomContextManager):
         self.fine_tune_frame.grid_forget()
         if self.direction[0].lower() == "h":
             if self.mode_var.get() == "manual":
-                self.manual_frame.grid(column=2, row=0, sticky="nsew")
+                self.manual_frame.grid(column=2, row=0, sticky=tk.NSEW)
             elif self.mode_var.get() == "auto":
-                self.automatic_frame.grid(column=2, row=0, sticky="nsew")
+                self.automatic_frame.grid(column=2, row=0, sticky=tk.NSEW)
             elif self.mode_var.get() == "fine tune":
-                self.fine_tune_frame.grid(column=2, row=0, sticky="nsew")
+                self.fine_tune_frame.grid(column=2, row=0, sticky=tk.NSEW)
 
         else:
             if self.mode_var.get() == "manual":
-                self.manual_frame.grid(column=0, row=1, sticky="nsew")
+                self.manual_frame.grid(column=0, row=1, sticky=tk.NSEW)
             elif self.mode_var.get() == "auto":
-                self.automatic_frame.grid(column=0, row=1, sticky="nsew")
+                self.automatic_frame.grid(column=0, row=1, sticky=tk.NSEW)
             elif self.mode_var.get() == "fine tune":
-                self.fine_tune_frame.grid(column=0, row=1, sticky="nsew")
+                self.fine_tune_frame.grid(column=0, row=1, sticky=tk.NSEW)
 
     def _show_on_image(self):
         """
         Shows the on image radio button.
         """
-        self.on_image_radio.grid(column=0, row=3, sticky="nsew")
+        self.on_image_radio.grid(column=0, row=3, sticky=tk.NSEW)
 
     def _show_fine_tune(self, context: PhantomContext):
         """
@@ -915,7 +915,7 @@ class AutoPhantomManager(PhantomContextManager):
         self.fine_tune_frame.ymin_var.set(context.ymin)
         self.fine_tune_frame.ymax_var.set(context.ymax)
         self.fine_tune_frame.shape_var.set(self.inv_shape_map[context.shape])
-        self.fine_tune_radio.grid(column=0, row=2, sticky="nsew")
+        self.fine_tune_radio.grid(column=0, row=2, sticky=tk.NSEW)
 
     def get_boundary_roi(self,
                          image: ArrayImage,

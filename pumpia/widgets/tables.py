@@ -120,16 +120,16 @@ class SimpleTable(ttk.Frame):
 
         self.xscrlbr = ttk.Scrollbar(self, orient='horizontal')
         if x_scroll:
-            self.xscrlbr.grid(column=0, row=2, columnspan=2, sticky='ew')
+            self.xscrlbr.grid(column=0, row=2, columnspan=2, sticky=tk.EW)
         self.yscrlbr = ttk.Scrollbar(self)
         if y_scroll:
-            self.yscrlbr.grid(column=1, row=0, sticky='ns')
+            self.yscrlbr.grid(column=1, row=0, sticky=tk.NS)
 
         self.out_canv = tk.Canvas(self)
         self.out_canv.config(relief='flat',
                              width=10,
                              height=10, bd=0)
-        self.out_canv.grid(column=0, row=0, sticky='nsew')
+        self.out_canv.grid(column=0, row=0, sticky=tk.NSEW)
         self.out_frame = ttk.Frame(self)
         self.out_canv.create_window(0, 0, window=self.out_frame, anchor='nw')
         self.out_canv.config(xscrollcommand=self.xscrlbr.set,
@@ -139,7 +139,7 @@ class SimpleTable(ttk.Frame):
         self.tab_canv.config(relief='flat',
                              width=10,
                              height=10, bd=-2)  # -2 needed as canvas has default border of 2
-        self.tab_canv.grid(column=0, row=1, columnspan=len(titles) + 1, sticky='nsew')
+        self.tab_canv.grid(column=0, row=1, columnspan=len(titles) + 1, sticky=tk.NSEW)
         self.tab_frame = ttk.Frame(self.out_frame)
         self.tab_canv.create_window(0, 0, window=self.tab_frame, anchor='nw')
         self.tab_canv.config(yscrollcommand=self.yscrlbr.set,
@@ -160,7 +160,7 @@ class SimpleTable(ttk.Frame):
                                               text=titles[t],
                                               borderwidth=0.5,
                                               relief="solid"))
-            self.title_labels[-1].grid(row=0, column=t, sticky='nsew')
+            self.title_labels[-1].grid(row=0, column=t, sticky=tk.NSEW)
             self.out_frame.grid_columnconfigure(t, weight=1)
             self.tab_frame.grid_columnconfigure(t, weight=1)
 
@@ -191,7 +191,7 @@ class SimpleTable(ttk.Frame):
         new_row = []
         for e, _ in enumerate(entry):
             new_row.append(tk.Label(self.tab_frame, text=entry[e], borderwidth=0.5, relief="solid"))
-            new_row[-1].grid(row=row, column=e, sticky='nsew')
+            new_row[-1].grid(row=row, column=e, sticky=tk.NSEW)
         if new:
             self.entries.append(entry)
         self.entry_labels.append(new_row)
