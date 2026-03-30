@@ -13,12 +13,12 @@ There are ten key areas:
     #. The mouse option dropdown.
     #. The ROI options - used when an ROI is selected. Overrides the mouse option.
     #. Tabs to switch between the main frame and modules in the collection. Not shown when a Module is ran.
-    #. Tabs to switch to see the context and inputs/outputs.
+    #. Tabs to switch to see the context and fields/ROIs.
     #. Commands for the collection.
     #. Outputs for the collection.
     #. Viewers
 
-Commands and outputs may be in different locations for modules, additionally modules contain sections for inputs and ROIs.
+Commands and outputs may be in different locations for modules, additionally modules contain sections for fields and ROIs.
 
 When the mouse is within a viewer following shortcuts are provided for user interaction:
 

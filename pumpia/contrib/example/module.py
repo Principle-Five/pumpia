@@ -2,9 +2,9 @@ import math
 
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.module_handling.modules import BaseModule
-from pumpia.module_handling.in_outs.roi_ios import BaseInputROI, InputEllipseROI
-from pumpia.module_handling.in_outs.viewer_ios import ArrayViewerIO
-from pumpia.module_handling.in_outs.simple import PercInput, FloatOutput, IntOutput
+from pumpia.module_handling.fields.roi_fields import BaseROIField, EllipseROIField
+from pumpia.module_handling.fields.viewer_fields import ArrayViewerField
+from pumpia.module_handling.fields.simple import PercField, FloatField, IntField
 from pumpia.module_handling.context import SimpleContext
 from pumpia.image_handling.roi_structures import EllipseROI
 from pumpia.utilities.tkinter_utils import tk_copy
@@ -21,22 +21,22 @@ class ExampleModule(BaseModule):
     """
     show_draw_rois_button = True
     show_analyse_button = True
-    name = "Example Module"
+    title = "Example Module"
 
-    viewer = ArrayViewerIO(row=0, column=0)
-    size = PercInput(80, verbose_name="Size (%)")
-    ellipse_roi = InputEllipseROI("Ellipse ROI")
+    viewer = ArrayViewerField(row=0, column=0)
+    size = PercField(80, verbose_name="Size (%)")
+    ellipse_roi = EllipseROIField("Ellipse ROI")
 
-    width = IntOutput(verbose_name="Width (px)")
-    height = IntOutput(verbose_name="Height (px)")
-    average = FloatOutput(reset_on_analysis=True)
+    width = IntField(verbose_name="Width (px)", read_only=True)
+    height = IntField(verbose_name="Height (px)", read_only=True)
+    average = FloatField(reset_on_analysis=True, read_only=True)
 
     def link_rois_viewers(self):
         self.ellipse_roi.viewer = self.viewer
 
     def draw_rois(self, context: SimpleContext, batch: bool = False):
         if self.viewer.image is not None:
-            factor = self.size.value / 100
+            factor = self.size / 100
             a = round(factor * context.width / 2)
             b = round(factor * context.height / 2)
             self.ellipse_roi.register_roi(EllipseROI(self.viewer.image,
@@ -46,7 +46,7 @@ class ExampleModule(BaseModule):
                                                      b,
                                                      slice_num=self.viewer.current_slice))
 
-    def post_roi_register(self, roi_input: BaseInputROI):
+    def post_roi_register(self, roi_input: BaseROIField):
         if self.ellipse_roi.roi is not None and self.manager is not None:
             self.manager.add_roi(self.ellipse_roi.roi)
 
@@ -55,16 +55,16 @@ class ExampleModule(BaseModule):
             roi = self.ellipse_roi.roi
             mean = roi.mean
             if isinstance(mean, (float, int)):
-                self.average.value = mean
+                self.average = mean
             else:
-                self.average.value = math.sqrt(math.sumprod(mean, mean))
+                self.average = math.sqrt(math.sumprod(mean, mean))
 
     def on_image_load(self, viewer: BaseViewer) -> None:
         if viewer is self.viewer:
             image = self.viewer.image
             if image is not None:
-                self.height.value = image.shape[1]
-                self.width.value = image.shape[2]
+                self.height = image.shape[1]
+                self.width = image.shape[2]
 
     def load_commands(self):
         self.register_command("Copy Average", self.copy_average)
@@ -73,4 +73,4 @@ class ExampleModule(BaseModule):
         """
         Copy the value of the average to the clipboard.
         """
-        tk_copy(str(self.average.value))
+        tk_copy(str(self.average))

@@ -12,254 +12,80 @@ import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self, Any
 from collections.abc import Callable
-from copy import copy
 from pumpia.utilities.typing import DirectionType
-from pumpia.utilities.tkinter_utils import tk_copy
 from pumpia.image_handling.image_structures import ArrayImage
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.widgets.context_managers import (BaseContextManager,
-                                             BaseContextManagerGenerator,
-                                             SimpleContextManagerGenerator,
+                                             SimpleContextManager,
                                              PhantomContextManager)
 from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
-from pumpia.module_handling.in_outs.simple import BaseIO
-from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
-from pumpia.module_handling.modules import BaseModule
+from pumpia.module_handling.fields.groups import _FieldGroupsMeta
+from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
+from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
+from pumpia.module_handling.modules import BaseModule, _ModulesMeta
 from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext
 
 
-class OutputFrame(ttk.Labelframe):
+class _ModuleGroups:
+    def __init__(self, obj: BaseCollection) -> None:
+        self.obj: BaseCollection = obj
+        self.groups_dict: dict[str, ModuleGroup] = {}
+
+    def __iter__(self):
+        for group in self.groups_dict.values():
+            yield group
+
+
+class _ModuleGroupsMeta:
+    def __init__(self) -> None:
+        self.groups: dict[str, ModuleGroup] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseCollection] | None = None
+
+    @property
+    def group_names(self) -> list[str]:
+        return list(self.groups.keys())
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self, obj: BaseCollection, owner: type[BaseCollection]) -> _ModuleGroups: ...
+    @overload
+    def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
+
+    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _ModuleGroups | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            groups = _ModuleGroups(obj)
+            setattr(obj, self.private_name, groups)
+            return groups
+
+
+class ModuleGroup(ttk.Panedwindow):
     """
-    A frame for displaying output values.
+    Groups multiple modules into the same tab in the collection.
 
     Parameters
     ----------
-    parent : tk.Misc or None, optional
-        The parent widget (default is None).
-    verbose_name : str or None, optional
-        The verbose name of the frame (default is None).
-    direction : DirectionType, optional
-        The direction of the child widgets in the frame (default is vertical).
-    **kw : dict
-        Additional keyword arguments as defined by ttk Labelframe.
-
-    Attributes
-    ----------
-    verbose_name : str or None
-        The verbose name of the frame.
-    parent : tk.Misc or None
-        The parent widget.
-    is_setup : bool
-    var_values : list
-    var_strings : list[str]
-    horizontal_str : str
-    vertical_str : str
-
-    Methods
-    -------
-    set_parent(parent: tk.Misc)
-        Sets the parent widget.
-    setup(parent: tk.Misc | None = None, verbose_name: str | None = None)
-        Sets up the frame.
-    copy_horizontal() -> None
-        Copies the horizontal string representation of the variable values to the clipboard.
-    copy_vertical() -> None
-        Copies the vertical string representation of the variable values to the clipboard.
-    register_output(output: BaseIO, verbose_name: str | None = None) -> None
-        Registers an output variable in the frame.
-    """
-
-    @overload
-    def __init__(
-        self,
-        parent: tk.Misc | None = None,
-        *,
-        verbose_name: str | None = None,
-        direction: DirectionType = "V",
-        border: ScreenUnits = ...,
-        borderwidth: ScreenUnits = ...,  # undocumented
-        class_: str = "",
-        cursor: Cursor = "",
-        height: ScreenUnits = 0,
-        labelanchor: Literal["nw", "n", "ne",
-                             "en", "e", "es",
-                             "se", "s", "sw",
-                             "ws", "w", "wn"] = ...,
-        labelwidget: tk.Misc = ...,
-        padding: Padding = ...,
-        relief: Relief = ...,  # undocumented
-        style: str = "",
-        takefocus: TakeFocusValue = "",
-        underline: int = -1,
-        width: ScreenUnits = 0,
-    ) -> None: ...
-
-    @overload
-    def __init__(
-        self,
-        parent: tk.Misc | None = None,
-        *,
-        verbose_name: str | None = None,
-        direction: DirectionType = "V",
-        **kw) -> None: ...
-
-    # pylint: disable-next=super-init-not-called
-    def __init__(
-            self,
-            parent: tk.Misc | None = None,
-            *,
-            verbose_name: str | None = None,
-            direction: DirectionType = "V",
-            **kw):
-        self.verbose_name = verbose_name
-        self.parent = parent
-        self._kw = kw
-        self._vars: list[tk.Variable] = []
-        self._labels: list[ttk.Label] = []
-        self._out_labs: list[ttk.Label] = []
-        self._is_setup: bool = False
-
-        if direction[0].lower() == "h":
-            self.direction: Literal["horizontal", "vertical"] = "horizontal"
-        else:
-            self.direction: Literal["horizontal", "vertical"] = "vertical"
-
-        if self.parent is not None:
-            self.setup()
-
-    @property
-    def is_setup(self) -> bool:
-        """
-        Whether the frame is set up.
-        """
-        return self._is_setup
-
-    def set_parent(self, parent: tk.Misc):
-        """
-        Sets the parent widget.
-        """
-        self.parent = parent
-
-    def setup(self, *, parent: tk.Misc | None = None, verbose_name: str | None = None):
-        """
-        Sets up the frame.
-        Parent and verbose_name must be set before calling this method or provided as arguments.
-        If they are provided then they override the values set before calling this method.
-
-        Parameters
-        ----------
-        parent : tk.Misc or None, optional
-            The parent widget (default is None).
-        verbose_name : str or None, optional
-            The verbose name of the frame (default is None).
-        """
-        if not self._is_setup:
-            if parent is not None:
-                self.parent = parent
-            if verbose_name is not None:
-                self.verbose_name = verbose_name
-            if self.parent is None:
-                raise ValueError("parent needs to be set using set_parent or provided")
-            if self.verbose_name is None:
-                raise ValueError("name needs to be provided or set as string")
-            super().__init__(self.parent, text=self.verbose_name, **self._kw)
-
-            self.output_frame = ttk.Frame(self)
-            self.output_frame.grid(column=0, row=0, sticky="nsew")
-
-            self.button_frame = ttk.Frame(self)
-            self.button_frame.grid(column=0, row=1, sticky="nsew")
-
-            self.h_button = ttk.Button(self.button_frame,
-                                       text="Copy Horizontal",
-                                       command=self.copy_horizontal)
-            self.v_button = ttk.Button(self.button_frame,
-                                       text="Copy Vertical",
-                                       command=self.copy_vertical)
-            self.h_button.grid(column=0, row=0, sticky="nsew")
-            self.v_button.grid(column=0, row=1, sticky="nsew")
-
-            self._is_setup = True
-
-    @property
-    def var_values(self) -> list:
-        """
-        The values of the variables in the frame.
-        """
-        return [var.get() for var in self._vars]
-
-    @property
-    def var_strings(self) -> list[str]:
-        """
-        The string representations of the variable values.
-        """
-        return [str(val) for val in self.var_values]
-
-    @property
-    def horizontal_str(self) -> str:
-        """
-        The string representation of the variable values tab seperated.
-        """
-        return "\t".join(self.var_strings)
-
-    @property
-    def vertical_str(self) -> str:
-        """
-        The string representation of the variable values newline seperated.
-        """
-        return "\n".join(self.var_strings)
-
-    def copy_horizontal(self) -> None:
-        """
-        Copies the horizontal string representation of the variable values to the clipboard.
-        """
-        tk_copy(self.horizontal_str)
-
-    def copy_vertical(self) -> None:
-        """
-        Copies the vertical string representation of the variable values to the clipboard.
-        """
-        tk_copy(self.vertical_str)
-
-    def register_output(self, output: BaseIO, verbose_name: str | None = None) -> None:
-        """
-        Registers an output variable in the frame.
-        """
-        if output.verbose_name is not None:
-            if verbose_name is not None:
-                self._labels.append(ttk.Label(self.output_frame, text=verbose_name))
-            else:
-                self._labels.append(ttk.Label(self.output_frame, textvariable=output.label_var))
-
-            self._vars.append(output.value_var)
-            self._out_labs.append(ttk.Label(self.output_frame, textvariable=output.value_var))
-
-            if self.direction == "horizontal":
-                self._labels[-1].grid(column=2 * (len(self._vars) - 1),
-                                      row=0,
-                                      sticky="nsew")
-                self._out_labs[-1].grid(column=2 * (len(self._vars) - 1) + 1,
-                                        row=0,
-                                        sticky="nsew")
-            else:
-                self._labels[-1].grid(column=0,
-                                      row=len(self._vars) - 1,
-                                      sticky="nsew")
-                self._out_labs[-1].grid(column=1,
-                                        row=len(self._vars) - 1,
-                                        sticky="nsew")
-
-
-class WindowGroup(ttk.Panedwindow):
-    """
-    A window for showing multiple modules.
-
-    Parameters
-    ----------
-    modules : list of BaseModule
-        The list of modules to display.
+    *modules : BaseModule
     verbose_name : str or None, optional
         The verbose name of the group (default is None).
     direction : DirectionType, optional
@@ -287,9 +113,8 @@ class WindowGroup(ttk.Panedwindow):
     @overload
     def __init__(
         self,
-        modules: list[BaseModule],
+        *modules: BaseModule,
         verbose_name: str | None = None,
-        *,
         direction: DirectionType = "V",
         border: ScreenUnits = ...,
         borderwidth: ScreenUnits = ...,
@@ -306,52 +131,86 @@ class WindowGroup(ttk.Panedwindow):
     @overload
     def __init__(
         self,
-        modules: list[BaseModule],
+        *modules: BaseModule,
         verbose_name: str | None = None,
-        *,
         direction: DirectionType = "V",
         **kwargs) -> None: ...
 
     # pylint: disable-next=super-init-not-called
     def __init__(self,
-                 modules: list[BaseModule],
+                 *modules: BaseModule,
                  verbose_name: str | None = None,
-                 *,
                  direction: DirectionType = "V",
                  **kw) -> None:
-        self.modules = modules
-        self.verbose_name = verbose_name
+        self.module_names: list[str] = []
+        self.modules: list[BaseModule] = list(modules)
+        self.verbose_name: str | None = verbose_name
+        self.name: str = ""
+
         if direction[0].lower() == "h":
-            self.direction = "horizontal"
+            self.direction: DirectionType = "horizontal"
         else:
-            self.direction = "vertical"
+            self.direction: DirectionType = "vertical"
         self.kw = kw
         self.kw["orient"] = self.direction
 
-    def setup(self, parent: tk.Misc, verbose_name: str | None = None):
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        if self.verbose_name is None:
+            self.verbose_name = name.replace("_", " ").title()
+        owner.module_groups.groups[name] = self
+        self.module_names = [module.name for module in self.modules]
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.module_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
+        except KeyError:
+            group = type(self)(*[],
+                               verbose_name=self.verbose_name,
+                               direction=self.direction,
+                               **self.kw)
+            group.setup(parent=obj.notebook)
+
+            modules: list[BaseModule] = []
+            for module_name in self.module_names:
+                module: BaseModule = getattr(obj, module_name)
+                if module.verbose_name is None:
+                    name = module.name
+                else:
+                    name = module.verbose_name
+                lf = ttk.Labelframe(group, text=name, labelanchor="nw")
+                lf.columnconfigure(0, weight=1)
+                lf.rowconfigure(0, weight=1)
+                module.setup(parent=lf,
+                             manager=obj.manager,
+                             context_manager=obj.context_manager)
+                module.grid(column=0, row=0, sticky="nsew")
+                group.add(lf, weight=1)
+                modules.append(getattr(obj, module_name))
+
+            group.module_names = self.module_names
+            group.modules = modules
+            obj.module_groups.groups_dict[self.name] = group
+            return group
+
+    def setup(self, parent: tk.Misc):
         """
-        Sets up the window group.
-        verbose_name must be set before calling this method or provided as arguments.
-        If it is provided then it overrides the value set before calling this method.
+        Sets up the module group.
 
         Parameters
         ----------
         parent : tk.Misc
             The parent widget.
-        verbose_name : str or None, optional
-            The verbose name of the group (default is None).
         """
-        if verbose_name is not None:
-            self.verbose_name = verbose_name
-
-        if self.verbose_name is None:
-            raise ValueError("name needs to be provided or set as string")
 
         super().__init__(parent, **self.kw)
 
     def on_tab_select(self):
         """
-        Called when the tab containing this window is selected.
+        Called when the tab containing this group is selected.
         Defaults to calling on_tab_select for each module in the group.
         """
         for module in self.modules:
@@ -375,26 +234,32 @@ class BaseCollection(ABC, ttk.Frame):
 
     Attributes
     ----------
+    context_manager : BaseContextManager
+        Set at class level.
+        Determines which context manager to use
+        if none is passed in at object initialisation.
+        (default is SimpleContextManager)
+    title : str
+        Set at class level.
+        Title of the module tkinter window.
     manager : Manager
         The manager object for this collection.
     direction : str
         The direction of the child widgets in this collection.
+    modules
+    field_groups
+    field_windows
+    viewers
+    module_groups
     main_viewer : BaseViewer | None
         The main viewer in the collection.
-    viewers : list[BaseViewer]
-        The list of viewers in the collection.
     viewer_count : int
         The number of viewers in the collection.
-    modules : list[BaseModule]
-        The list of modules in the collection.
     output_frame_count : int
         The number of output frames in the collection.
 
     Methods
     -------
-    load_outputs()
-        User should override this method to load outputs into the OutputFrame objects in collection
-        and link input and output variables in IOGroup objects.
     load_commands()
         User can override this method to register command buttons for the collection.
     register_command(text: str, command: Callable[[], Any])
@@ -413,8 +278,13 @@ class BaseCollection(ABC, ttk.Frame):
         Runs the application.
     """
 
-    context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
-    name: str | None = None
+    context_manager: BaseContextManager = SimpleContextManager()
+    title: str = "Pumpia Collection"
+    modules = _ModulesMeta()
+    field_groups = _FieldGroupsMeta()
+    field_windows = _FieldWindowsMeta()
+    viewers = _ViewerFieldsMeta()
+    module_groups = _ModuleGroupsMeta()
 
     @overload
     def __init__(
@@ -460,10 +330,7 @@ class BaseCollection(ABC, ttk.Frame):
             self.direction = "vertical"
 
         self.main_viewer: BaseViewer | None = None
-        self.viewers: list[BaseViewer] = []
         self.viewer_count: int = 0
-        self._module_groups: dict[WindowGroup, list[BaseModule]] = {}
-        self.modules: list[BaseModule] = []
         self.output_frame_count: int = 0
         self.command_buttons_count: int = 0
 
@@ -500,9 +367,7 @@ class BaseCollection(ABC, ttk.Frame):
         self.context_frame = ScrolledWindow(self.main_window)
         self.context_buttons_frame = ttk.Frame(self.context_frame)
         self.context_buttons_frame.grid(column=0, row=0, sticky="nsew")
-        self.context_manager: BaseContextManager = self.context_manager_generator(
-            self.context_frame,
-            self.manager)
+        self.context_manager(parent=self.context_frame, manager=self.manager)
         self.context_manager.grid(column=0, row=1, sticky="nsew")
         self.main_window.add(self.context_frame.outer_frame, text="Context")
 
@@ -511,47 +376,62 @@ class BaseCollection(ABC, ttk.Frame):
                                              command=self.get_context)
         self.get_context_button.grid(column=0, row=0, sticky="nsew")
 
-        for k, v in self.__class__.__dict__.items():
-            if k[:2] != "__" or k[-2:] != "__":
-                if isinstance(v, OutputFrame):
-                    attr = copy(v)
-                    setattr(self, k, attr)
-                    if attr.verbose_name is None:
-                        attr.verbose_name = k.replace("_", " ").title()
-                    attr.setup(parent=self.output_frame)
-                    if self.direction == "horizontal":
-                        attr.grid(column=0, row=self.output_frame_count, sticky="nsew")
-                    else:
-                        attr.grid(column=self.output_frame_count, row=0, sticky="nsew")
-                    self.output_frame_count += 1
+        show_draw_rois_button: bool = False
+        show_analyse_button: bool = False
 
-                elif isinstance(v, WindowGroup):
-                    attr = copy(v)
-                    setattr(self, k, attr)
-                    if attr.verbose_name is None:
-                        attr.verbose_name = k.replace("_", " ").title()
-                    attr.setup(parent=self.notebook)
-                    self.notebook.add(attr, text=attr.verbose_name)
-                    self._tab_change_calls[self.notebook.tabs()[-1]] = attr.on_tab_select
-                    self._module_groups[attr] = attr.modules
+        for group_name in type(self).module_groups.group_names:
+            group: ModuleGroup = getattr(self, group_name)
+            if group.verbose_name is None:
+                name = group.name
+            else:
+                name = group.verbose_name
+            self.notebook.add(group, text=name)
+            self._tab_change_calls[self.notebook.tabs()[-1]] = group.on_tab_select
 
-                elif isinstance(v, BaseViewerIO):
-                    attr = v.viewer_type(self.viewer_frame,
-                                         manager=self.manager,
-                                         allow_drag_drop=v.allow_drag_drop,
-                                         allow_drawing_rois=v.allow_drawing_rois,
-                                         validation_command=v.validation_command)
-                    attr.grid(column=v.column,
-                              row=v.row,
-                              sticky="nsew")
-                    self.viewer_frame.columnconfigure(v.column, weight=1)
-                    self.viewer_frame.rowconfigure(v.row, weight=1)
-                    setattr(self, k, attr)
-                    attr.add_load_trace(self._on_image_load_partial(attr))
-                    self.viewers.append(attr)
-                    if self.viewer_count == 0 or v.main:
-                        self.main_viewer = attr
-                    self.viewer_count += 1
+        for module_name in type(self).modules.module_names:
+            module: BaseModule = getattr(self, module_name)
+            show_draw_rois_button = show_draw_rois_button or module.show_draw_rois_button
+            show_analyse_button = show_analyse_button or module.show_analyse_button
+            if module.parent is None:
+                module.setup(parent=self.notebook,
+                             manager=self.manager,
+                             context_manager=self.context_manager)
+                if module.verbose_name is None:
+                    name = module.name
+                else:
+                    name = module.verbose_name
+                self.notebook.add(module, text=name)
+                self._tab_change_calls[self.notebook.tabs()[-1]] = module.on_tab_select
+
+        for window_name in type(self).field_windows.window_names:
+            window: FieldWindow = getattr(self, window_name)
+            frame = window.get_frame(self.output_frame)
+            if self.direction == "horizontal":
+                frame.grid(column=0,
+                           row=self.output_frame_count,
+                           columnspan=2,
+                           sticky="nsew")
+            else:
+                frame.grid(column=2 * self.output_frame_count,
+                           row=0,
+                           columnspan=2,
+                           sticky="nsew")
+            self.output_frame_count += 1
+
+        for group_name in type(self).field_groups.group_names:
+            getattr(self, group_name)
+
+        for viewer_name, viewer_field in type(self).viewers.viewer_fields.items():
+            viewer: BaseViewer = getattr(self, viewer_name)
+            viewer.grid(column=viewer_field.column,
+                        row=viewer_field.row,
+                        sticky=tk.NSEW)
+            self.viewer_frame.columnconfigure(viewer_field.column, weight=1)
+            self.viewer_frame.rowconfigure(viewer_field.row, weight=1)
+            viewer.add_load_trace(self._on_image_load_partial(viewer))
+            if self.viewer_count == 0 or viewer_field.main:
+                self.main_viewer = viewer
+            self.viewer_count += 1
 
         self.rois_button = ttk.Button(self.button_frame,
                                       text="Draw ROIs",
@@ -562,67 +442,6 @@ class BaseCollection(ABC, ttk.Frame):
         self.create_and_run_button = ttk.Button(self.button_frame,
                                                 text="Create and Run",
                                                 command=self.create_and_run)
-
-        if (self.main_viewer is not None
-                and isinstance(self.context_manager, PhantomContextManager)):
-
-            def bbox_command():
-                if (self.main_viewer is not None
-                    and isinstance(self.main_viewer.image, ArrayImage)
-                        and isinstance(self.context_manager, PhantomContextManager)):
-                    self.context_manager.get_bound_box_roi(self.main_viewer.image)
-
-            bbox_button = ttk.Button(self.context_buttons_frame,
-                                     command=bbox_command,
-                                     text="Draw Phantom Boundbox")
-            bbox_button.grid(column=0, row=1, sticky="nsew")
-
-            def boundary_command():
-                if (self.main_viewer is not None
-                    and isinstance(self.main_viewer.image, ArrayImage)
-                        and isinstance(self.context_manager, PhantomContextManager)):
-                    self.context_manager.get_boundary_roi(self.main_viewer.image)
-
-            boundary_button = ttk.Button(self.context_buttons_frame,
-                                         command=boundary_command,
-                                         text="Draw Phantom Boundary")
-            boundary_button.grid(column=0, row=2, sticky="nsew")
-
-        show_draw_rois_button: bool = False
-        show_analyse_button: bool = False
-
-        for k, v in self.__class__.__dict__.items():
-            if k[:2] != "__" or k[-2:] != "__":
-                if isinstance(v, BaseModule):
-                    attr = copy(v)
-                    setattr(self, k, attr)
-                    self.modules.append(attr)
-                    show_draw_rois_button = show_draw_rois_button or attr.show_draw_rois_button
-                    show_analyse_button = show_analyse_button or attr.show_analyse_button
-                    if attr.verbose_name is None:
-                        attr.verbose_name = k.replace("_", " ").title()
-                    found = False
-
-                    for window, modules in self._module_groups.items():
-                        if v in modules:
-                            window.modules[window.modules.index(v)] = attr
-                            lf = ttk.Labelframe(window, text=attr.verbose_name, labelanchor="nw")
-                            lf.columnconfigure(0, weight=1)
-                            lf.rowconfigure(0, weight=1)
-                            attr.setup(parent=lf,
-                                       manager=self.manager,
-                                       context_manager=self.context_manager)
-                            attr.grid(column=0, row=0, sticky="nsew")
-                            window.add(lf, weight=1)
-                            found = True
-                            break
-
-                    if not found:
-                        attr.setup(parent=self.notebook,
-                                   manager=self.manager,
-                                   context_manager=self.context_manager)
-                        self.notebook.add(attr, text=attr.verbose_name)
-                        self._tab_change_calls[self.notebook.tabs()[-1]] = attr.on_tab_select
 
         if self.direction == "horizontal":
             if show_draw_rois_button:
@@ -690,7 +509,31 @@ class BaseCollection(ABC, ttk.Frame):
                                                 sticky="nsew")
                 self.command_buttons_count += 1
 
-        self.load_outputs()
+        if (self.main_viewer is not None
+                and isinstance(self.context_manager, PhantomContextManager)):
+
+            def bbox_command():
+                if (self.main_viewer is not None
+                    and isinstance(self.main_viewer.image, ArrayImage)
+                        and isinstance(self.context_manager, PhantomContextManager)):
+                    self.context_manager.get_bound_box_roi(self.main_viewer.image)
+
+            bbox_button = ttk.Button(self.context_buttons_frame,
+                                     command=bbox_command,
+                                     text="Draw Phantom Boundbox")
+            bbox_button.grid(column=0, row=1, sticky="nsew")
+
+            def boundary_command():
+                if (self.main_viewer is not None
+                    and isinstance(self.main_viewer.image, ArrayImage)
+                        and isinstance(self.context_manager, PhantomContextManager)):
+                    self.context_manager.get_boundary_roi(self.main_viewer.image)
+
+            boundary_button = ttk.Button(self.context_buttons_frame,
+                                         command=boundary_command,
+                                         text="Draw Phantom Boundary")
+            boundary_button.grid(column=0, row=2, sticky="nsew")
+
         self.load_commands()
 
     def _on_image_load_partial(self, viewer: BaseViewer) -> Callable[[], None]:
@@ -711,22 +554,6 @@ class BaseCollection(ABC, ttk.Frame):
             self.on_image_load(viewer)
 
         return partial
-
-    def load_outputs(self):
-        """
-        User can override this method to load outputs into the OutputFrame objects in collection
-        and link input and output variables in IOGroup objects.
-
-        Examples
-        --------
-        The following would load outputs into the output frames::
-
-            self.output_frame.register_output(self.module.output, verbose_name="Output Name")
-
-        The following would link different modules inputs and outputs::
-
-            IOGroup([self.module1.input, self.module2.input, self.module3.output])
-        """
 
     def load_commands(self):
         """
@@ -879,7 +706,7 @@ class BaseCollection(ABC, ttk.Frame):
             The direction of the collection (default is "Horizontal").
         """
         app = tk.Tk()
-        app.title(cls.name)
+        app.title(cls.title)
         app.columnconfigure(0, weight=1)
         app.columnconfigure(1, weight=1)
         app.rowconfigure(1, weight=1)

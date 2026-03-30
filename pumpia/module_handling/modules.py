@@ -7,10 +7,11 @@ Classes:
 from abc import ABC
 import tkinter as tk
 from tkinter import ttk
-from copy import copy
-from typing import overload, Self, Literal, Any
+from typing import overload, Self, Literal, Any, TYPE_CHECKING
 from collections.abc import Callable
 
+from pumpia.module_handling.context import BaseContext, SimpleContext
+from pumpia.module_handling.manager import Manager
 from pumpia.utilities.typing import DirectionType
 from pumpia.image_handling.image_structures import ArrayImage
 from pumpia.image_handling.roi_structures import BaseROI
@@ -18,24 +19,82 @@ from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
 from pumpia.widgets.context_managers import (BaseContextManager,
                                              PhantomContextManager,
-                                             BaseContextManagerGenerator,
-                                             PhantomContextManagerGenerator,
-                                             SimpleContextManagerGenerator,
-                                             ManualPhantomManagerGenerator)
+                                             SimpleContextManager,
+                                             ManualPhantomManager)
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
-from pumpia.module_handling.in_outs.simple import BaseInput, BaseOutput
-from pumpia.module_handling.in_outs.viewer_ios import BaseViewerIO
-from pumpia.module_handling.in_outs.roi_ios import BaseInputROI
-from pumpia.module_handling.manager import Manager
-from pumpia.module_handling.context import BaseContext, SimpleContext
+from pumpia.module_handling.fields.simple import _FieldsMeta
+from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
+from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
+from pumpia.module_handling.fields.roi_fields import _ROIFieldsMeta, BaseROIField
+
+if TYPE_CHECKING:
+    from pumpia.module_handling.collections import BaseCollection
+
+
+class _Modules:
+    def __init__(self, obj: BaseCollection) -> None:
+        self.modules_dict: dict[str, BaseModule] = {}
+        self.obj: BaseCollection = obj
+
+    def __iter__(self):
+        for module in self.modules_dict.values():
+            yield module
+
+    def __getitem__(self, key: str):
+        return self.modules_dict[key]
+
+
+class _ModulesMeta:
+    def __init__(self) -> None:
+        self.module_types: dict[str, BaseModule] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseCollection] | None = None
+
+    @property
+    def module_names(self) -> list[str]:
+        """
+        The names of the modules for the module.
+
+        Returns
+        -------
+        list[str]
+        """
+        return list(self.module_types.keys())
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self, obj: BaseCollection, owner: type[BaseCollection]) -> _Modules: ...
+    @overload
+    def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
+
+    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _Modules | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            modules = _Modules(obj)
+            setattr(obj, self.private_name, modules)
+            return modules
 
 
 class BaseModule(ABC, ttk.Frame):
     """
     Base class for modules.
-
-    Class attribute `context_manager_generator` is used when running the module as stand alone,
-    set to `SimpleContextManagerGenerator` by default.
 
     Parameters
     ----------
@@ -54,7 +113,28 @@ class BaseModule(ABC, ttk.Frame):
 
     Attributes
     ----------
-    context_manager : BaseContextManager | None
+    context_manager : BaseContextManager
+        Set at class level.
+        Determines which context manager to use
+        if none is passed in at object initialisation.
+        (default is SimpleContextManager)
+    show_draw_rois_button : bool
+        Set at class level.
+        Determines if a button to draw ROIs is shown.
+    show_analyse_button : bool
+        Set at class level.
+        Determines if a button to analyse the module is shown.
+    show_copy_buttons : bool
+        Set at class level.
+        Determines if buttons to copy all field values is shown.
+    title : str
+        Set at class level.
+        Title of the module tkinter window.
+    fields
+    field_windows
+    viewers
+    rois
+        ROI Fields for the module
     manager : Manager | None
     parent : tk.Misc | None
     verbose_name : str | None
@@ -63,8 +143,6 @@ class BaseModule(ABC, ttk.Frame):
         The main viewer for the module, used to get context etc.
         Defaults to first viewer defined if not provided in ViewerIOs.
         If multiple are set then defaults to the last defined ViewerIO.
-    viewers : list[BaseViewer]
-    rois : list[BaseInputROI]
     rois_loaded : bool
     analysed : bool
     input_count : int
@@ -75,11 +153,7 @@ class BaseModule(ABC, ttk.Frame):
 
     Methods
     -------
-    set_parent(parent: tk.Misc)
-        Sets the parent widget.
-    set_manager(manager: Manager)
-        Sets the manager.
-    setup(parent: tk.Misc | None = None, manager: Manager | None = None, context_manager: BaseContextManager | None = None)
+    setup(parent : tk.Misc | None = None, manager : Manager | None = None, context_manager : BaseContextManager | None = None)
         Sets up the module.
     get_context() -> BaseContext
         Returns the context for the module.
@@ -87,35 +161,40 @@ class BaseModule(ABC, ttk.Frame):
         User can override this method to register command buttons for the collection.
     register_command(text: str, command: Callable[[], Any])
         Register a command so that it shows as a button in the main tab.
-    link_rois_viewers():
+    link_rois_viewers()
         Link ROIs and viewers for manual drawing.
-    post_roi_register(roi_input: BaseInputROI):
+    post_roi_register(roi_input : BaseInputROI)
         Command ran after an roi is registered with an input.
-    manual_roi_draw(self):
+    manual_roi_draw(self)
         Does a full manual draw of all ROIs
-    draw_rois(context: BaseContext) -> None
+    draw_rois(context : BaseContext) -> None
         User should override this method to handle drawing the required ROIs.
     analyse()
         User should override this method to handle analysing the ROIs.
-    on_image_load(viewer: BaseViewer) -> None
+    on_image_load(viewer : BaseViewer) -> None
         User can add to this method to handle image load events by calling it using super.
     on_tab_select()
         Handles the event when a tab containing the module is selected.
-    create_rois(context: BaseContext | None = None) -> None
+    create_rois(context : BaseContext | None = None) -> None
         Creates the ROIs for the module.
     run_analysis() -> None
         Runs the analysis for the module.
-    create_and_run(context: BaseContext | None = None) -> None
+    create_and_run(context : BaseContext | None = None) -> None
         Creates the ROIs and runs the analysis.
-    setup_window(app: tk.Tk, direction: DirectionType = "Horizontal")
+    setup_window(app : tk.Tk, direction : DirectionType = "Horizontal")
         Sets up the application window when running the module independently.
-    run(direction: DirectionType = "Horizontal")
+    run(direction : DirectionType = "Horizontal")
         Class method which runs the module independently.
     """
-    context_manager_generator: BaseContextManagerGenerator = SimpleContextManagerGenerator()
+    context_manager: BaseContextManager = SimpleContextManager()
     show_draw_rois_button: bool = False
     show_analyse_button: bool = False
-    name: str | None = None
+    show_copy_buttons: bool = False
+    title: str = "PumpIA Module"
+    fields = _FieldsMeta()
+    field_windows = _FieldWindowsMeta()
+    viewers = _ViewerFieldsMeta()
+    rois = _ROIFieldsMeta()
 
     @overload
     def __init__(
@@ -157,11 +236,14 @@ class BaseModule(ABC, ttk.Frame):
                  verbose_name: str | None = None,
                  direction: DirectionType = "Horizontal",
                  **kw):
-        self.context_manager: BaseContextManager | None = context_manager
-        self.manager: Manager | None = manager
         self.parent: tk.Misc | None = parent
+        self.manager: Manager | None = manager
+        if context_manager is not None:
+            self.context_manager = context_manager
+
         self._kw = kw
         self.verbose_name = verbose_name
+        self.name: str = ""
 
         self._is_setup: bool = False
 
@@ -171,9 +253,7 @@ class BaseModule(ABC, ttk.Frame):
             self.direction = "vertical"
 
         self.main_viewer: BaseViewer | None = None
-        self.viewers: list[BaseViewer] = []
 
-        self.rois: list[BaseInputROI] = []
         self.analysed: bool = False
 
         self.input_count: int = 0
@@ -183,11 +263,36 @@ class BaseModule(ABC, ttk.Frame):
         self.command_buttons_count: int = 0
         self._start_manual_draw: bool = False
 
-        self.inputs: list[BaseInput] = []
-        self.outputs: list[BaseOutput] = []
+        for field_name in type(self).fields.field_names:
+            getattr(self, field_name)
 
         if self.manager is not None and self.parent is not None:
             self.setup()
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        if self.verbose_name is None:
+            self.verbose_name = name.replace("_", " ").title()
+        owner.modules.module_types[name] = self
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.modules.modules_dict[self.name]  # pyright: ignore[reportReturnType]
+        except KeyError:
+            module = type(self)(parent=self.parent,
+                                manager=self.manager,
+                                context_manager=self.context_manager,
+                                verbose_name=self.verbose_name,
+                                direction=self.direction,
+                                **self._kw)
+            module.name = self.name
+            obj.modules.modules_dict[self.name] = module
+            return module
+        except AttributeError:
+            return self
 
     @property
     def is_setup(self) -> bool:
@@ -195,18 +300,6 @@ class BaseModule(ABC, ttk.Frame):
         Whether the module is set up.
         """
         return self._is_setup
-
-    def set_parent(self, parent: tk.Misc):
-        """
-        Sets the parent widget.
-        """
-        self.parent = parent
-
-    def set_manager(self, manager: Manager):
-        """
-        Sets the manager.
-        """
-        self.manager = manager
 
     def setup(self,
               *,
@@ -233,8 +326,6 @@ class BaseModule(ABC, ttk.Frame):
                 self.parent = parent
             if manager is not None:
                 self.manager = manager
-            if context_manager is not None:
-                self.context_manager = context_manager
 
             if self.parent is None:
                 raise ValueError("parent needs to be set using set_parent or provided")
@@ -244,7 +335,7 @@ class BaseModule(ABC, ttk.Frame):
             if self.verbose_name is None:
                 super().__init__(self.parent, **self._kw)
             else:
-                super().__init__(self.parent, name=self.verbose_name.lower(), ** self._kw)
+                super().__init__(self.parent, name=self.verbose_name.lower(), **self._kw)
 
             self.columnconfigure(0, weight=1)
             self.rowconfigure(0, weight=1)
@@ -255,7 +346,7 @@ class BaseModule(ABC, ttk.Frame):
             self.viewer_frame = ttk.Frame(self.paned_window)
             self.paned_window.add(self.viewer_frame, weight=1)
 
-            if self.context_manager is None:
+            if context_manager is None:
                 self.main_window = ttk.Notebook(self.paned_window)
                 self.paned_window.add(self.main_window)
                 self.io_frame = ScrolledWindow(self.main_window)
@@ -271,37 +362,36 @@ class BaseModule(ABC, ttk.Frame):
                 self.get_context_button.grid(column=0, row=0, sticky="nsew")
 
                 if self.direction == "horizontal":
-                    self.context_manager = self.context_manager_generator(self.context_frame,
-                                                                          self.manager)
+                    self.context_manager.direction = "V"
+                    self.context_manager(parent=self.context_frame,
+                                         manager=self.manager)
                 else:
-                    self.context_manager = self.context_manager_generator(self.context_frame,
-                                                                          self.manager,
-                                                                          direction="H")
+                    self.context_manager.direction = "H"
+                    self.context_manager(parent=self.context_frame,
+                                         manager=self.manager)
                 self.context_manager.grid(column=0, row=1, sticky="nsew")  # type: ignore
 
                 self.main_window.add(self.context_frame.outer_frame, text="Context")
                 add_context_buttons = True
             else:
+                self.context_manager = context_manager
                 self.io_frame = ScrolledWindow(self.paned_window)
                 self.paned_window.add(self.io_frame.outer_frame)
                 add_context_buttons = False
 
-            self.input_frame = ttk.Labelframe(self.io_frame, text="Inputs")
-            self.output_frame = ttk.Labelframe(self.io_frame, text="Outputs")
+            self.fields_frame = ttk.Labelframe(self.io_frame, text="Fields")
             self.roi_frame = ttk.Labelframe(self.io_frame, text="ROIs")
             self.button_frame = ttk.Labelframe(self.io_frame, text="Commands")
             self.command_buttons: list[ttk.Button] = []
 
             if self.direction == "horizontal":
-                self.input_frame.grid(column=0, row=0, sticky="nsew")
-                self.output_frame.grid(column=0, row=1, sticky="nsew")
-                self.roi_frame.grid(column=0, row=2, sticky="nsew")
-                self.button_frame.grid(column=0, row=3, sticky="nsew")
+                self.fields_frame.grid(column=0, row=0, sticky="nsew")
+                self.roi_frame.grid(column=0, row=1, sticky="nsew")
+                self.button_frame.grid(column=0, row=2, sticky="nsew")
             else:
-                self.input_frame.grid(column=0, row=0, sticky="nsew")
-                self.output_frame.grid(column=1, row=0, sticky="nsew")
-                self.roi_frame.grid(column=2, row=0, sticky="nsew")
-                self.button_frame.grid(column=3, row=0, sticky="nsew")
+                self.fields_frame.grid(column=0, row=0, sticky="nsew")
+                self.roi_frame.grid(column=1, row=0, sticky="nsew")
+                self.button_frame.grid(column=2, row=0, sticky="nsew")
 
             self.rois_button = ttk.Button(self.button_frame,
                                           command=self.create_rois,
@@ -320,24 +410,20 @@ class BaseModule(ABC, ttk.Frame):
                         self.rois_button.grid(column=0,
                                               row=self.command_buttons_count,
                                               sticky="nsew")
+                        self.analyse_button.grid(column=1,
+                                                 row=self.command_buttons_count,
+                                                 sticky="nsew")
                     else:
                         self.rois_button.grid(column=0,
                                               row=self.command_buttons_count,
                                               columnspan=2,
                                               sticky="nsew")
-
-                if self.show_analyse_button:
-                    if self.show_draw_rois_button:
-                        self.analyse_button.grid(column=1,
-                                                 row=self.command_buttons_count,
-                                                 sticky="nsew")
-                    else:
-                        self.analyse_button.grid(column=0,
-                                                 row=self.command_buttons_count,
-                                                 columnspan=2,
-                                                 sticky="nsew")
-
-                if self.show_analyse_button or self.show_draw_rois_button:
+                    self.command_buttons_count += 1
+                elif self.show_analyse_button:
+                    self.analyse_button.grid(column=0,
+                                             row=self.command_buttons_count,
+                                             columnspan=2,
+                                             sticky="nsew")
                     self.command_buttons_count += 1
 
                 if self.show_analyse_button and self.show_draw_rois_button:
@@ -353,24 +439,20 @@ class BaseModule(ABC, ttk.Frame):
                         self.rois_button.grid(column=self.command_buttons_count,
                                               row=0,
                                               sticky="nsew")
+                        self.analyse_button.grid(column=self.command_buttons_count,
+                                                 row=1,
+                                                 sticky="nsew")
                     else:
                         self.rois_button.grid(column=self.command_buttons_count,
                                               row=0,
                                               rowspan=2,
                                               sticky="nsew")
-
-                if self.show_analyse_button:
-                    if self.show_draw_rois_button:
-                        self.analyse_button.grid(column=self.command_buttons_count,
-                                                 row=1,
-                                                 sticky="nsew")
-                    else:
-                        self.analyse_button.grid(column=self.command_buttons_count,
-                                                 row=0,
-                                                 rowspan=2,
-                                                 sticky="nsew")
-
-                if self.show_analyse_button or self.show_draw_rois_button:
+                    self.command_buttons_count += 1
+                elif self.show_analyse_button:
+                    self.analyse_button.grid(column=self.command_buttons_count,
+                                             row=0,
+                                             rowspan=2,
+                                             sticky="nsew")
                     self.command_buttons_count += 1
 
                 if self.show_analyse_button and self.show_draw_rois_button:
@@ -380,98 +462,80 @@ class BaseModule(ABC, ttk.Frame):
                                                     sticky="nsew")
                     self.command_buttons_count += 1
 
-            for k, v in self.__class__.__dict__.items():
-                if k[:2] != "__" or k[-2:] != "__":
-                    if isinstance(v, (BaseInput, BaseOutput)):
-                        attr = copy(v)
-                        setattr(self, k, attr)
-                        if attr.verbose_name is None:
-                            attr.verbose_name = k.replace("_", " ").title()
-                        if isinstance(attr, BaseInput):
-                            attr.set_parent(self.input_frame)
-                            self.inputs.append(attr)
-                            if not attr.hidden:
-                                if self.direction == "horizontal":
-                                    attr.label.grid(column=0,
-                                                    row=self.input_count,
-                                                    sticky="nsew")
-                                    attr.entry.grid(column=1,
-                                                    row=self.input_count,
-                                                    sticky="nsew")
-                                else:
-                                    attr.label.grid(column=2 * self.input_count,
-                                                    row=0,
-                                                    sticky="nsew")
-                                    attr.entry.grid(column=2 * self.input_count + 1,
-                                                    row=0,
-                                                    sticky="nsew")
-                            self.input_count += 1
-                        elif isinstance(attr, BaseOutput):
-                            attr.set_parent(self.output_frame)
-                            self.outputs.append(attr)
-                            if not attr.hidden:
-                                if self.direction == "horizontal":
-                                    attr.label.grid(column=0,
-                                                    row=self.output_count,
-                                                    sticky="nsew")
-                                    attr.value_label.grid(column=1,
-                                                          row=self.output_count,
-                                                          sticky="nsew")
-                                else:
-                                    attr.label.grid(column=2 * self.output_count,
-                                                    row=0,
-                                                    sticky="nsew")
-                                    attr.value_label.grid(column=2 * self.output_count + 1,
-                                                          row=0,
-                                                          sticky="nsew")
-                            self.output_count += 1
-                    elif isinstance(v, BaseViewerIO):
-                        attr = v.viewer_type(self.viewer_frame,
-                                             manager=self.manager,
-                                             allow_drag_drop=v.allow_drag_drop,
-                                             allow_drawing_rois=v.allow_drawing_rois,
-                                             allow_changing_rois=v.allow_changing_rois,
-                                             validation_command=v.validation_command)
-                        attr.grid(column=v.column,
-                                  row=v.row,
-                                  sticky="nsew")
-                        self.viewer_frame.columnconfigure(v.column, weight=1)
-                        self.viewer_frame.rowconfigure(v.row, weight=1)
-                        setattr(self, k, attr)
-                        attr.add_load_trace(self._on_image_load_partial(attr))
-                        self.viewers.append(attr)
-                        if self.viewer_count == 0 or v.main:
-                            self.main_viewer = attr
-                        self.viewer_count += 1
+            field_count = 0
 
-                    elif isinstance(v, BaseInputROI):
-                        attr = copy(v)
-                        setattr(self, k, attr)
-                        if attr.name is None:
-                            attr.name = k.replace("_", " ").title()
-                        self.rois.append(attr)
-                        attr.set_manager(self.manager)
-                        attr.set_parent(self.roi_frame)
-                        attr.post_register_command = self._post_roi_register_manual_wrapper
+            frames = []
+            for window_name in type(self).field_windows.window_names:
+                window: FieldWindow = getattr(self, window_name)
+                frames.append(window.get_frame(self.fields_frame))
 
+            for field in self.fields:
+                if field.parent is None:
+                    field.parent = self.fields_frame
+                    if not field.hidden:
+                        label = field.new_label(self.fields_frame)
+                        entry = field.new_entry(self.fields_frame)
                         if self.direction == "horizontal":
-                            attr.select_button.grid(column=0,
-                                                    row=self.roi_count,
-                                                    sticky="nsew")
-                            if attr.allow_manual_draw:
-                                attr.draw_button.grid(column=1,
-                                                      row=self.roi_count,
-                                                      sticky="nsew")
-
+                            label.grid(column=0,
+                                       row=field_count,
+                                       sticky="nsew")
+                            entry.grid(column=1,
+                                       row=field_count,
+                                       sticky="nsew")
                         else:
-                            attr.select_button.grid(column=2 * self.roi_count,
-                                                    row=0,
-                                                    sticky="nsew")
-                            if attr.allow_manual_draw:
-                                attr.draw_button.grid(column=2 * self.roi_count + 1,
-                                                      row=0,
-                                                      sticky="nsew")
-                        self.roi_count += 1
+                            label.grid(column=2 * field_count,
+                                       row=0,
+                                       sticky="nsew")
+                            entry.grid(column=2 * field_count + 1,
+                                       row=0,
+                                       sticky="nsew")
+                        field_count += 1
+
+            for frame in frames:
+                if self.direction == "horizontal":
+                    frame.grid(column=0,
+                               row=field_count,
+                               columnspan=2,
+                               sticky="nsew")
+                else:
+                    frame.grid(column=2 * field_count,
+                               row=0,
+                               columnspan=2,
+                               sticky="nsew")
+                field_count += 1
+
+            for viewer_name, viewer_field in type(self).viewers.viewer_fields.items():
+                viewer: BaseViewer = getattr(self, viewer_name)
+                viewer.grid(column=viewer_field.column,
+                            row=viewer_field.row,
+                            sticky=tk.NSEW)
+                self.viewer_frame.columnconfigure(viewer_field.column, weight=1)
+                self.viewer_frame.rowconfigure(viewer_field.row, weight=1)
+                viewer.add_load_trace(self._on_image_load_partial(viewer))
+                if self.viewer_count == 0 or viewer_field.main:
+                    self.main_viewer = viewer
+                self.viewer_count += 1
+
+            for roi_name in type(self).rois.roi_names:
+                roi_field: BaseROIField = getattr(self, roi_name)
+                if self.direction == "horizontal":
+                    roi_field.select_button.grid(column=0,
+                                                 row=self.roi_count,
+                                                 sticky="nsew")
+                    if roi_field.allow_manual_draw:
+                        roi_field.draw_button.grid(column=1,
+                                                   row=self.roi_count,
+                                                   sticky="nsew")
+
+                else:
+                    roi_field.select_button.grid(column=2 * self.roi_count,
+                                                 row=0,
+                                                 sticky="nsew")
+                    if roi_field.allow_manual_draw:
+                        roi_field.draw_button.grid(column=2 * self.roi_count + 1,
+                                                   row=0,
+                                                   sticky="nsew")
+                    self.roi_count += 1
 
             if add_context_buttons:
                 if (self.main_viewer is not None
@@ -562,7 +626,7 @@ class BaseModule(ABC, ttk.Frame):
             The direction child widgets in the module (default is "Horizontal").
         """
         app = tk.Tk()
-        app.title(cls.name)
+        app.title(cls.title)
         cls.setup_window(app, direction)
         app.mainloop()
 
@@ -667,7 +731,7 @@ class BaseModule(ABC, ttk.Frame):
             viewer.update()
 
     def _post_roi_register_manual_wrapper(self,
-                                          roi_input: BaseInputROI,
+                                          roi_input: BaseROIField,
                                           update_viewers: bool = False):
         self.post_roi_register(roi_input)
         if (update_viewers
@@ -675,13 +739,13 @@ class BaseModule(ABC, ttk.Frame):
                 and roi_input.roi is not None):
             self.manager.update_viewers(roi_input.roi.image)
 
-    def post_roi_register(self, roi_input: BaseInputROI):
+    def post_roi_register(self, roi_input: BaseROIField):
         """
         Command ran after an roi is registered with an input.
 
         Parameters
         ----------
-        roi_input : BaseInputROI
+        roi_input : BaseROIField
             the roi input that has been registered
         """
 
@@ -819,9 +883,9 @@ class BaseModule(ABC, ttk.Frame):
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
         if self.rois_loaded:
-            for output in self.outputs:
-                if output.reset_on_analysis:
-                    output.reset_value()
+            for field in self.fields:
+                if field.reset_on_analysis:
+                    field.reset_value()
             self.analyse(batch)
             self.analysed = True
 
@@ -844,122 +908,6 @@ class PhantomModule(BaseModule):
     Module for handling phantom images.
     Has the same attributes and methods as `BaseModule` unless stated below.
 
-    Uses `ManualPhantomManagerGenerator` as the default `context_manager_generator`.
-
-    Adds two buttons for showing the phantom boundary and bounding box compared with `BaseModule`.
+    Uses `ManualPhantomManager` as the default `context_manager`.
     """
-    context_manager_generator: PhantomContextManagerGenerator = ManualPhantomManagerGenerator()
-
-    @overload
-    def __init__(
-        self,
-        parent: tk.Misc | None = None,
-        manager: Manager | None = None,
-        context_manager: PhantomContextManager | None = None,
-        *,
-        verbose_name: str | None = None,
-        direction: DirectionType = "Horizontal",
-        border: ScreenUnits = ...,
-        borderwidth: ScreenUnits = ...,
-        class_: str = "",
-        cursor: Cursor = "",
-        height: ScreenUnits = 0,
-        name: str = ...,
-        padding: Padding = ...,
-        relief: Relief = ...,
-        style: str = "",
-        takefocus: TakeFocusValue = "",
-        width: ScreenUnits = 0,
-    ) -> None: ...
-
-    @overload
-    def __init__(self,
-                 parent: tk.Misc | None = None,
-                 manager: Manager | None = None,
-                 context_manager: PhantomContextManager | None = None,
-                 *,
-                 verbose_name: str | None = None,
-                 direction: DirectionType = "Horizontal",
-                 **kw): ...
-
-    # pylint: disable-next=super-init-not-called
-    def __init__(self,
-                 parent: tk.Misc | None = None,
-                 manager: Manager | None = None,
-                 # _init__ overwrite is to change type here
-                 context_manager: PhantomContextManager | None = None,
-                 *,
-                 verbose_name: str | None = None,
-                 direction: DirectionType = "Horizontal",
-                 **kw):
-        super().__init__(parent,
-                         manager,
-                         context_manager,
-                         verbose_name=verbose_name,
-                         direction=direction, ** kw)
-
-    @classmethod
-    def setup_window(cls,
-                     app: tk.Tk,
-                     direction: DirectionType = "Horizontal"):
-        app.columnconfigure(0, weight=1)
-        app.columnconfigure(1, weight=1)
-        app.rowconfigure(1, weight=1)
-        app.resizable(True, True)
-
-        man = Manager()
-
-        load_butt = ttk.Button(app, text="Load Folder",
-                               command=lambda: man.load_folder(False, app, 0, 2))
-        load_butt.grid(column=0, row=0, sticky="nsew")
-
-        load_butt = ttk.Button(app, text="Add Folder",
-                               command=lambda: man.load_folder(True, app, 0, 2))
-        load_butt.grid(column=1, row=0, sticky="nsew")
-
-        frame = ttk.Panedwindow(app, orient="vertical")
-        frame.grid(column=0, row=1, columnspan=2, sticky="nsew")
-
-        tree_frame = man.get_tree_frame(frame)
-        frame.add(tree_frame)
-
-        options_frame = ttk.Frame(frame)
-        frame.add(options_frame)
-
-        options_combo = man.get_mouse_options_combobox(options_frame)
-        options_combo.grid(column=0, row=0, sticky="nsew")
-
-        roi_options = man.get_roi_options_frame(options_frame, "h")
-        roi_options.grid(column=2, row=0, sticky="nsew")
-
-        context_frame = ScrolledWindow(frame)
-        context_options = cls.context_manager_generator(context_frame,
-                                                        man,
-                                                        direction="H")
-        context_options.grid(column=0, row=0, sticky="nsew")
-        frame.add(context_frame.outer_frame)
-
-        module = cls(frame, man, context_manager=context_options, direction=direction)
-        frame.add(module, weight=1)
-
-        if module.main_viewer is not None:
-
-            def bbox_command():
-                if module.main_viewer is not None:
-                    if isinstance(module.main_viewer.image, ArrayImage):
-                        context_options.get_bound_box_roi(module.main_viewer.image)
-
-            bbox_button = ttk.Button(context_frame,
-                                     command=bbox_command,
-                                     text="Draw Phantom Boundbox")
-            bbox_button.grid(column=1, row=0, sticky="nsew")
-
-            def boundary_command():
-                if module.main_viewer is not None:
-                    if isinstance(module.main_viewer.image, ArrayImage):
-                        context_options.get_boundary_roi(module.main_viewer.image)
-
-            boundary_button = ttk.Button(context_frame,
-                                         command=boundary_command,
-                                         text="Draw Phantom Boundary")
-            boundary_button.grid(column=2, row=0, sticky="nsew")
+    context_manager: PhantomContextManager = ManualPhantomManager()
