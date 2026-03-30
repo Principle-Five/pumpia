@@ -81,12 +81,11 @@ class _ModuleGroupsMeta:
 
 class ModuleGroup(ttk.Panedwindow):
     """
-    A window for showing multiple modules.
+    Groups multiple modules into the same tab in the collection.
 
     Parameters
     ----------
-    modules : list of BaseModule
-        The list of modules to display.
+    *modules : BaseModule
     verbose_name : str or None, optional
         The verbose name of the group (default is None).
     direction : DirectionType, optional
@@ -199,9 +198,7 @@ class ModuleGroup(ttk.Panedwindow):
 
     def setup(self, parent: tk.Misc):
         """
-        Sets up the window group.
-        verbose_name must be set before calling this method or provided as arguments.
-        If it is provided then it overrides the value set before calling this method.
+        Sets up the module group.
 
         Parameters
         ----------
@@ -209,14 +206,11 @@ class ModuleGroup(ttk.Panedwindow):
             The parent widget.
         """
 
-        if self.verbose_name is None:
-            raise ValueError("name needs to be provided or set as string")
-
         super().__init__(parent, **self.kw)
 
     def on_tab_select(self):
         """
-        Called when the tab containing this window is selected.
+        Called when the tab containing this group is selected.
         Defaults to calling on_tab_select for each module in the group.
         """
         for module in self.modules:
@@ -240,20 +234,27 @@ class BaseCollection(ABC, ttk.Frame):
 
     Attributes
     ----------
+    context_manager : BaseContextManager
+        Set at class level.
+        Determines which context manager to use
+        if none is passed in at object initialisation.
+        (default is SimpleContextManager)
+    title : str
+        Set at class level.
+        Title of the module tkinter window.
     manager : Manager
         The manager object for this collection.
-    context_manager : BaseContextManager
-        The context manager object for this collection.
     direction : str
         The direction of the child widgets in this collection.
+    modules
+    field_groups
+    field_windows
+    viewers
+    module_groups
     main_viewer : BaseViewer | None
         The main viewer in the collection.
-    viewers : list[BaseViewer]
-        The list of viewers in the collection.
     viewer_count : int
         The number of viewers in the collection.
-    modules : list[BaseModule]
-        The list of modules in the collection.
     output_frame_count : int
         The number of output frames in the collection.
 
@@ -278,7 +279,7 @@ class BaseCollection(ABC, ttk.Frame):
     """
 
     context_manager: BaseContextManager = SimpleContextManager()
-    name: str = "Pumpia Collection"
+    title: str = "Pumpia Collection"
     modules = _ModulesMeta()
     field_groups = _FieldGroupsMeta()
     field_windows = _FieldWindowsMeta()
@@ -705,7 +706,7 @@ class BaseCollection(ABC, ttk.Frame):
             The direction of the collection (default is "Horizontal").
         """
         app = tk.Tk()
-        app.title(cls.name)
+        app.title(cls.title)
         app.columnconfigure(0, weight=1)
         app.columnconfigure(1, weight=1)
         app.rowconfigure(1, weight=1)

@@ -8,7 +8,7 @@ from pumpia.module_handling.collections import (BaseCollection,
                                                 ModuleGroup)
 from pumpia.module_handling.fields.roi_fields import BaseROIField, EllipseROIField
 from pumpia.module_handling.fields.viewer_fields import ArrayViewerField
-from pumpia.module_handling.fields.fields import PercField, FloatField, IntField
+from pumpia.module_handling.fields.simple import PercField, FloatField, IntField
 from pumpia.module_handling.fields.groups import FieldGroup
 from pumpia.module_handling.fields.windows import FieldWindow
 from pumpia.module_handling.context import SimpleContext

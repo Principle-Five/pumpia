@@ -5,7 +5,7 @@ from typing import overload, Self, TYPE_CHECKING
 import tkinter as tk
 from tkinter import ttk
 from pumpia.utilities.tkinter_utils import tk_copy
-from pumpia.module_handling.fields.fields import BaseField
+from pumpia.module_handling.fields.simple import BaseField
 
 
 if TYPE_CHECKING:
@@ -22,6 +22,9 @@ class _FieldWindows:
         for window in self.windows_dict.values():
             yield window
 
+    def __getitem__(self, key: str):
+        return self.windows_dict[key]
+
 
 class _FieldWindowsMeta:
     def __init__(self) -> None:
@@ -32,6 +35,13 @@ class _FieldWindowsMeta:
 
     @property
     def window_names(self) -> list[str]:
+        """
+        The names of the windows for the module/collection.
+
+        Returns
+        -------
+        list[str]
+        """
         return list(self.windows.keys())
 
     def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
@@ -66,17 +76,23 @@ class _FieldWindowsMeta:
 
 class FieldWindow:
     """
-    Represents a group of linked input / output objects.
-    IOs should only be a member of one group.
+    Used to group fields together in the user interface.
 
     Parameters
     ----------
-    linked_ios: list[BaseIO]
-        The list of linked input / output objects.
+    *fields : list[BaseField]
+    field_names : list[str|None]|None
+        This is a list of strings which replaces the verbose_name of the relevant field.
+        If provided must be a list of same length as fields,
+        use `None` for fields that shouldn't be changed
+        (default is None).
 
     Attributes
     ----------
-    linked_ios: list[BaseIO]
+    fields : list[BaseField]
+    field_names : list[str|None]|None
+    name : str
+    verbose_name : str | None
     """
 
     def __init__(self,
@@ -114,6 +130,7 @@ class FieldWindow:
                 if module_name is not None:
                     fields.append(getattr(getattr(obj, module_name).fields, field_name))
                 else:
+                    # pylint: disable-next=line-too-long
                     fields.append(getattr(obj.fields, field_name))  # pyright: ignore[reportAttributeAccessIssue]
 
             window = type(self)(*fields,
@@ -127,8 +144,28 @@ class FieldWindow:
             return self
 
     def get_frame(self, parent: tk.Misc, show_copy_buttons: bool | None = None) -> ttk.Labelframe:
+        """
+        Returns a ttk Labelframe with the fields widgets inside.
+
+        Parameters
+        ----------
+        parent : tk.Misc
+            tkinter parent of the frame
+        show_copy_buttons : bool | None, optional
+            Can be used to override the `show_copy_buttons` value
+            used when initialising the FieldWindow.
+
+        Returns
+        -------
+        ttk.Labelframe
+
+        Raises
+        ------
+        ValueError
+            If the FieldWindow has no fields.
+        """
         if len(self.fields) == 0:
-            raise ValueError("Window group has no fields.")
+            raise ValueError("Field window has no fields.")
         if self.verbose_name is None:
             frame = ttk.Labelframe(parent, text=self.name)
         else:
@@ -142,7 +179,8 @@ class FieldWindow:
                 label = field.new_label(frame)
                 if (self.field_names is not None
                         and self.field_names[field_num] is not None):
-                    field.label_var.set(self.field_names[field_num])  # pyright: ignore[reportArgumentType]
+                    # pylint: disable-next=line-too-long
+                    field.verbose_name = self.field_names[field_num]  # pyright: ignore[reportAttributeAccessIssue]
                 label.grid(column=0, row=row, sticky=tk.NSEW)
                 entry = field.new_entry(frame)
                 entry.grid(column=1, row=row, sticky=tk.NSEW)

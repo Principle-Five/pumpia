@@ -43,6 +43,8 @@ side_opts = list(side_map.keys())
 class BaseContextManager(ABC, ttk.Labelframe):
     """
     Base class for context managers.
+    Call directly to complete setup if `parent` and `manager`
+    are not provided at object initialisation.
 
     Parameters
     ----------

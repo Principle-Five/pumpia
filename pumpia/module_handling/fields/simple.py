@@ -30,6 +30,9 @@ class _Fields:
         for field in self.fields_dict.values():
             yield field
 
+    def __getitem__(self, key: str):
+        return self.fields_dict[key]
+
     @overload
     def __getattr__(self, name: Literal["module"]) -> BaseModule: ...
     @overload
@@ -55,6 +58,13 @@ class _FieldsMeta:
 
     @property
     def field_names(self) -> list[str]:
+        """
+        The names of the fields for the module.
+
+        Returns
+        -------
+        list[str]
+        """
         return list(self.field_types.keys())
 
     def __set_name__(self, owner: type[BaseModule], name: str):
@@ -89,18 +99,27 @@ class _FieldsMeta:
 
 class BaseField[ValT, TkVarT:tk.Variable](ABC):
     """
-    Base class for input/output handling in modules.
+    Base class for fields in modules.
 
     Parameters
     ----------
     initial_value : ValT or Callable[[], ValT]
         The initial value or a callable that returns the initial value.
+    parent : tk.Misc, optional
+        The parent widget (default is None).
     verbose_name : str, optional
-        The verbose name of the input/output (default is None).
+        The verbose name of the field (default is None).
     label_style : str, optional
-        The style of the label (default is None).
+        The ttk style of the labels linked to this field (default is None).
+    entry_style : str, optional
+        The ttk style of the entries linked to this field (default is None).
     hidden : bool, optional
-        Whether the input/output is hidden (default is False).
+        Whether the field is hidden in the user interface (default is False).
+    read_only : bool, optional
+        Whether the field is read only in the user interface (default is False).
+    reset_on_analysis : bool, optional
+        Whether the field is set to the initial value prior to analysis for a module
+        (default is False).
 
     Attributes
     ----------
@@ -110,11 +129,7 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
     label_var : tk.StringVar
     value_var : TkVarT
     hidden : bool
-
-    Methods
-    -------
-    set_parent(parent: tk.Misc)
-        Sets the parent of the input/output.
+    parent : tk.Misc | None
     """
 
     def __init__(self,
@@ -201,17 +216,30 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     @property
     def widget(self) -> type[ttk.Entry]:
+        """
+        The tkinter widget used for entries.
+
+        Returns
+        -------
+        type[ttk.Entry]
+        """
         return ttk.Entry
 
     @property
     @abstractmethod
     def value_type(self) -> type[BaseValue[ValT, TkVarT]]:
-        pass
+        """
+        The pumpia value type used for this field.
+
+        Returns
+        -------
+        type[BaseValue[ValT, TkVarT]]
+        """
 
     @property
     def verbose_name(self) -> str | None:
         """
-        The verbose name of the input/output.
+        The verbose name of the field.
         """
         return self._name
 
@@ -223,19 +251,14 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     @property
     def parent(self) -> tk.Misc | None:
+        """
+        The parent of the field.
+        Can only be set once.
+        """
         return self._parent
 
     @parent.setter
     def parent(self, value: tk.Misc):
-        """
-        Sets the parent of the input/output.
-        Can only be set once.
-
-        Parameters
-        ----------
-        parent : tk.Misc
-            The parent of the input/output.
-        """
         if self._parent is None:
             self._parent = value
         else:
@@ -243,6 +266,21 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     @property
     def value_store(self) -> BaseValue[ValT, TkVarT]:
+        """
+        The pumpia value used to store the value for this field.
+        Values can shared between fields
+        by setting the value store for one field to be the value of another field.
+        e.g. `field1.value = field2.value_store`
+
+        Returns
+        -------
+        BaseValue[ValT, TkVarT]
+
+        Raises
+        ------
+        ValueError
+            If the field parent has not been set
+        """
         if self._value is None:
             if self._parent is None:
                 raise ValueError("Parent has not been set")
@@ -251,12 +289,15 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     @property
     def value_var(self) -> TkVarT:
+        """
+        The tkinter variable used for the entry widgets.
+        """
         return self.value_store.var
 
     @property
     def value(self) -> ValT:
         """
-        The value of the input/output.
+        The value of the field.
         """
         if self.value_store.error:
             raise ValueError(f"Error in value of {self.verbose_name}")
@@ -282,7 +323,16 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     def new_label(self, parent: tk.Misc) -> ttk.Label:
         """
-        The label with the name of the input/output.
+        Returns a label linked to this field, with text of `verbose_name`.
+        This is placed in `parent`, this is not the fields parent.
+
+        Parameters
+        ----------
+        parent : tk.Misc
+
+        Returns
+        -------
+        ttk.Label
         """
         var = self.label_var
         if self._label_style is None:
@@ -295,7 +345,7 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
     @property
     def label_var(self) -> tk.StringVar:
         """
-        The tkinter variable related to `label`.
+        The tkinter variable linked to labels for this field.
         """
         if self._parent is None:
             raise ValueError("Parent has not been set")
@@ -313,7 +363,16 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
     def new_entry(self, parent: tk.Misc) -> ttk.Entry:
         """
-        The entry widget of the input.
+        Returns an entry linked to this field.
+        This is placed in `parent`, this is not the fields parent.
+
+        Parameters
+        ----------
+        parent : tk.Misc
+
+        Returns
+        -------
+        ttk.Entry
         """
         var = self.value_store.var
         if self.read_only:
@@ -334,8 +393,8 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
 class OptionField[DictValT](BaseField[str, tk.StringVar]):
     """
-    Represents an option input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents an option field.
+    Has the same attributes and methods as BaseField unless stated below.
 
     Parameters
     ----------
@@ -461,9 +520,18 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
         else:
             raise ValueError("Value not in options")
 
-    def new_entry(self, parent: tk.Misc) -> ttk.Entry:
+    def new_entry(self, parent: tk.Misc) -> ttk.Combobox:
         """
-        The Combobox widget of the input.
+        Returns a combobox linked to this field.
+        This is placed in `parent`, this is not the fields parent.
+
+        Parameters
+        ----------
+        parent : tk.Misc
+
+        Returns
+        -------
+        ttk.Combobox
         """
         var = self.value_var
         if self.read_only:
@@ -487,8 +555,8 @@ class OptionField[DictValT](BaseField[str, tk.StringVar]):
 
 class BoolField(BaseField[bool, tk.BooleanVar]):
     """
-    Represents a boolean input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents a boolean field.
+    Has the same attributes and methods as BaseField unless stated below.
     """
 
     def __init__(self,
@@ -525,7 +593,16 @@ class BoolField(BaseField[bool, tk.BooleanVar]):
 
     def new_entry(self, parent: tk.Misc) -> ttk.Checkbutton:
         """
-        The Checkbutton widget of the input.
+        Returns a checkbutton linked to this field.
+        This is placed in `parent`, this is not the fields parent.
+
+        Parameters
+        ----------
+        parent : tk.Misc
+
+        Returns
+        -------
+        ttk.Checkbutton
         """
         var = self.value_var
         if self.read_only:
@@ -542,8 +619,8 @@ class BoolField(BaseField[bool, tk.BooleanVar]):
 
 class StringField(BaseField[str, tk.StringVar]):
     """
-    Represents a string input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents a string field.
+    Has the same attributes and methods as BaseField unless stated below.
     """
 
     def __init__(self,
@@ -572,8 +649,8 @@ class StringField(BaseField[str, tk.StringVar]):
 
 class IntField(BaseField[int, tk.IntVar]):
     """
-    Represents an integer input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents an integer field.
+    Has the same attributes and methods as BaseField unless stated below.
     """
 
     def __init__(self,
@@ -606,8 +683,8 @@ class IntField(BaseField[int, tk.IntVar]):
 
 class PercField(BaseField[float, tk.IntVar]):
     """
-    Represents a percentage input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents a percentage field.
+    Has the same attributes and methods as BaseField unless stated below.
     """
 
     def __init__(self,
@@ -642,8 +719,8 @@ class PercField(BaseField[float, tk.IntVar]):
 
 class FloatField(BaseField[float, tk.DoubleVar]):
     """
-    Represents a float input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents a float field.
+    Has the same attributes and methods as BaseField unless stated below.
     """
 
     def __init__(self,
@@ -676,8 +753,8 @@ class FloatField(BaseField[float, tk.DoubleVar]):
 
 class DateField(BaseField[date, DateVar]):
     """
-    Represents a date input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Represents a date field.
+    Has the same attributes and methods as BaseField unless stated below.
     """
 
     def __init__(self,

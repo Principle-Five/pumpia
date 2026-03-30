@@ -22,7 +22,7 @@ from pumpia.widgets.context_managers import (BaseContextManager,
                                              SimpleContextManager,
                                              ManualPhantomManager)
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
-from pumpia.module_handling.fields.fields import _FieldsMeta
+from pumpia.module_handling.fields.simple import _FieldsMeta
 from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
 from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
 from pumpia.module_handling.fields.roi_fields import _ROIFieldsMeta, BaseROIField
@@ -40,6 +40,9 @@ class _Modules:
         for module in self.modules_dict.values():
             yield module
 
+    def __getitem__(self, key: str):
+        return self.modules_dict[key]
+
 
 class _ModulesMeta:
     def __init__(self) -> None:
@@ -50,6 +53,13 @@ class _ModulesMeta:
 
     @property
     def module_names(self) -> list[str]:
+        """
+        The names of the modules for the module.
+
+        Returns
+        -------
+        list[str]
+        """
         return list(self.module_types.keys())
 
     def __set_name__(self, owner: type[BaseCollection], name: str):
@@ -86,9 +96,6 @@ class BaseModule(ABC, ttk.Frame):
     """
     Base class for modules.
 
-    Class attribute `context_manager_generator` is used when running the module as stand alone,
-    set to `SimpleContextManagerGenerator` by default.
-
     Parameters
     ----------
     parent : tk.Misc or None, optional
@@ -107,6 +114,27 @@ class BaseModule(ABC, ttk.Frame):
     Attributes
     ----------
     context_manager : BaseContextManager
+        Set at class level.
+        Determines which context manager to use
+        if none is passed in at object initialisation.
+        (default is SimpleContextManager)
+    show_draw_rois_button : bool
+        Set at class level.
+        Determines if a button to draw ROIs is shown.
+    show_analyse_button : bool
+        Set at class level.
+        Determines if a button to analyse the module is shown.
+    show_copy_buttons : bool
+        Set at class level.
+        Determines if buttons to copy all field values is shown.
+    title : str
+        Set at class level.
+        Title of the module tkinter window.
+    fields
+    field_windows
+    viewers
+    rois
+        ROI Fields for the module
     manager : Manager | None
     parent : tk.Misc | None
     verbose_name : str | None
@@ -115,8 +143,6 @@ class BaseModule(ABC, ttk.Frame):
         The main viewer for the module, used to get context etc.
         Defaults to first viewer defined if not provided in ViewerIOs.
         If multiple are set then defaults to the last defined ViewerIO.
-    viewers : list[BaseViewer]
-    rois : list[BaseInputROI]
     rois_loaded : bool
     analysed : bool
     input_count : int
@@ -127,11 +153,7 @@ class BaseModule(ABC, ttk.Frame):
 
     Methods
     -------
-    set_parent(parent: tk.Misc)
-        Sets the parent widget.
-    set_manager(manager: Manager)
-        Sets the manager.
-    setup(parent: tk.Misc | None = None, manager: Manager | None = None, context_manager: BaseContextManager | None = None)
+    setup(parent : tk.Misc | None = None, manager : Manager | None = None, context_manager : BaseContextManager | None = None)
         Sets up the module.
     get_context() -> BaseContext
         Returns the context for the module.
@@ -139,29 +161,29 @@ class BaseModule(ABC, ttk.Frame):
         User can override this method to register command buttons for the collection.
     register_command(text: str, command: Callable[[], Any])
         Register a command so that it shows as a button in the main tab.
-    link_rois_viewers():
+    link_rois_viewers()
         Link ROIs and viewers for manual drawing.
-    post_roi_register(roi_input: BaseInputROI):
+    post_roi_register(roi_input : BaseInputROI)
         Command ran after an roi is registered with an input.
-    manual_roi_draw(self):
+    manual_roi_draw(self)
         Does a full manual draw of all ROIs
-    draw_rois(context: BaseContext) -> None
+    draw_rois(context : BaseContext) -> None
         User should override this method to handle drawing the required ROIs.
     analyse()
         User should override this method to handle analysing the ROIs.
-    on_image_load(viewer: BaseViewer) -> None
+    on_image_load(viewer : BaseViewer) -> None
         User can add to this method to handle image load events by calling it using super.
     on_tab_select()
         Handles the event when a tab containing the module is selected.
-    create_rois(context: BaseContext | None = None) -> None
+    create_rois(context : BaseContext | None = None) -> None
         Creates the ROIs for the module.
     run_analysis() -> None
         Runs the analysis for the module.
-    create_and_run(context: BaseContext | None = None) -> None
+    create_and_run(context : BaseContext | None = None) -> None
         Creates the ROIs and runs the analysis.
-    setup_window(app: tk.Tk, direction: DirectionType = "Horizontal")
+    setup_window(app : tk.Tk, direction : DirectionType = "Horizontal")
         Sets up the application window when running the module independently.
-    run(direction: DirectionType = "Horizontal")
+    run(direction : DirectionType = "Horizontal")
         Class method which runs the module independently.
     """
     context_manager: BaseContextManager = SimpleContextManager()
@@ -278,18 +300,6 @@ class BaseModule(ABC, ttk.Frame):
         Whether the module is set up.
         """
         return self._is_setup
-
-    def set_parent(self, parent: tk.Misc):
-        """
-        Sets the parent widget.
-        """
-        self.parent = parent
-
-    def set_manager(self, manager: Manager):
-        """
-        Sets the manager.
-        """
-        self.manager = manager
 
     def setup(self,
               *,

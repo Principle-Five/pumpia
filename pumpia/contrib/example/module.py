@@ -4,7 +4,7 @@ from pumpia.widgets.viewers import BaseViewer
 from pumpia.module_handling.modules import BaseModule
 from pumpia.module_handling.fields.roi_fields import BaseROIField, EllipseROIField
 from pumpia.module_handling.fields.viewer_fields import ArrayViewerField
-from pumpia.module_handling.fields.fields import PercField, FloatField, IntField
+from pumpia.module_handling.fields.simple import PercField, FloatField, IntField
 from pumpia.module_handling.context import SimpleContext
 from pumpia.image_handling.roi_structures import EllipseROI
 from pumpia.utilities.tkinter_utils import tk_copy

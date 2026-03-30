@@ -22,13 +22,16 @@ if TYPE_CHECKING:
 
 
 class _ROIFields:
-    def __init__(self, obj: BaseModule) -> None:
-        self.obj: BaseModule = obj
+    def __init__(self, module: BaseModule) -> None:
+        self.module: BaseModule = module
         self.rois_dict: dict[str, BaseROIField] = {}
 
     def __iter__(self):
         for window in self.rois_dict.values():
             yield window
+
+    def __getitem__(self, key: str):
+        return self.rois_dict[key]
 
 
 class _ROIFieldsMeta:
@@ -40,6 +43,13 @@ class _ROIFieldsMeta:
 
     @property
     def roi_names(self) -> list[str]:
+        """
+        The names of the ROIs for the module.
+
+        Returns
+        -------
+        list[str]
+        """
         return list(self.rois.keys())
 
     def __set_name__(self, owner: type[BaseModule], name: str):
@@ -74,35 +84,41 @@ class _ROIFieldsMeta:
 
 class BaseROIField[ROI:BaseROI]:
     """
-    Base class for input handling of ROIs.
+    Base class for ROI Fields.
 
     Parameters
     ----------
-    name: str, optional
+    name : str, optional
         The name of the ROI(default is None).
-    show_button: bool, optional
+    default_type : ManualROIType
+        The default ROI type to draw (default is "ROI ellipse").
+    show_button : bool, optional
         Whether to show the button to select the ROI as active(default is True).
-    button_style: str, optional
+    button_style : str, optional
         The style of the `show_button` (default is None).
 
     Attributes
     ----------
-    name: str | None
-    roi: BaseROI | None
-    post_register_command: Callable[[BaseROIField, bool|None], Any]
+    name : str | None
+    roi : BaseROI | None
+    default_type : ManualROIType
+    self.viewer : BaseViewer | None
+        This must be set for manual drawing to work.
+        Modules will set this to their main viewer by default, this behaviour can be overridden.
+    post_register_command : Callable[[BaseROIField, bool|None], Any]
         Command called after ROI is registered.
         This should accept an ROI and a boolean indicating if it was a manual draw.
-    label_var: tk.StringVar
-    select_button: ttk.Button
-    draw_button: ttk.Button
+    label_var : tk.StringVar
+    select_button : ttk.Button
+    draw_button : ttk.Button
 
     Methods
     -------
-    register_roi(roi: ROI)
+    register_roi(roi : ROI)
         Registers an ROI.
-    set_parent(parent: tk.Misc)
+    set_parent(parent : tk.Misc)
         Sets the parent of the ROI.
-    set_manager(manager: Manager)
+    set_manager(manager : Manager)
         Sets the manager of the ROI.
     set_as_active()
         Sets the ROI as the active ROI.
@@ -172,7 +188,7 @@ class BaseROIField[ROI:BaseROI]:
 
     def register_roi(self, roi: ROI | None, update_viewers: bool = False):
         """
-        Registers an ROI.
+        Registers an ROI  to the field.
         """
         if roi is not None:
             self.select_button.configure(state="normal")
@@ -190,7 +206,7 @@ class BaseROIField[ROI:BaseROI]:
     @property
     def label_var(self) -> tk.StringVar:
         """
-        The label variable of the ROI.
+        The label variable of the ROI field.
         """
         if self._parent is None:
             raise ValueError("Parent has not been set")
@@ -203,7 +219,7 @@ class BaseROIField[ROI:BaseROI]:
     @property
     def select_button(self) -> ttk.Button:
         """
-        The button to select the ROI.
+        The button to select the ROI linked to this field.
         """
         if self._parent is None:
             raise ValueError("Parent has not been set")
@@ -225,7 +241,7 @@ class BaseROIField[ROI:BaseROI]:
     @property
     def draw_button(self) -> ttk.Button:
         """
-        The button to mannually redraw the ROI.
+        The button to mannually redraw the ROI linked to this field.
         """
         if self._parent is None:
             raise ValueError("Parent has not been set")
@@ -274,7 +290,7 @@ class BaseROIField[ROI:BaseROI]:
 
         Parameters
         ----------
-        postdraw_command: Callable[[], Any] | None, optional
+        postdraw_command : Callable[[], Any] | None, optional
             A command to call once the ROI has been drawn(default is None).
 
         Raises

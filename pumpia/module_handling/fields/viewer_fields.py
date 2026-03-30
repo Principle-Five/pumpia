@@ -1,5 +1,5 @@
 """
-Contains inputs/outputs representing viewers
+Contains fields representing viewers
 """
 
 from collections.abc import Callable
@@ -22,11 +22,14 @@ if TYPE_CHECKING:
 class _Viewers:
     def __init__(self, obj: BaseCollection | BaseModule) -> None:
         self.obj: BaseCollection | BaseModule = obj
-        self.viewers: dict[str, BaseViewer] = {}
+        self.viewers_dict: dict[str, BaseViewer] = {}
 
     def __iter__(self):
-        for viewer in self.viewers.values():
+        for viewer in self.viewers_dict.values():
             yield viewer
+
+    def __getitem__(self, key: str):
+        return self.viewers_dict[key]
 
 
 class _ViewerFieldsMeta:
@@ -38,6 +41,13 @@ class _ViewerFieldsMeta:
 
     @property
     def viewer_names(self) -> list[str]:
+        """
+        The names of the viewers for the module/collection.
+
+        Returns
+        -------
+        list[str]
+        """
         return list(self.viewer_fields.keys())
 
     def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
@@ -46,11 +56,21 @@ class _ViewerFieldsMeta:
         self.base_owner = owner
 
     @overload
-    def __get__(self, obj: BaseCollection | BaseModule, owner: type[BaseCollection | BaseModule]) -> _Viewers: ...
-    @overload
-    def __get__(self, obj: None, owner: type[BaseCollection | BaseModule]) -> Self: ...
+    def __get__(self,
+                obj: BaseCollection | BaseModule,
+                owner: type[BaseCollection | BaseModule]
+                ) -> _Viewers: ...
 
-    def __get__(self, obj: BaseCollection | BaseModule | None, owner: type[BaseCollection | BaseModule]) -> _Viewers | Self:
+    @overload
+    def __get__(self,
+                obj: None,
+                owner: type[BaseCollection | BaseModule]
+                ) -> Self: ...
+
+    def __get__(self,
+                obj: BaseCollection | BaseModule | None,
+                owner: type[BaseCollection | BaseModule]
+                ) -> _Viewers | Self:
         if obj is None:
             if owner is self.base_owner:
                 return self
@@ -72,31 +92,32 @@ class _ViewerFieldsMeta:
 
 class BaseViewerField[ViewerT:BaseViewer](ABC):
     """
-    Base class for viewer input / output handling.
+    Base class for viewer field handling.
 
     Parameters
     ----------
-    row: int
+    row : int
         The row position of the viewer.
-    column: int
+    column : int
         The column position of the viewer.
-    allow_drag_drop: bool, optional
-        Whether to allow drag and drop(default is True).
-    allow_drawing_rois: bool, optional
-        Whether to allow drawing ROIs(default is True).
-    validation_command: Callable[[BaseImageSet], bool], optional
-        The validation command(default is None).
+    allow_drag_drop : bool, optional
+        Whether to allow drag and drop (default is True).
+    allow_drawing_rois : bool, optional
+        Whether to allow drawing ROIs (default is True).
+    validation_command : Callable[[BaseImageSet], bool], optional
+        The validation command (default is None).
     main: bool, optional
-        Whether the viewer is the main viewer(default is False).
+        Whether the viewer is the main viewer of the module/collection
+        (default is False).
 
     Attributes
     ----------
-    row: int
-    column: int
-    allow_drag_drop: bool
-    allow_drawing_rois: bool
-    validation_command: Callable[[BaseImageSet], bool] | None
-    main: bool
+    row : int
+    column : int
+    allow_drag_drop : bool
+    allow_drawing_rois : bool
+    validation_command : Callable[[BaseImageSet], bool] | None
+    main : bool
     """
 
     # pylint: disable-next=super-init-not-called
@@ -132,7 +153,7 @@ class BaseViewerField[ViewerT:BaseViewer](ABC):
             return self
 
         try:
-            return obj.viewers.viewers[self.name]  # pyright: ignore[reportReturnType]
+            return obj.viewers.viewers_dict[self.name]  # pyright: ignore[reportReturnType]
         except KeyError as exc:
             if obj.manager is None:
                 raise ValueError("object manager needs to be set") from exc
@@ -142,7 +163,7 @@ class BaseViewerField[ViewerT:BaseViewer](ABC):
                                       allow_drawing_rois=self.allow_drawing_rois,
                                       allow_changing_rois=self.allow_changing_rois,
                                       validation_command=self.validation_command)
-            obj.viewers.viewers[self.name] = viewer
+            obj.viewers.viewers_dict[self.name] = viewer
             return viewer
         except AttributeError:
             return self
@@ -150,12 +171,14 @@ class BaseViewerField[ViewerT:BaseViewer](ABC):
     @property
     @abstractmethod
     def viewer_type(self) -> type[ViewerT]:
-        pass
+        """
+        The type of viewer used for this field.
+        """
 
 
 class ViewerField(BaseViewerField[Viewer]):
     """
-    Represents a viewer input / output.
+    Represents a viewer field with no restrictions on what can be shows.
     Has the same attributes and methods as BaseViewerField unless stated below.
     """
     @property
@@ -165,7 +188,7 @@ class ViewerField(BaseViewerField[Viewer]):
 
 class ArrayViewerField(BaseViewerField[ArrayViewer]):
     """
-    Represents an array viewer input / output.
+    Represents an viewer field for viewing images that can be stored as an array.
     Has the same attributes and methods as BaseViewerField unless stated below.
     """
     @property
@@ -175,7 +198,7 @@ class ArrayViewerField(BaseViewerField[ArrayViewer]):
 
 class MonochromeViewerField(BaseViewerField[MonochromeViewer]):
     """
-    Represents a monochrome viewer input / output.
+    Represents a viewer field for viewing monochrome images that can be stored as an array.
     Has the same attributes and methods as BaseViewerField unless stated below.
     """
     @property
@@ -185,7 +208,7 @@ class MonochromeViewerField(BaseViewerField[MonochromeViewer]):
 
 class DicomViewerField(BaseViewerField[DicomViewer]):
     """
-    Represents a DICOM viewer input / output.
+    Represents a viewer field for viewing DICOM images.
     Has the same attributes and methods as BaseViewerField unless stated below.
     """
     @property
@@ -195,7 +218,7 @@ class DicomViewerField(BaseViewerField[DicomViewer]):
 
 class MonochromeDicomViewerField(BaseViewerField[MonochromeDicomViewer]):
     """
-    Represents a DICOM viewer input / output for monochrome images.
+    Represents a DICOM viewer field for viewing monochrome DICOM images.
     Has the same attributes and methods as BaseViewerField unless stated below.
     """
     @property

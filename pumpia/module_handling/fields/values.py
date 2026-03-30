@@ -11,6 +11,23 @@ from pumpia.widgets.entry_boxes import DateVar
 
 
 class BaseValue[ValT, TkVarT:tk.Variable](ABC):
+    """
+    Base for values used in fields.
+
+    Parameters
+    ----------
+    parent : tk.Misc, optional
+        The parent widget (default is None).
+    initial_value : ValT or Callable[[], ValT]
+        The initial value or a callable that returns the initial value.
+
+    Attributes
+    ----------
+    var : TkVarT
+        The tkinter variable linked to this value.
+    error : bool
+        If there has been an error while trying to access this variable.
+    """
 
     def __init__(self, parent: tk.Misc, initial_value: ValT) -> None:
         self._value: ValT = initial_value
@@ -22,12 +39,18 @@ class BaseValue[ValT, TkVarT:tk.Variable](ABC):
     @property
     @abstractmethod
     def var_type(self) -> type[TkVarT]:
-        pass
+        """
+        The tkinter variable type used for this value type.
+
+        Returns
+        -------
+        type[TkVarT]
+        """
 
     @property
     def value(self) -> ValT:
         """
-        The value of the input/output.
+        The base python value stored.
         """
         return self._value
 
@@ -47,7 +70,7 @@ class BaseValue[ValT, TkVarT:tk.Variable](ABC):
 class StringValue(BaseValue[str, tk.StringVar]):
     """
     Represents a string input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Has the same attributes and methods as BaseValue unless stated below.
     """
 
     def __init__(self, parent: tk.Misc, initial_value: str = "") -> None:
@@ -62,7 +85,7 @@ class StringValue(BaseValue[str, tk.StringVar]):
 class BoolValue(BaseValue[bool, tk.BooleanVar]):
     """
     Represents an integer input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Has the same attributes and methods as BaseValue unless stated below.
     """
 
     def __init__(self, parent: tk.Misc, initial_value: bool = True) -> None:
@@ -77,7 +100,7 @@ class BoolValue(BaseValue[bool, tk.BooleanVar]):
 class IntValue(BaseValue[int, tk.IntVar]):
     """
     Represents an integer input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Has the same attributes and methods as BaseValue unless stated below.
     """
 
     def __init__(self, parent: tk.Misc, initial_value: int = 0) -> None:
@@ -92,7 +115,7 @@ class IntValue(BaseValue[int, tk.IntVar]):
 class FloatValue(BaseValue[float, tk.DoubleVar]):
     """
     Represents a float input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Has the same attributes and methods as BaseValue unless stated below.
     """
 
     def __init__(self, parent: tk.Misc, initial_value: float = 0) -> None:
@@ -107,10 +130,13 @@ class FloatValue(BaseValue[float, tk.DoubleVar]):
 class DateValue(BaseValue[date, DateVar]):
     """
     Represents a date input.
-    Has the same attributes and methods as BaseInput unless stated below.
+    Has the same attributes and methods as BaseValue unless stated below.
     """
 
-    def __init__(self, parent: tk.Misc, initial_value: date | Callable[[], date] = date.today) -> None:
+    def __init__(self,
+                 parent: tk.Misc,
+                 initial_value: date | Callable[[], date] = date.today
+                 ) -> None:
         if callable(initial_value):
             initial_value = initial_value()
         super().__init__(parent=parent,
