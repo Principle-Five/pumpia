@@ -45,12 +45,12 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
     yscrollbar = ttk.Scrollbar(
         root, orient=tk.VERTICAL, command=tree.yview)
     tree.configure(yscrollcommand=yscrollbar.set)
-    yscrollbar.grid(row=0, column=1, sticky='ns')
+    yscrollbar.grid(row=0, column=1, sticky=tk.NS)
 
     xscrollbar = ttk.Scrollbar(
         root, orient=tk.HORIZONTAL, command=tree.xview)
     tree.configure(xscrollcommand=xscrollbar.set)
-    xscrollbar.grid(row=1, column=0, columnspan=2, sticky='ew')
+    xscrollbar.grid(row=1, column=0, columnspan=2, sticky=tk.EW)
 
     def add_to_tree(elem: pydicom.DataElement | pydicom.Dataset, parent: str = ''):
         """
@@ -80,6 +80,6 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
 
     add_to_tree(dicom)
 
-    tree.grid(column=0, row=0, sticky='nsew')
+    tree.grid(column=0, row=0, sticky=tk.NSEW)
 
     root.mainloop()

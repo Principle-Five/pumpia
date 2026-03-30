@@ -20,16 +20,3 @@ Context Managers
 .. autoclass:: pumpia.widgets.context_managers.ManualPhantomManager
 
 .. autoclass:: pumpia.widgets.context_managers.AutoPhantomManager
-
-Context Manager Generators
---------------------------
-
-.. autoclass:: pumpia.widgets.context_managers.BaseContextManagerGenerator
-
-.. autoclass:: pumpia.widgets.context_managers.SimpleContextManagerGenerator
-
-.. autoclass:: pumpia.widgets.context_managers.PhantomContextManagerGenerator
-
-.. autoclass:: pumpia.widgets.context_managers.ManualPhantomManagerGenerator
-
-.. autoclass:: pumpia.widgets.context_managers.AutoPhantomManagerGenerator

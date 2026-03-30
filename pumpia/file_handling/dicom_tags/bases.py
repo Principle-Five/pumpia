@@ -1,5 +1,9 @@
+"""
+Base classes and functions for DICOM handling.
+"""
 import dataclasses as dc
 from dataclasses import dataclass
+from typing import overload, Literal, Any
 import pydicom
 
 
@@ -31,7 +35,7 @@ class Tag:
     element : int
     links : list[TagLink]
     alternative_tags : list[tuple[int, int]]
-    as_tuple : list[tuple[int, int]]
+    as_tuple : tuple[int, int]
         This tag as a tuple of (group, element).
 
     Methods
@@ -53,32 +57,21 @@ class Tag:
         """
         return (self.group, self.element)
 
-    def get(self) -> tuple[int, int]:
-        """
-        returns the tag as a Tuple of (group, element)
-
-        Returns
-        -------
-        Tuple
-            (group, element)
-        """
-        return self.as_tuple
-
     def __int__(self) -> int:
         return (self.group << 16) | self.element
 
     def __eq__(self, value) -> bool:
         if isinstance(value, Tag):
-            return self.get() == value.get()
+            return self.as_tuple == value.as_tuple
         elif isinstance(value, tuple):
-            return self.get() == value
+            return self.as_tuple == value
         elif isinstance(value, int):
             return int(self) == value
         else:
             return False
 
     def __hash__(self) -> int:
-        return hash(self.get())
+        return hash(self.as_tuple)
 
     def __str__(self) -> str:
         return f"({self.group:04X}, {self.element:04X})"
@@ -101,26 +94,43 @@ class TagLink:
     frame_link: bool = False
 
 
+@overload
 def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             tag: Tag,
-            frame: int | None = None) -> pydicom.DataElement:
+            frame: int | None = None,
+            get_first: Literal[False] = False) -> pydicom.DataElement | list[pydicom.DataElement]: ...
+
+
+@overload
+def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
+            tag: Tag,
+            frame: int | None = None,
+            get_first: Literal[True] = True) -> pydicom.DataElement: ...
+
+
+def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
+            tag: Tag,
+            frame: int | None = None,
+            get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement]:
     """
     Returns the dicom element from the pydicom Dataset defined by tag.
-    If the Dataset is a stack then the frame can be provided for frame specific elements.
+    If the Dataset is an enhanced dicom then the frame can be provided for frame specific elements.
 
     Parameters
     ----------
-    dicom_image : Dataset
-        pydicom Dataset to be searched
+    dicom_image : Dataset | DataElement
+        pydicom Dataset/DataElement to be searched
     tag : Tag
         tag of element to be returned
     frame : int, optional
         frame number (starting at 1) if relevant, by default None
+    get_first : bool, optional
+        whether to get the first value for a matching tag in dicom_image
 
     Returns
     -------
-    DataElement
-        pydicom Dataelement of the provided tag.
+    DataElement | list[DataElement]
+        pydicom DataElement of the provided tag, or a list of pydicom DataElements for the provided tag.
         Use DataElement.value attribute to get the value of the element.
 
     Raises
@@ -128,26 +138,106 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
     KeyError
         raised if an element is not found.
     """
-    element = None
+    element: pydicom.DataElement | list[pydicom.DataElement] | None = None
 
     try:
         element = dicom_image[int(tag)]
     except KeyError:
         pass
 
-    sequence = None
-    for seq in tag.links:
-        try:
-            if seq.frame_link and frame is not None:
-                sequence = get_tag(dicom_image, seq.tag, frame).value
-                element = sequence[frame - 1][tag.as_tuple]
-            elif not seq.frame_link:
-                sequence = get_tag(dicom_image, seq.tag, frame).value
-                element = sequence[0][tag.as_tuple]
-        except (KeyError, IndexError):
-            pass
+    if element is None:
+        for seq_link in tag.links:
+            try:
+                sequence = get_tag(dicom_image, seq_link.tag, frame, get_first)
+                if isinstance(sequence, pydicom.DataElement):
+                    value = sequence.value
+                    if seq_link.frame_link and frame is not None:
+                        element = get_tag(value[frame - 1], tag, frame, get_first)
+                    else:
+                        if get_first:
+                            element = get_tag(value[0], tag, frame, get_first)
+                        else:
+                            element = []
+                            for entry in value:
+                                subelement = get_tag(entry, tag, frame, get_first)
+                                if isinstance(subelement, pydicom.DataElement):
+                                    element.append(subelement)
+                                else:
+                                    element.extend(subelement)
+                else:
+                    if get_first:
+                        element = get_tag(sequence[0].value[0], tag, frame, get_first)
+                    else:
+                        element = []
+                        for entry in sequence:
+                            for value in entry.value:
+                                subelement = get_tag(value, tag, frame, get_first)
+                                if isinstance(subelement, pydicom.DataElement):
+                                    element.append(subelement)
+                                else:
+                                    element.extend(subelement)
+            except KeyError:
+                pass
 
     if element is None:
-        raise KeyError(f"{tag.as_tuple}, {tag.name}")
+        raise KeyError(f"{tag}, {tag.name}")
+    elif isinstance(element, list):
+        if len(element) == 0:
+            raise KeyError(f"{tag}, {tag.name}")
+        elif len(element) == 1:
+            element = element[0]
 
     return element
+
+
+@overload
+def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
+              tag: Tag,
+              frame: int | None = None,
+              get_first: Literal[False] = False) -> Any | list[Any]: ...
+
+
+@overload
+def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
+              tag: Tag,
+              frame: int | None = None,
+              get_first: Literal[True] = True) -> Any: ...
+
+
+def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
+              tag: Tag,
+              frame: int | None = None,
+              get_first: bool = False) -> Any | list[Any]:
+    """
+    Returns the value of the dicom element from the pydicom Dataset defined by tag.
+    If the Dataset is an enhanced dicom then the frame can be provided for frame specific elements.
+
+    Parameters
+    ----------
+    dicom_image : Dataset | DataElement
+        pydicom Dataset/DataElement to be searched
+    tag : Tag
+        tag of element to be returned
+    frame : int, optional
+        frame number (starting at 1) if relevant, by default None
+    get_first : bool, optional
+        whether to get the first value for a matching tag in dicom_image
+
+    Returns
+    -------
+    DataElement | list[DataElement]
+        pydicom DataElement of the provided tag, or a list of pydicom DataElements for the provided tag.
+        Use DataElement.value attribute to get the value of the element.
+
+    Raises
+    ------
+    KeyError
+        raised if an element is not found.
+    """
+    tag_object = get_tag(dicom_image, tag, frame, get_first)
+    if isinstance(tag_object, list):
+        value = [t.value for t in tag_object]
+    else:
+        value = tag_object.value
+
+    return value

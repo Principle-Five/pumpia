@@ -18,56 +18,58 @@ When subclassing one of the provided modules the following are designed to be re
 
 The class method :py:meth:`run <pumpia.module_handling.modules.BaseModule.run>` is used to run the module as a stand alone.
 
+The ``context_manager`` class attribute can be defined for modules, it defaults to :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManager>`.
 If the class attribute ``show_draw_rois_button`` is set to ``True`` then a button to draw ROIs is shown.
 If the class attribute ``show_analyse_button`` is set to ``True`` then a button to analyse the image is shown.
 If both are set to ``True`` then a button to do both is also shown.
-The ``name`` class attribute is shown in the window title, this defaults to ``None``.
+The ``title`` class attribute is shown in the window title, this defaults to ``Pumpia Module``.
 
-:doc:`module_ios/module_ios`
+:doc:`fields/fields`
 ----------------------------
 These allow users to provide information to and get information out of the module.
 There are three categories of IOs:
 
-    * :doc:`Simple IOs <module_ios/simple>` handle IOs such as strings, options, numbers, and dates. These can be linked through :py:class:`IOGroup <pumpia.module_handling.in_outs.groups.IOGroup>` so that multiple IOs always have the same value.
-    * :doc:`Viewer IOs <module_ios/viewer_ios>` represent viewers. These become viewers on module setup as well.
-    * :doc:`ROI IOs <module_ios/roi_ios>` handle ROIs created and used by the module.
+    * :doc:`Simple fields <fields/simple>` handle data such as strings, options, numbers, booleans, and dates.
+        These can be linked through :py:class:`FieldGroup <pumpia.module_handling.fields.groups.FieldGroup>` in collections so that multiple fields always have the same value.
+    * :doc:`Viewer fields <fields/viewer_fields>` represent viewers. These become viewers on module setup as well.
+    * :doc:`ROI fields <fields/roi_fields>` handle ROIs created and used by the module.
+
+Fields can be grouped together in the user interface of both modules and collections by using :py:class:`FieldWindow <pumpia.module_handling.fields.windows.FieldWindow>`.
 
 :doc:`context`
 --------------
-Context is used to pass information into the module for drawing ROIs.
+Context is used to pass information into the module for drawing ROIs, it is useful to reduce recalculating information between modules.
 In the user interface collections of widgets called `context managers` use the modules ``main_viewer`` to generate the context.
-Each context manager requires a `context manager generator` which is used to create the context manager when running the module, this is set using the ``context_manager_generator`` class attribute.
+The context manager is set using the ``context_manager`` class attribute, or it can be passed into the module like with collections.
 Alternatively a modules `get_context` method can be overwritten.
 
-The following context managers and generators are provided:
+The following context managers are provided:
 
-    * :py:class:`BaseContextManager <pumpia.widgets.context_managers.BaseContextManager>` : :py:class:`BaseContextManagerGenerator <pumpia.widgets.context_managers.BaseContextManagerGenerator>`
-    * :py:class:`SimpleContextManager <pumpia.widgets.context_managers.SimpleContextManager>` : :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManagerGenerator>`
-    * :py:class:`PhantomContextManager <pumpia.widgets.context_managers.PhantomContextManager>` : :py:class:`PhantomContextManagerGenerator <pumpia.widgets.context_managers.PhantomContextManagerGenerator>`
-    * :py:class:`ManualPhantomManager <pumpia.widgets.context_managers.ManualPhantomManager>` : :py:class:`ManualPhantomManagerGenerator <pumpia.widgets.context_managers.ManualPhantomManagerGenerator>`
-    * :py:class:`AutoPhantomManager <pumpia.widgets.context_managers.AutoPhantomManager>` : :py:class:`AutoPhantomManagerGenerator <pumpia.widgets.context_managers.AutoPhantomManagerGenerator>`
+    * :py:class:`BaseContextManager <pumpia.widgets.context_managers.BaseContextManager>`
+    * :py:class:`SimpleContextManager <pumpia.widgets.context_managers.SimpleContextManager>`
+    * :py:class:`PhantomContextManager <pumpia.widgets.context_managers.PhantomContextManager>`
+    * :py:class:`ManualPhantomManager <pumpia.widgets.context_managers.ManualPhantomManager>`
+    * :py:class:`AutoPhantomManager <pumpia.widgets.context_managers.AutoPhantomManager>`
 
 When creating your own context manager you must provide the :py:meth:`get_context <pumpia.widgets.context_managers.BaseContextManager.get_context>` method.
 
 :doc:`collections`
 ------------------
 Collections are used to group modules together, with a main tab showing the context and any defined viewers.
-Only :doc:`viewer IOs <module_ios/viewer_ios>` can be used with collections, any others will be ignored/wont function as expected.
+Only :doc:`viewer fields <fields/viewer_fields>`, :doc:`field groups <fields/groups>`  can be used with collections, any others will be ignored/wont function as expected.
 
 Similar to modules they have context which is shared across all the modules in the collection.
-The ``context_manager_generator`` class attribute must be defined for collections, it defaults to :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManagerGenerator>`.
-The ``name`` class attribute is shown in the window title, this defaults to ``None``.
+The ``context_manager`` class attribute can be defined for collections, it defaults to :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManager>`.
+The ``title`` class attribute is shown in the window title, this defaults to ``Pumpia Collection``.
 
 Collections introduce two other useful classes:
 
-    * :py:class:`OutputFrame <pumpia.module_handling.module_collections.OutputFrame>` which shows outputs from different modules in the main tab for ease of viewing.
-    * :py:class:`WindowGroup <pumpia.module_handling.module_collections.WindowGroup>` which shows multiple modules in the same tab instead of showing them across multiple tabs.
+    * :py:class:`WindowGroup <pumpia.module_handling.collections.ModulsGroup>` which shows multiple modules in the same tab instead of showing them across multiple tabs.
 
-When subclassing :py:class:`BaseCollection <pumpia.module_handling.module_collections.BaseCollection>` the following methods are designed to be overwritten:
+When subclassing :py:class:`BaseCollection <pumpia.module_handling.collections.BaseCollection>` the following methods are designed to be overwritten:
 
-    * :py:meth:`load_outputs <pumpia.module_handling.module_collections.BaseCollection.load_outputs>`
-    * :py:meth:`load_commands <pumpia.module_handling.module_collections.BaseCollection.load_commands>`
-    * :py:meth:`on_image_load <pumpia.module_handling.module_collections.BaseCollection.on_image_load>`
+    * :py:meth:`load_commands <pumpia.module_handling.collections.BaseCollection.load_commands>`
+    * :py:meth:`on_image_load <pumpia.module_handling.collections.BaseCollection.on_image_load>`
 
 
 Contents
@@ -75,7 +77,7 @@ Contents
 .. toctree::
     example
     modules
-    module_ios/module_ios
+    fields/fields
     collections
     context
     user_interface

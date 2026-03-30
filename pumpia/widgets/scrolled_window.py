@@ -87,17 +87,17 @@ class ScrolledWindow(ttk.Frame):
         # creating a scrollbars
         self.xscrlbr = ttk.Scrollbar(self.outer_frame, orient='horizontal')
         if x_scroll:
-            self.xscrlbr.grid(column=0, row=1, sticky='ew', columnspan=2)
+            self.xscrlbr.grid(column=0, row=1, sticky=tk.EW, columnspan=2)
         self.yscrlbr = ttk.Scrollbar(self.outer_frame)
         if y_scroll:
-            self.yscrlbr.grid(column=1, row=0, sticky='ns')
+            self.yscrlbr.grid(column=1, row=0, sticky=tk.NS)
         # creating a canvas
         self.canv = tk.Canvas(self.outer_frame)
         self.canv.config(relief='flat',
                          width=10,
                          height=10, bd=2)
         # placing a canvas into frame
-        self.canv.grid(column=0, row=0, sticky='nsew')
+        self.canv.grid(column=0, row=0, sticky=tk.NSEW)
         # associating scrollbar commands to canvas scrolling
         self.xscrlbr.config(command=self.canv.xview)
         self.yscrlbr.config(command=self.canv.yview)
