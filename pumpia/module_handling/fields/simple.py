@@ -130,6 +130,31 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
     value_var : TkVarT
     hidden : bool
     parent : tk.Misc | None
+
+    Methods
+    -------
+    reset_value()
+        Resets the field to the initial value.
+    new_label(parent: tk.Misc) -> ttk.Label:
+        Returns a label linked to this field, with text of `verbose_name`.
+        This is placed in `parent`, this is not the fields parent.
+    configure_label_style(**kw):
+        Use to configure the ttk labels for this field.
+        Passes arguments provided into ttk.Style.configure.
+    reset_label_style():
+        Resets label styles to the originally provided one.
+    new_entry(parent: tk.Misc) -> ttk.Entry:
+        Returns an entry linked to this field.
+        This is placed in `parent`, this is not the fields parent.
+    configure_entry_style(**kw):
+        Use to configure the ttk entries for this field.
+        Passes arguments provided into ttk.Style.configure.
+
+        WARNING: Base ttk Entry widgets are not very configurable trhough styles,
+        it is therefore recommended to configure the field labels instead
+        using `configure_label_style`.
+    reset_entry_style():
+        Resets entry styles to the originally provided one.
     """
 
     def __init__(self,
@@ -143,7 +168,6 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
                  read_only: bool = False,
                  reset_on_analysis: bool = False):
         self._name: str | None = verbose_name
-        self._label_style: str | None = label_style
 
         self._parent: tk.Misc | None = parent
         self._labels: list[ttk.Label] = []
@@ -155,6 +179,9 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
 
         self.read_only: bool = read_only
         self._entry_style: str | None = entry_style
+        self._edited_entry_style: str | None = None
+        self._label_style: str | None = label_style
+        self._edited_label_style: str | None = None
 
         self.reset_on_analysis: bool = reset_on_analysis
 
@@ -321,6 +348,12 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         else:
             return self._initial_value
 
+    def reset_value(self):
+        """
+        Resets the field to the initial value.
+        """
+        self.value = self.initial_value
+
     def new_label(self, parent: tk.Misc) -> ttk.Label:
         """
         Returns a label linked to this field, with text of `verbose_name`.
@@ -335,12 +368,98 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         ttk.Label
         """
         var = self.label_var
-        if self._label_style is None:
-            label = ttk.Label(parent, textvariable=var)
+        if len(self._labels) != 0:
+            style = self._labels[0].cget("style")
+            label = ttk.Label(parent, textvariable=var, style=style)
         else:
-            label = ttk.Label(parent, style=self._label_style, textvariable=var)
+            if self._label_style is None:
+                label = ttk.Label(parent, textvariable=var)
+            else:
+                label = ttk.Label(parent, textvariable=var, style=self._label_style)
         self._labels.append(label)
         return label
+
+    def configure_label_style(self, **kw):
+        """
+        Use to configure the ttk labels for this field.
+        Passes arguments provided into ttk.Style.configure.
+        """
+        if len(self._labels) == 0:
+            raise ValueError("No labels to configure")
+
+        style = ttk.Style(self._labels[0])
+        winfo_class = self._labels[0].winfo_class()
+
+        if self._label_style is None:
+            orig_style: str = self._entries[0].cget("style")
+            if orig_style == "":
+                self._label_style = winfo_class
+            else:
+                self._label_style = orig_style
+
+        if self._label_style != winfo_class and not self._label_style.endswith("." + winfo_class):
+            orig_dict = style.configure(self._label_style)
+            self._label_style += "." + winfo_class
+            if orig_dict is not None:
+                style.configure(self._label_style, **orig_dict)
+
+        if self._edited_label_style is None:
+            if self.module is None:
+                module_text = ""
+            else:
+                module_text = "Module:" + self.module.name + "-"
+            self._edited_label_style = \
+                "edited-"\
+                + module_text\
+                + "Field:" + self.name\
+                + "." + self._label_style
+
+        style.configure(self._edited_label_style, **kw)
+        for label in self._labels:
+            label.configure(style=self._edited_label_style)
+
+    def reset_label_style(self):
+        """
+        Resets label styles to the originally provided one.
+        """
+        if len(self._labels) == 0:
+            raise ValueError("No labels to configure")
+
+        style = ttk.Style(self._labels[0])
+        winfo_class = self._labels[0].winfo_class()
+
+        if self._label_style is None:
+            orig_style: str = self._entries[0].cget("style")
+            if orig_style == "":
+                self._label_style = winfo_class
+            else:
+                self._label_style = orig_style
+
+        if self._label_style != winfo_class and not self._label_style.endswith("." + winfo_class):
+            orig_dict = style.configure(self._label_style)
+            self._label_style += "." + winfo_class
+            if orig_dict is not None:
+                style.configure(self._label_style, **orig_dict)
+
+        if self._edited_label_style is None:
+            if self.module is None:
+                module_text = ""
+            else:
+                module_text = "Module:" + self.module.name + "-"
+            self._edited_label_style = \
+                "edited-"\
+                + module_text\
+                + "Field:" + self.name\
+                + "." + self._label_style
+
+        for label in self._labels:
+            label.configure(style=self._label_style)
+
+        orig_dict = style.configure(self._edited_label_style)
+        if orig_dict is not None:
+            for key in orig_dict:
+                orig_dict[key] = style.lookup(self._label_style, key)
+                style.configure(self._edited_label_style, **orig_dict)
 
     @property
     def label_var(self) -> tk.StringVar:
@@ -354,12 +473,6 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         if self._label_var is None:
             self._label_var = tk.StringVar(self._parent, value=self.verbose_name)
         return self._label_var
-
-    def reset_value(self):
-        """
-        Resets the field to the initial value.
-        """
-        self.value = self.initial_value
 
     def new_entry(self, parent: tk.Misc) -> ttk.Entry:
         """
@@ -379,12 +492,103 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
             state = "readonly"
         else:
             state = "normal"
-        if self._entry_style is None:
-            entry = self.widget(parent, textvariable=var, state=state)
+
+        if len(self._entries) != 0:
+            style = self._entries[0].cget("style")
+            entry = self.widget(parent, textvariable=var, state=state, style=style)
         else:
-            entry = self.widget(parent, textvariable=var, state=state, style=self._entry_style)
+            if self._entry_style is None:
+                entry = self.widget(parent, textvariable=var, state=state)
+            else:
+                entry = self.widget(parent, textvariable=var, state=state, style=self._entry_style)
         self._entries.append(entry)
         return entry
+
+    def configure_entry_style(self, **kw):
+        """
+        Use to configure the ttk entries for this field.
+        Passes arguments provided into ttk.Style.configure.
+
+        WARNING: Base ttk Entry widgets are not very configurable trhough styles,
+        it is therefore recommended to configure the field labels instead
+        using `configure_label_style.
+        """
+        if len(self._entries) == 0:
+            raise ValueError("No entries to configure")
+
+        style = ttk.Style(self._entries[0])
+        winfo_class = self._entries[0].winfo_class()
+
+        if self._entry_style is None:
+            orig_style: str = self._entries[0].cget("style")
+            if orig_style == "":
+                self._entry_style = winfo_class
+            else:
+                self._entry_style = orig_style
+
+        if self._entry_style != winfo_class and not self._entry_style.endswith("." + winfo_class):
+            orig_dict = style.configure(self._entry_style)
+            self._entry_style += "." + winfo_class
+            if orig_dict is not None:
+                style.configure(self._entry_style, **orig_dict)
+
+        if self._edited_entry_style is None:
+            if self.module is None:
+                module_text = ""
+            else:
+                module_text = "Module:" + self.module.name + "-"
+            self._edited_entry_style = \
+                "edited-"\
+                + module_text\
+                + "Field:" + self.name\
+                + "." + self._entry_style
+
+        style.configure(self._edited_entry_style, **kw)
+        for entry in self._entries:
+            entry.configure(style=self._edited_entry_style)
+
+    def reset_entry_style(self):
+        """
+        Resets entry styles to the originally provided one.
+        """
+        if len(self._entries) == 0:
+            raise ValueError("No entries to configure")
+
+        style = ttk.Style(self._entries[0])
+        winfo_class = self._entries[0].winfo_class()
+
+        if self._entry_style is None:
+            orig_style: str = self._entries[0].cget("style")
+            if orig_style == "":
+                self._entry_style = winfo_class
+            else:
+                self._entry_style = orig_style
+
+        if self._entry_style != winfo_class and not self._entry_style.endswith("." + winfo_class):
+            orig_dict = style.configure(self._entry_style)
+            self._entry_style += "." + winfo_class
+            if orig_dict is not None:
+                style.configure(self._entry_style, **orig_dict)
+
+        if self._edited_entry_style is None:
+            if self.module is None:
+                module_text = ""
+            else:
+                module_text = "Module:" + self.module.name + "-"
+            self._edited_entry_style = \
+                "edited-"\
+                + module_text\
+                + "Field:" + self.name\
+                + "." + self._entry_style
+
+        for entry in self._entries:
+            entry.configure(style=self._entry_style)
+
+        orig_dict = style.configure(self._edited_entry_style)
+        if orig_dict is not None:
+            for key in orig_dict:
+                orig_dict[key] = style.lookup(self._entry_style, key)
+                style.configure(self._edited_entry_style, **orig_dict)
 
     def _value_var_setter(self):
         for entry in self._entries:

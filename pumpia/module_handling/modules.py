@@ -886,6 +886,8 @@ class BaseModule(ABC, ttk.Frame):
             for field in self.fields:
                 if field.reset_on_analysis:
                     field.reset_value()
+                    field.reset_entry_style()
+                    field.reset_label_style()
             self.analyse(batch)
             self.analysed = True
 
