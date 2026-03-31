@@ -459,7 +459,7 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         if orig_dict is not None:
             for key in orig_dict:
                 orig_dict[key] = style.lookup(self._label_style, key)
-                style.configure(self._edited_label_style, **orig_dict)
+            style.configure(self._edited_label_style, **orig_dict)
 
     @property
     def label_var(self) -> tk.StringVar:
@@ -588,7 +588,7 @@ class BaseField[ValT, TkVarT:tk.Variable](ABC):
         if orig_dict is not None:
             for key in orig_dict:
                 orig_dict[key] = style.lookup(self._entry_style, key)
-                style.configure(self._edited_entry_style, **orig_dict)
+            style.configure(self._edited_entry_style, **orig_dict)
 
     def _value_var_setter(self):
         for entry in self._entries:
