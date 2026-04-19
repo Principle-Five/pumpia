@@ -15,6 +15,9 @@ class ScrolledWindow(ttk.Frame):
     """
     A frame with scrollbars that automatically adjust to the size of the content.
 
+    WARNING: For parent widgets such as paned window where it is managed through `add`
+    use `ScrolledWindow.outer_frame` as the child argument.
+
     Parameters
     ----------
     parent : tk.Misc
@@ -47,11 +50,6 @@ class ScrolledWindow(ttk.Frame):
         The underline position (default is -1).
     width : ScreenUnits, optional
         The width of the frame (default is 0).
-
-    Notes
-    -----
-    For parent widgets such as paned window where it is managed through .add
-    use `ScrolledWindow.outer_frame` as the child argument
     """
 
     @overload
@@ -77,78 +75,53 @@ class ScrolledWindow(ttk.Frame):
     def __init__(self, parent: tk.Misc, y_scroll: bool = True, x_scroll: bool = True, **kw): ...
 
     def __init__(self, parent: tk.Misc, y_scroll: bool = True, x_scroll: bool = True, **kw):
-        self.outer_frame = ttk.Frame(parent, **kw)
         self.parent = parent
         self.x_scroll = x_scroll
         self.y_scroll = y_scroll
 
+        self.outer_frame = ttk.Frame(parent, **kw)
         self.outer_frame.columnconfigure(0, weight=1)
         self.outer_frame.rowconfigure(0, weight=1)
-        # creating a scrollbars
-        self.xscrlbr = ttk.Scrollbar(self.outer_frame, orient='horizontal')
+
+        self.canv = tk.Canvas(self.outer_frame,
+                              highlightthickness=0,
+                              relief='flat',
+                              width=10,
+                              height=10,
+                              bd=2,
+                              scrollregion=(0, 0, 100, 100))
+
+        self.canv.grid(column=0, row=0, sticky=tk.NSEW)
+
+        self.xscrlbr = ttk.Scrollbar(self.outer_frame, orient='horizontal', command=self.canv.xview)
         if x_scroll:
             self.xscrlbr.grid(column=0, row=1, sticky=tk.EW, columnspan=2)
-        self.yscrlbr = ttk.Scrollbar(self.outer_frame)
+
+        self.yscrlbr = ttk.Scrollbar(self.outer_frame, command=self.canv.yview)
         if y_scroll:
             self.yscrlbr.grid(column=1, row=0, sticky=tk.NS)
-        # creating a canvas
-        self.canv = tk.Canvas(self.outer_frame)
-        self.canv.config(relief='flat',
-                         width=10,
-                         height=10, bd=2)
-        # placing a canvas into frame
-        self.canv.grid(column=0, row=0, sticky=tk.NSEW)
-        # associating scrollbar commands to canvas scrolling
-        self.xscrlbr.config(command=self.canv.xview)
-        self.yscrlbr.config(command=self.canv.yview)
 
-        # when super call is put at top then widgets within scrolled window are not visible
-        super().__init__(self.outer_frame, **kw)  # ordering of widget creation matters?
+        super().__init__(self.canv, **kw)
 
         self.canv.create_window(0, 0, window=self, anchor='nw')
-
         self.canv.config(xscrollcommand=self.xscrlbr.set,
-                         yscrollcommand=self.yscrlbr.set,
-                         scrollregion=(0, 0, 100, 100))
+                         yscrollcommand=self.yscrlbr.set)
 
         self.yscrlbr.lift(self)
         self.xscrlbr.lift(self)
+
         self.bind('<Configure>', self._configure_window)
-        self.bind('<Enter>', self._bound_to_mousewheel)
-        self.bind('<Leave>', self._unbound_to_mousewheel)
+        self.outer_frame.bind('<Enter>', self._bound_to_mousewheel)
+        self.outer_frame.bind('<Leave>', self._unbound_to_mousewheel)
 
     def _bound_to_mousewheel(self, _: tk.Event):
-        """
-        Binds the mouse wheel to the canvas for scrolling.
-
-        Parameters
-        ----------
-        _ : tk.Event
-            The event object.
-        """
         self.canv.bind_all("<MouseWheel>", self._on_mousewheel)
 
     def _unbound_to_mousewheel(self, _: tk.Event):
-        """
-        Unbinds the mouse wheel from the canvas.
-
-        Parameters
-        ----------
-        _ : tk.Event
-            The event object.
-        """
         self.canv.unbind_all("<MouseWheel>")
 
     def _on_mousewheel(self, event: tk.Event):
-        """
-        Handles mouse wheel events for scrolling.
-
-        Parameters
-        ----------
-        event : tk.Event
-            The event object.
-        """
-        if self.outer_frame.winfo_height() < self.winfo_reqheight():
+        if (self.outer_frame.winfo_height() - self.xscrlbr.winfo_height()) < self.winfo_reqheight():
             direction = 0
             if event.num == 5 or event.delta == -120:
                 direction = 1
@@ -157,26 +130,13 @@ class ScrolledWindow(ttk.Frame):
             self.canv.yview_scroll(direction, "units")
 
     def _configure_window(self, _: tk.Event):
-        """
-        Configures the window to update the scroll region.
-
-        Parameters
-        ----------
-        _ : tk.Event
-            The event object.
-        """
-        # update the scrollbars to match the size of the inner frame
-        self.canv.config(scrollregion=(0,
+        self.canv.config(width=self.winfo_reqwidth(),
+                         height=self.winfo_reqheight(),
+                         scrollregion=(0,
                                        0,
                                        self.winfo_reqwidth(),
-                                       self.winfo_reqheight()))
-        if self.winfo_reqwidth() != self.canv.winfo_width():
-            # update the canvas's width to fit the inner frame
-            self.canv.config(width=self.winfo_reqwidth())
-
-        if self.winfo_reqheight() != self.canv.winfo_height():
-            # update the canvas's height to fit the inner frame
-            self.canv.config(height=self.winfo_reqheight())
+                                       self.winfo_reqheight()),
+                         )
 
     @overload
     def grid(self,
@@ -205,12 +165,5 @@ class ScrolledWindow(ttk.Frame):
              **kwargs) -> None:
         """
         Places the widget on the grid.
-
-        Parameters
-        ----------
-        *args : tuple
-            Positional arguments for the grid method.
-        **kwargs : dict
-            Keyword arguments for the grid method.
         """
         self.outer_frame.grid(*args, **kwargs)
