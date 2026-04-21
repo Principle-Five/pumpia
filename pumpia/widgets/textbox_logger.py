@@ -17,10 +17,13 @@ LOG_LEVELS_STRINGS = ["ALL"] + list(LOG_LEVELS_MAP.keys())
 class TextBoxHandler(logging.Handler):
     def __init__(self, parent: tk.Misc, level: int | str = 0, label_text: str = "Logger") -> None:
         super().__init__(level)
+        self.setFormatter(logging.Formatter(fmt="{levelname: >8}: {message}", style="{"))
 
         self.records: list[logging.LogRecord] = []
 
         self.frame = ttk.Labelframe(parent, text=label_text)
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(1, weight=1)
 
         self.options_frame = ttk.Frame(self.frame)
         self.options_frame.grid(column=0, row=0, sticky=tk.NW)
@@ -47,9 +50,15 @@ class TextBoxHandler(logging.Handler):
 
         self.textbox_frame = ttk.Frame(self.frame)
         self.textbox_frame.grid(column=0, row=1, sticky=tk.NSEW)
+
+        self.textbox_frame.columnconfigure(0, weight=1)
+        self.textbox_frame.rowconfigure(0, weight=1)
+
         self.textbox = tk.Text(self.textbox_frame,
                                state=tk.DISABLED,
-                               wrap="word")
+                               width=1,
+                               height=1,
+                               wrap="none")
         self.textbox.grid(column=0, row=0, sticky=tk.NSEW)
 
         self.xscrlbr = ttk.Scrollbar(self.textbox_frame,
@@ -63,25 +72,6 @@ class TextBoxHandler(logging.Handler):
 
         self.textbox.config(xscrollcommand=self.xscrlbr.set,
                             yscrollcommand=self.yscrlbr.set)
-
-        self.textbox_frame.bind('<Enter>', self._bound_to_mousewheel)
-        self.textbox_frame.bind('<Leave>', self._unbound_to_mousewheel)
-
-    def _bound_to_mousewheel(self, _: tk.Event):
-        self.textbox.bind_all("<MouseWheel>", self._on_mousewheel)
-
-    def _unbound_to_mousewheel(self, _: tk.Event):
-        self.textbox.unbind_all("<MouseWheel>")
-
-    def _on_mousewheel(self, event: tk.Event):
-        if ((self.textbox_frame.winfo_height() - self.xscrlbr.winfo_height())
-                < self.textbox.winfo_reqheight()):
-            direction = 0
-            if event.num == 5 or event.delta == -120:
-                direction = 1
-            elif event.num == 4 or event.delta == 120:
-                direction = -1
-            self.textbox.yview_scroll(direction, "units")
 
     def emit(self, record: logging.LogRecord) -> None:
         self.records.append(record)
