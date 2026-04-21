@@ -4,6 +4,7 @@ Classes:
  * PhantomModule
 """
 
+import logging
 from abc import ABC
 import tkinter as tk
 from tkinter import ttk
@@ -21,6 +22,7 @@ from pumpia.widgets.context_managers import (BaseContextManager,
                                              PhantomContextManager,
                                              SimpleContextManager,
                                              ManualPhantomManager)
+from pumpia.widgets.textbox_logger import TextBoxHandler
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.module_handling.fields.simple import _FieldsMeta
 from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
@@ -326,6 +328,8 @@ class BaseModule(ABC, ttk.Frame):
                 self.parent = parent
             if manager is not None:
                 self.manager = manager
+            if context_manager is not None:
+                self.context_manager = context_manager
 
             if self.parent is None:
                 raise ValueError("parent needs to be set using set_parent or provided")
@@ -346,11 +350,12 @@ class BaseModule(ABC, ttk.Frame):
             self.viewer_frame = ttk.Frame(self.paned_window)
             self.paned_window.add(self.viewer_frame, weight=1)
 
+            self.main_window = ttk.Notebook(self.paned_window)
+            self.paned_window.add(self.main_window)
+            self.io_frame = ScrolledWindow(self.main_window)
+            self.main_window.add(self.io_frame.outer_frame, text="Main")
+
             if context_manager is None:
-                self.main_window = ttk.Notebook(self.paned_window)
-                self.paned_window.add(self.main_window)
-                self.io_frame = ScrolledWindow(self.main_window)
-                self.main_window.add(self.io_frame.outer_frame, text="Main")
                 self.context_frame = ScrolledWindow(self.main_window)
 
                 self.context_buttons_frame = ttk.Frame(self.context_frame)
@@ -374,10 +379,17 @@ class BaseModule(ABC, ttk.Frame):
                 self.main_window.add(self.context_frame.outer_frame, text="Context")
                 add_context_buttons = True
             else:
-                self.context_manager = context_manager
-                self.io_frame = ScrolledWindow(self.paned_window)
-                self.paned_window.add(self.io_frame.outer_frame)
                 add_context_buttons = False
+
+            self.log_handler = TextBoxHandler(self.main_window)
+            self.main_window.add(self.log_handler.frame, text="Log")
+            self.stream_handler = logging.StreamHandler()
+            self.stream_handler.setLevel(logging.WARNING)
+
+            self.logger = logging.getLogger(self.name)
+            self.logger.setLevel(logging.DEBUG)
+            self.logger.addHandler(self.log_handler)
+            self.logger.addHandler(self.stream_handler)
 
             self.fields_frame = ttk.Labelframe(self.io_frame, text="Fields")
             self.roi_frame = ttk.Labelframe(self.io_frame, text="ROIs")
