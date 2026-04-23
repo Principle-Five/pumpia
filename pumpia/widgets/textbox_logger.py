@@ -17,7 +17,7 @@ LOG_LEVELS_STRINGS = ["ALL"] + list(LOG_LEVELS_MAP.keys())
 class TextBoxHandler(logging.Handler):
     def __init__(self, parent: tk.Misc, level: int | str = 0, label_text: str = "Logger") -> None:
         super().__init__(level)
-        self.setFormatter(logging.Formatter(fmt="{levelname: <8}: {message}", style="{"))
+        self.setFormatter(logging.Formatter(fmt="{name}: {levelname}: {message}", style="{"))
 
         self.records: list[logging.LogRecord] = []
 

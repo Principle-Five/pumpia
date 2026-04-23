@@ -307,7 +307,8 @@ class BaseModule(ABC, ttk.Frame):
               *,
               parent: tk.Misc | None = None,
               manager: Manager | None = None,
-              context_manager: BaseContextManager | None = None):
+              context_manager: BaseContextManager | None = None,
+              parent_logger: logging.Logger | None = None):
         """
         Sets up the module.
         Parent and manager must be set before calling this method or provided as arguments.
@@ -386,7 +387,11 @@ class BaseModule(ABC, ttk.Frame):
             self.stream_handler = logging.StreamHandler()
             self.stream_handler.setLevel(logging.WARNING)
 
-            self.logger = logging.getLogger(self.name)
+            if parent_logger is not None:
+                self.logger = logging.getLogger(parent_logger.name + "." + self.name)
+            else:
+                self.logger = logging.getLogger(self.name)
+            self.logger.propagate = True
             self.logger.setLevel(logging.DEBUG)
             self.logger.addHandler(self.log_handler)
             self.logger.addHandler(self.stream_handler)

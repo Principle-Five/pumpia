@@ -8,6 +8,7 @@ Classes:
 from abc import ABC
 import warnings
 import traceback
+import logging
 import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self, Any
@@ -20,6 +21,7 @@ from pumpia.widgets.context_managers import (BaseContextManager,
                                              PhantomContextManager)
 from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
+from pumpia.widgets.textbox_logger import TextBoxHandler
 from pumpia.module_handling.fields.groups import _FieldGroupsMeta
 from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
 from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
@@ -186,7 +188,8 @@ class ModuleGroup(ttk.Panedwindow):
                 lf.rowconfigure(0, weight=1)
                 module.setup(parent=lf,
                              manager=obj.manager,
-                             context_manager=obj.context_manager)
+                             context_manager=obj.context_manager,
+                             parent_logger=obj.logger)
                 module.grid(column=0, row=0, sticky=tk.NSEW)
                 group.add(lf, weight=1)
                 modules.append(getattr(obj, module_name))
@@ -376,6 +379,16 @@ class BaseCollection(ABC, ttk.Frame):
                                              command=self.get_context)
         self.get_context_button.grid(column=0, row=0, sticky=tk.NSEW)
 
+        self.log_handler = TextBoxHandler(self.main_window)
+        self.main_window.add(self.log_handler.frame, text="Log")
+        self.stream_handler = logging.StreamHandler()
+        self.stream_handler.setLevel(logging.WARNING)
+
+        self.logger = logging.getLogger(self.title.replace(" ", "_").lower())
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.addHandler(self.log_handler)
+        self.logger.addHandler(self.stream_handler)
+
         show_draw_rois_button: bool = False
         show_analyse_button: bool = False
 
@@ -395,7 +408,8 @@ class BaseCollection(ABC, ttk.Frame):
             if module.parent is None:
                 module.setup(parent=self.notebook,
                              manager=self.manager,
-                             context_manager=self.context_manager)
+                             context_manager=self.context_manager,
+                             parent_logger=self.logger)
                 if module.verbose_name is None:
                     name = module.name
                 else:
