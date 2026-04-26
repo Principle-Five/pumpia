@@ -1,3 +1,7 @@
+"""
+Contains a logging handler that provides a frame for tkinter user interfaces.
+"""
+
 import logging
 import tkinter as tk
 from tkinter import ttk
@@ -15,9 +19,22 @@ LOG_LEVELS_STRINGS = ["ALL"] + list(LOG_LEVELS_MAP.keys())
 
 
 class TextBoxHandler(logging.Handler):
-    def __init__(self, parent: tk.Misc, level: int | str = 0, label_text: str = "Logger") -> None:
+    """
+    A logging handler with a tkinter user interface
+    that can be accessed using the attribute `frame`
+    """
+
+    def __init__(self,
+                 parent: tk.Misc,
+                 level: logging._Level = 0,
+                 label_text: str = "Logger",
+                 formatter: logging.Formatter | None = None) -> None:
         super().__init__(level)
-        self.setFormatter(logging.Formatter(fmt="{name}: {levelname}: {message}", style="{"))
+
+        if formatter is None:
+            self.setFormatter(logging.Formatter(fmt="{levelname}: {message}", style="{"))
+        else:
+            self.setFormatter(formatter)
 
         self.records: list[logging.LogRecord] = []
 
@@ -32,7 +49,7 @@ class TextBoxHandler(logging.Handler):
         self.options_label.grid(column=0, row=0, sticky=tk.NE)
 
         self.options_var = tk.StringVar(self.options_frame, LOG_LEVELS_STRINGS[0])
-        self.options_var.trace_add('write', self.switch_levels)
+        self.options_var.trace_add('write', self._switch_levels)
         self.options_box = ttk.Combobox(self.options_frame,
                                         values=LOG_LEVELS_STRINGS,
                                         state="readonly",
@@ -43,7 +60,7 @@ class TextBoxHandler(logging.Handler):
         self.lower_levels_label.grid(column=0, row=1, sticky=tk.NE)
 
         self.lower_levels_var = tk.BooleanVar(self.options_frame, True)
-        self.lower_levels_var.trace_add('write', self.switch_levels)
+        self.lower_levels_var.trace_add('write', self._switch_levels)
         self.lower_levels_entry = ttk.Checkbutton(self.options_frame,
                                                   variable=self.lower_levels_var)
         self.lower_levels_entry.grid(column=1, row=1, sticky=tk.NW)
@@ -78,16 +95,22 @@ class TextBoxHandler(logging.Handler):
         self.add_new_log(self.format(record))
 
     def add_new_log(self, text: str):
+        """
+        Adds text to the textbox.
+        """
         self.textbox.configure(state=tk.NORMAL)
         self.textbox.insert(tk.END, text + "\n")
         self.textbox.configure(state=tk.DISABLED)
 
     def clear_log(self):
+        """
+        Clears the textbox.
+        """
         self.textbox.configure(state=tk.NORMAL)
         self.textbox.delete(1.0, tk.END)
         self.textbox.configure(state=tk.DISABLED)
 
-    def switch_levels(self, *_: str):
+    def _switch_levels(self, *_: str):
         self.clear_log()
         include_lower = self.lower_levels_var.get()
         level = LOG_LEVELS_MAP.get(self.options_var.get(), 0)

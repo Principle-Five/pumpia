@@ -6,8 +6,6 @@ Classes:
 """
 
 from abc import ABC
-import warnings
-import traceback
 import logging
 import tkinter as tk
 from tkinter import ttk
@@ -30,6 +28,21 @@ from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext
 
 
+class ModuleFormatter(logging.Formatter):
+    """
+    A logging formatter that preppends the module name
+    (pulled from the initial logger name) to the formatted string.
+    """
+
+    def format(self, record: logging.LogRecord) -> str:
+        formatted_record = super().format(record)
+        try:
+            module_logger = ".".join(record.name.split(".")[1:])
+        except IndexError:
+            module_logger = record.name
+        return f"{module_logger}: {formatted_record}"
+
+
 class _ModuleGroups:
     def __init__(self, obj: BaseCollection) -> None:
         self.obj: BaseCollection = obj
@@ -49,6 +62,9 @@ class _ModuleGroupsMeta:
 
     @property
     def group_names(self) -> list[str]:
+        """
+        The names of the module groups for the linked collection.
+        """
         return list(self.groups.keys())
 
     def __set_name__(self, owner: type[BaseCollection], name: str):
@@ -61,7 +77,10 @@ class _ModuleGroupsMeta:
     @overload
     def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
 
-    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _ModuleGroups | Self:
+    def __get__(self,
+                obj: BaseCollection | None,
+                owner: type[BaseCollection]
+                ) -> _ModuleGroups | Self:
         if obj is None:
             if owner is self.base_owner:
                 return self
@@ -379,10 +398,14 @@ class BaseCollection(ABC, ttk.Frame):
                                              command=self.get_context)
         self.get_context_button.grid(column=0, row=0, sticky=tk.NSEW)
 
-        self.log_handler = TextBoxHandler(self.main_window)
+        self.log_handler = TextBoxHandler(self.main_window,
+                                          formatter=ModuleFormatter(fmt="{levelname}: {message}",
+                                                                    style="{"))
         self.main_window.add(self.log_handler.frame, text="Log")
         self.stream_handler = logging.StreamHandler()
         self.stream_handler.setLevel(logging.WARNING)
+        self.stream_handler.setFormatter(ModuleFormatter(fmt="{levelname}: {message}",
+                                                         style="{"))
 
         self.logger = logging.getLogger(self.title.replace(" ", "_").lower())
         self.logger.setLevel(logging.DEBUG)
@@ -668,38 +691,17 @@ class BaseCollection(ABC, ttk.Frame):
         calls the `create_rois` method for each module.
         """
         context = self.get_context()
-        filters = warnings.filters
         for module in self.modules:
-            warnings.simplefilter("default")
-            try:
-                module.create_rois(context, batch=True)
-            # pylint: disable-next=broad-exception-caught
-            except Exception as exc:
-                warning = UserWarning(f"{module.verbose_name} module had an error drawing ROIs.")
-                warning.with_traceback(exc.__traceback__)
-                traceback.print_exc()
-                warnings.simplefilter("always")
-                warnings.warn(warning, stacklevel=2)
-        warnings.filters = filters
+            module.create_rois(context, batch=True)
         self.update_viewers()
 
     def run_analysis(self) -> None:
         """
         By default this calls the `run_analysis` method for each module.
         """
-        filters = warnings.filters
         for module in self.modules:
-            warnings.simplefilter("default")
-            try:
-                module.run_analysis(batch=True)
-            # pylint: disable-next=broad-exception-caught
-            except Exception as exc:
-                warning = UserWarning(f"{module.verbose_name} module had an error on analysis.")
-                warning.with_traceback(exc.__traceback__)
-                traceback.print_exc()
-                warnings.simplefilter("always")
-                warnings.warn(warning, stacklevel=2)
-        warnings.filters = filters
+            module.run_analysis(batch=True)
+        self.update_viewers()
 
     def create_and_run(self) -> None:
         """

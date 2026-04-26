@@ -391,10 +391,11 @@ class BaseModule(ABC, ttk.Frame):
                 self.logger = logging.getLogger(parent_logger.name + "." + self.name)
             else:
                 self.logger = logging.getLogger(self.name)
+                self.logger.addHandler(self.stream_handler)
+
             self.logger.propagate = True
             self.logger.setLevel(logging.DEBUG)
             self.logger.addHandler(self.log_handler)
-            self.logger.addHandler(self.stream_handler)
 
             self.fields_frame = ttk.Labelframe(self.io_frame, text="Fields")
             self.roi_frame = ttk.Labelframe(self.io_frame, text="ROIs")
@@ -881,13 +882,19 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
-        for roi in self.rois:
-            roi.register_roi(None)
-        if context is None:
-            context = self.get_context()
-        self.draw_rois(context, batch)
-        if batch is False:
-            self.update_viewers()
+        try:
+            for roi in self.rois:
+                roi.register_roi(None)
+            if context is None:
+                context = self.get_context()
+            self.draw_rois(context, batch)
+            if batch is False:
+                self.update_viewers()
+            self.logger.info("ROIs Created")
+        # pylint: disable-next=broad-exception-caught
+        except Exception:
+            self.logger.warning("module had an error drawing ROIs.",
+                                exc_info=True)
 
     def run_analysis(self, batch: bool = False) -> None:
         """
@@ -899,14 +906,22 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
-        if self.rois_loaded:
-            for field in self.fields:
-                if field.reset_on_analysis:
-                    field.reset_value()
-                    field.reset_entry_style()
-                    field.reset_label_style()
-            self.analyse(batch)
-            self.analysed = True
+        try:
+            if self.rois_loaded:
+                for field in self.fields:
+                    if field.reset_on_analysis:
+                        field.reset_value()
+                        field.reset_entry_style()
+                        field.reset_label_style()
+                self.analyse(batch)
+                self.analysed = True
+                if batch is False:
+                    self.update_viewers()
+                self.logger.info("Analysis Completed")
+        # pylint: disable-next=broad-exception-caught
+        except Exception:
+            self.logger.warning("module had an error on analysis.",
+                                exc_info=True)
 
     def create_and_run(self, context: BaseContext | None = None) -> None:
         """
