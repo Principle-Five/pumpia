@@ -6,7 +6,9 @@ Classes:
 """
 
 from abc import ABC
+import sys
 import logging
+from types import TracebackType
 import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self, Any
@@ -40,7 +42,9 @@ class ModuleFormatter(logging.Formatter):
             module_logger = ".".join(record.name.split(".")[1:])
         except IndexError:
             module_logger = record.name
-        return f"{module_logger}: {formatted_record}"
+        if module_logger != "":
+            return f"{module_logger}: {formatted_record}"
+        return formatted_record
 
 
 class _ModuleGroups:
@@ -402,15 +406,16 @@ class BaseCollection(ABC, ttk.Frame):
                                           formatter=ModuleFormatter(fmt="{levelname}: {message}",
                                                                     style="{"))
         self.main_window.add(self.log_handler.frame, text="Log")
-        self.stream_handler = logging.StreamHandler()
-        self.stream_handler.setLevel(logging.WARNING)
-        self.stream_handler.setFormatter(ModuleFormatter(fmt="{levelname}: {message}",
-                                                         style="{"))
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.WARNING)
+        stream_handler.setFormatter(ModuleFormatter(fmt="{levelname}: {message}",
+                                                    style="{"))
 
         self.logger = logging.getLogger(self.title.replace(" ", "_").lower())
+        self.logger.propagate = False
         self.logger.setLevel(logging.DEBUG)
         self.logger.addHandler(self.log_handler)
-        self.logger.addHandler(self.stream_handler)
+        self.logger.addHandler(stream_handler)
 
         show_draw_rois_button: bool = False
         show_analyse_button: bool = False
@@ -573,6 +578,15 @@ class BaseCollection(ABC, ttk.Frame):
 
         self.load_commands()
 
+    def _handle_exception(self,
+                          exc_type: type[BaseException],
+                          exc_value: BaseException,
+                          exc_traceback: TracebackType | None):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
+        self.logger.error("", exc_info=(exc_type, exc_value, exc_traceback))
+
     def _on_image_load_partial(self, viewer: BaseViewer) -> Callable[[], None]:
         """
         Returns a partial function for handling image load events.
@@ -692,7 +706,12 @@ class BaseCollection(ABC, ttk.Frame):
         """
         context = self.get_context()
         for module in self.modules:
-            module.create_rois(context, batch=True)
+            try:
+                module.create_rois(context, batch=True)
+            # pylint: disable-next=broad-exception-caught
+            except Exception:
+                module.logger.warning("module had an error drawing ROIs.",
+                                      exc_info=True)
         self.update_viewers()
 
     def run_analysis(self) -> None:
@@ -700,7 +719,12 @@ class BaseCollection(ABC, ttk.Frame):
         By default this calls the `run_analysis` method for each module.
         """
         for module in self.modules:
-            module.run_analysis(batch=True)
+            try:
+                module.run_analysis(batch=True)
+            # pylint: disable-next=broad-exception-caught
+            except Exception:
+                module.logger.warning("module had an error on analysis.",
+                                      exc_info=True)
         self.update_viewers()
 
     def create_and_run(self) -> None:
@@ -755,5 +779,11 @@ class BaseCollection(ABC, ttk.Frame):
 
         collection = cls(frame, man, direction=direction)
         frame.add(collection, weight=1)
+
+        app.report_callback_exception = collection._handle_exception
+        logging.getLogger().addHandler(collection.log_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.WARNING)
+        logging.getLogger().addHandler(stream_handler)
 
         app.mainloop()

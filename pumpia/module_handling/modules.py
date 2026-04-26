@@ -3,8 +3,9 @@ Classes:
  * BaseModule
  * PhantomModule
 """
-
+import sys
 import logging
+from types import TracebackType
 from abc import ABC
 import tkinter as tk
 from tkinter import ttk
@@ -385,14 +386,16 @@ class BaseModule(ABC, ttk.Frame):
 
             self.log_handler = TextBoxHandler(self.main_window)
             self.main_window.add(self.log_handler.frame, text="Log")
-            self.stream_handler = logging.StreamHandler()
-            self.stream_handler.setLevel(logging.WARNING)
 
             if parent_logger is not None:
                 self.logger = logging.getLogger(parent_logger.name + "." + self.name)
             else:
                 self.logger = logging.getLogger(self.name)
-                self.logger.addHandler(self.stream_handler)
+                self.logger.propagate = False
+                stream_handler = logging.StreamHandler()
+                stream_handler.setLevel(logging.WARNING)
+                self.logger.addHandler(stream_handler)
+                sys.excepthook = self._handle_exception
 
             self.logger.propagate = True
             self.logger.setLevel(logging.DEBUG)
@@ -586,20 +589,28 @@ class BaseModule(ABC, ttk.Frame):
             self.load_commands()
             self._is_setup = True
 
+    def _handle_exception(self,
+                          exc_type: type[BaseException],
+                          exc_value: BaseException,
+                          exc_traceback: TracebackType | None):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
+        self.logger.error("", exc_info=(exc_type, exc_value, exc_traceback))
+
     @classmethod
-    def setup_window(cls: type[Self],
-                     app: tk.Tk,
-                     direction: DirectionType = "Horizontal"):
+    def run(cls: type[Self],
+            direction: DirectionType = "Horizontal"):
         """
-        Sets up the application window when running the module independantly.
+        Runs the module independently.
 
         Parameters
         ----------
-        app : tk.Tk
-            The application window.
         direction : DirectionType, optional
-            The direction of the child widgets in the module (default is "Horizontal").
+            The direction child widgets in the module (default is "Horizontal").
         """
+        app = tk.Tk()
+        app.title(cls.title)
         app.columnconfigure(0, weight=1)
         app.columnconfigure(1, weight=1)
         app.rowconfigure(1, weight=1)
@@ -633,20 +644,12 @@ class BaseModule(ABC, ttk.Frame):
         module = cls(frame, man, direction=direction)
         frame.add(module, weight=1)
 
-    @classmethod
-    def run(cls: type[Self],
-            direction: DirectionType = "Horizontal"):
-        """
-        Runs the module independently.
+        app.report_callback_exception = module._handle_exception
+        logging.getLogger().addHandler(module.log_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.WARNING)
+        logging.getLogger().addHandler(stream_handler)
 
-        Parameters
-        ----------
-        direction : DirectionType, optional
-            The direction child widgets in the module (default is "Horizontal").
-        """
-        app = tk.Tk()
-        app.title(cls.title)
-        cls.setup_window(app, direction)
         app.mainloop()
 
     @property
@@ -883,19 +886,15 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
-        try:
-            for roi in self.rois:
-                roi.register_roi(None)
-            if context is None:
-                context = self.get_context()
-            self.draw_rois(context, batch)
-            if batch is False:
-                self.update_viewers()
-            self.logger.info("ROIs Created")
-        # pylint: disable-next=broad-exception-caught
-        except Exception:
-            self.logger.warning("module had an error drawing ROIs.",
-                                exc_info=True)
+
+        for roi in self.rois:
+            roi.register_roi(None)
+        if context is None:
+            context = self.get_context()
+        self.draw_rois(context, batch)
+        if batch is False:
+            self.update_viewers()
+        self.logger.info("ROIs Created")
 
     def run_analysis(self, batch: bool = False) -> None:
         """
@@ -907,22 +906,18 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
-        try:
-            if self.rois_loaded:
-                for field in self.fields:
-                    if field.reset_on_analysis:
-                        field.reset_value()
-                        field.reset_entry_style()
-                        field.reset_label_style()
-                self.analyse(batch)
-                self.analysed = True
-                if batch is False:
-                    self.update_viewers()
-                self.logger.info("Analysis Completed")
-        # pylint: disable-next=broad-exception-caught
-        except Exception:
-            self.logger.warning("module had an error on analysis.",
-                                exc_info=True)
+
+        if self.rois_loaded:
+            for field in self.fields:
+                if field.reset_on_analysis:
+                    field.reset_value()
+                    field.reset_entry_style()
+                    field.reset_label_style()
+            self.analyse(batch)
+            self.analysed = True
+            if batch is False:
+                self.update_viewers()
+            self.logger.info("Analysis Completed")
 
     def create_and_run(self, context: BaseContext | None = None) -> None:
         """
