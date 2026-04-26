@@ -3,7 +3,9 @@ Classes:
  * BaseModule
  * PhantomModule
 """
-
+import sys
+import logging
+from types import TracebackType
 from abc import ABC
 import tkinter as tk
 from tkinter import ttk
@@ -21,6 +23,7 @@ from pumpia.widgets.context_managers import (BaseContextManager,
                                              PhantomContextManager,
                                              SimpleContextManager,
                                              ManualPhantomManager)
+from pumpia.widgets.textbox_logger import TextBoxHandler
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.module_handling.fields.simple import _FieldsMeta
 from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
@@ -137,6 +140,7 @@ class BaseModule(ABC, ttk.Frame):
         ROI Fields for the module
     manager : Manager | None
     parent : tk.Misc | None
+    logger : logging.Logger
     verbose_name : str | None
     direction : Literal["horizontal", "vertical"]
     main_viewer : BaseViewer | None
@@ -305,7 +309,8 @@ class BaseModule(ABC, ttk.Frame):
               *,
               parent: tk.Misc | None = None,
               manager: Manager | None = None,
-              context_manager: BaseContextManager | None = None):
+              context_manager: BaseContextManager | None = None,
+              parent_logger: logging.Logger | None = None):
         """
         Sets up the module.
         Parent and manager must be set before calling this method or provided as arguments.
@@ -326,6 +331,8 @@ class BaseModule(ABC, ttk.Frame):
                 self.parent = parent
             if manager is not None:
                 self.manager = manager
+            if context_manager is not None:
+                self.context_manager = context_manager
 
             if self.parent is None:
                 raise ValueError("parent needs to be set using set_parent or provided")
@@ -346,11 +353,12 @@ class BaseModule(ABC, ttk.Frame):
             self.viewer_frame = ttk.Frame(self.paned_window)
             self.paned_window.add(self.viewer_frame, weight=1)
 
+            self.main_window = ttk.Notebook(self.paned_window)
+            self.paned_window.add(self.main_window)
+            self.io_frame = ScrolledWindow(self.main_window)
+            self.main_window.add(self.io_frame.outer_frame, text="Main")
+
             if context_manager is None:
-                self.main_window = ttk.Notebook(self.paned_window)
-                self.paned_window.add(self.main_window)
-                self.io_frame = ScrolledWindow(self.main_window)
-                self.main_window.add(self.io_frame.outer_frame, text="Main")
                 self.context_frame = ScrolledWindow(self.main_window)
 
                 self.context_buttons_frame = ttk.Frame(self.context_frame)
@@ -374,10 +382,24 @@ class BaseModule(ABC, ttk.Frame):
                 self.main_window.add(self.context_frame.outer_frame, text="Context")
                 add_context_buttons = True
             else:
-                self.context_manager = context_manager
-                self.io_frame = ScrolledWindow(self.paned_window)
-                self.paned_window.add(self.io_frame.outer_frame)
                 add_context_buttons = False
+
+            self.log_handler = TextBoxHandler(self.main_window)
+            self.main_window.add(self.log_handler.frame, text="Log")
+
+            if parent_logger is not None:
+                self.logger = logging.getLogger(parent_logger.name + "." + self.name)
+            else:
+                self.logger = logging.getLogger(self.name)
+                self.logger.propagate = False
+                stream_handler = logging.StreamHandler()
+                stream_handler.setLevel(logging.WARNING)
+                self.logger.addHandler(stream_handler)
+                sys.excepthook = self._handle_exception
+
+            self.logger.propagate = True
+            self.logger.setLevel(logging.DEBUG)
+            self.logger.addHandler(self.log_handler)
 
             self.fields_frame = ttk.Labelframe(self.io_frame, text="Fields")
             self.roi_frame = ttk.Labelframe(self.io_frame, text="ROIs")
@@ -567,20 +589,28 @@ class BaseModule(ABC, ttk.Frame):
             self.load_commands()
             self._is_setup = True
 
+    def _handle_exception(self,
+                          exc_type: type[BaseException],
+                          exc_value: BaseException,
+                          exc_traceback: TracebackType | None):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
+        self.logger.error("", exc_info=(exc_type, exc_value, exc_traceback))
+
     @classmethod
-    def setup_window(cls: type[Self],
-                     app: tk.Tk,
-                     direction: DirectionType = "Horizontal"):
+    def run(cls: type[Self],
+            direction: DirectionType = "Horizontal"):
         """
-        Sets up the application window when running the module independantly.
+        Runs the module independently.
 
         Parameters
         ----------
-        app : tk.Tk
-            The application window.
         direction : DirectionType, optional
-            The direction of the child widgets in the module (default is "Horizontal").
+            The direction child widgets in the module (default is "Horizontal").
         """
+        app = tk.Tk()
+        app.title(cls.title)
         app.columnconfigure(0, weight=1)
         app.columnconfigure(1, weight=1)
         app.rowconfigure(1, weight=1)
@@ -614,20 +644,12 @@ class BaseModule(ABC, ttk.Frame):
         module = cls(frame, man, direction=direction)
         frame.add(module, weight=1)
 
-    @classmethod
-    def run(cls: type[Self],
-            direction: DirectionType = "Horizontal"):
-        """
-        Runs the module independently.
+        app.report_callback_exception = module._handle_exception
+        logging.getLogger().addHandler(module.log_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.WARNING)
+        logging.getLogger().addHandler(stream_handler)
 
-        Parameters
-        ----------
-        direction : DirectionType, optional
-            The direction child widgets in the module (default is "Horizontal").
-        """
-        app = tk.Tk()
-        app.title(cls.title)
-        cls.setup_window(app, direction)
         app.mainloop()
 
     @property
@@ -864,6 +886,7 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
+
         for roi in self.rois:
             roi.register_roi(None)
         if context is None:
@@ -871,6 +894,7 @@ class BaseModule(ABC, ttk.Frame):
         self.draw_rois(context, batch)
         if batch is False:
             self.update_viewers()
+        self.logger.info("ROIs Created")
 
     def run_analysis(self, batch: bool = False) -> None:
         """
@@ -882,6 +906,7 @@ class BaseModule(ABC, ttk.Frame):
         batch : bool
             If this is being ran as part of a batch, e.g. in a collection (default is False)
         """
+
         if self.rois_loaded:
             for field in self.fields:
                 if field.reset_on_analysis:
@@ -890,6 +915,9 @@ class BaseModule(ABC, ttk.Frame):
                     field.reset_label_style()
             self.analyse(batch)
             self.analysed = True
+            if batch is False:
+                self.update_viewers()
+            self.logger.info("Analysis Completed")
 
     def create_and_run(self, context: BaseContext | None = None) -> None:
         """

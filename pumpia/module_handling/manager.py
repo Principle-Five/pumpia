@@ -3,8 +3,7 @@ Classes:
  * Manager
 """
 
-import warnings
-import traceback
+import logging
 import gc
 import datetime
 import typing
@@ -248,8 +247,6 @@ class Manager:
                 viewer.unload_images()
             gc.collect()
 
-        filters = warnings.filters
-        warnings.simplefilter("default")
         try:
             try:
                 open_dicom = dcmread(filepath)
@@ -268,13 +265,8 @@ class Manager:
                 else:
                     self.load_dicom(open_dicom, filepath)
         # pylint: disable-next=broad-exception-caught
-        except Exception as exc:
-            warning = UserWarning(f"{filepath} failed to load.")
-            warning.with_traceback(exc.__traceback__)
-            traceback.print_exc()
-            warnings.simplefilter("always")
-            warnings.warn(warning, stacklevel=2)
-        warnings.filters = filters
+        except Exception:
+            logging.warning("%s failed to load.", filepath)
         self.update_trees()
 
     def load_images(self,
@@ -336,9 +328,7 @@ class Manager:
 
             tk_parent.update()
 
-        filters = warnings.filters
         for file in files:
-            warnings.simplefilter("default")
             try:
                 try:
                     open_dicom = dcmread(file)
@@ -357,20 +347,14 @@ class Manager:
                     else:
                         self.load_dicom(open_dicom, file)
             # pylint: disable-next=broad-exception-caught
-            except Exception as exc:
-                warning = UserWarning(f"{file} failed to load.")
-                warning.with_traceback(exc.__traceback__)
-                traceback.print_exc()
-                warnings.simplefilter("always")
-                warnings.warn(warning, stacklevel=2)
+            except Exception:
+                logging.warning("%s failed to load.", file)
 
             if tk_parent is not None:
                 file_count += 1
                 count_label["text"] = f"{file_count}/{total_files}"
                 count_bar.step(1)
                 tk_parent.update()
-
-        warnings.filters = filters
 
         if tk_parent is not None:
             count_frame.destroy()

@@ -71,6 +71,10 @@ When subclassing :py:class:`BaseCollection <pumpia.module_handling.collections.B
     * :py:meth:`load_commands <pumpia.module_handling.collections.BaseCollection.load_commands>`
     * :py:meth:`on_image_load <pumpia.module_handling.collections.BaseCollection.on_image_load>`
 
+Logging
+-------
+Collections and Modules have a ``logger`` attribute which can be used to provide information to the user.
+Messages passed to the logger can be viewed on the ``Log`` window of the user interface.
 
 Contents
 --------

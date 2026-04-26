@@ -6,8 +6,9 @@ Classes:
 """
 
 from abc import ABC
-import warnings
-import traceback
+import sys
+import logging
+from types import TracebackType
 import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self, Any
@@ -20,12 +21,30 @@ from pumpia.widgets.context_managers import (BaseContextManager,
                                              PhantomContextManager)
 from pumpia.widgets.scrolled_window import ScrolledWindow
 from pumpia.widgets.viewers import BaseViewer
+from pumpia.widgets.textbox_logger import TextBoxHandler
 from pumpia.module_handling.fields.groups import _FieldGroupsMeta
 from pumpia.module_handling.fields.windows import _FieldWindowsMeta, FieldWindow
 from pumpia.module_handling.fields.viewer_fields import _ViewerFieldsMeta
 from pumpia.module_handling.modules import BaseModule, _ModulesMeta
 from pumpia.module_handling.manager import Manager
 from pumpia.module_handling.context import BaseContext
+
+
+class ModuleFormatter(logging.Formatter):
+    """
+    A logging formatter that preppends the module name
+    (pulled from the initial logger name) to the formatted string.
+    """
+
+    def format(self, record: logging.LogRecord) -> str:
+        formatted_record = super().format(record)
+        try:
+            module_logger = ".".join(record.name.split(".")[1:])
+        except IndexError:
+            module_logger = record.name
+        if module_logger != "":
+            return f"{module_logger}: {formatted_record}"
+        return formatted_record
 
 
 class _ModuleGroups:
@@ -47,6 +66,9 @@ class _ModuleGroupsMeta:
 
     @property
     def group_names(self) -> list[str]:
+        """
+        The names of the module groups for the linked collection.
+        """
         return list(self.groups.keys())
 
     def __set_name__(self, owner: type[BaseCollection], name: str):
@@ -59,7 +81,10 @@ class _ModuleGroupsMeta:
     @overload
     def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
 
-    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _ModuleGroups | Self:
+    def __get__(self,
+                obj: BaseCollection | None,
+                owner: type[BaseCollection]
+                ) -> _ModuleGroups | Self:
         if obj is None:
             if owner is self.base_owner:
                 return self
@@ -186,7 +211,8 @@ class ModuleGroup(ttk.Panedwindow):
                 lf.rowconfigure(0, weight=1)
                 module.setup(parent=lf,
                              manager=obj.manager,
-                             context_manager=obj.context_manager)
+                             context_manager=obj.context_manager,
+                             parent_logger=obj.logger)
                 module.grid(column=0, row=0, sticky=tk.NSEW)
                 group.add(lf, weight=1)
                 modules.append(getattr(obj, module_name))
@@ -376,6 +402,21 @@ class BaseCollection(ABC, ttk.Frame):
                                              command=self.get_context)
         self.get_context_button.grid(column=0, row=0, sticky=tk.NSEW)
 
+        self.log_handler = TextBoxHandler(self.main_window,
+                                          formatter=ModuleFormatter(fmt="{levelname}: {message}",
+                                                                    style="{"))
+        self.main_window.add(self.log_handler.frame, text="Log")
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.WARNING)
+        stream_handler.setFormatter(ModuleFormatter(fmt="{levelname}: {message}",
+                                                    style="{"))
+
+        self.logger = logging.getLogger(self.title.replace(" ", "_").lower())
+        self.logger.propagate = False
+        self.logger.setLevel(logging.DEBUG)
+        self.logger.addHandler(self.log_handler)
+        self.logger.addHandler(stream_handler)
+
         show_draw_rois_button: bool = False
         show_analyse_button: bool = False
 
@@ -395,7 +436,8 @@ class BaseCollection(ABC, ttk.Frame):
             if module.parent is None:
                 module.setup(parent=self.notebook,
                              manager=self.manager,
-                             context_manager=self.context_manager)
+                             context_manager=self.context_manager,
+                             parent_logger=self.logger)
                 if module.verbose_name is None:
                     name = module.name
                 else:
@@ -536,6 +578,15 @@ class BaseCollection(ABC, ttk.Frame):
 
         self.load_commands()
 
+    def _handle_exception(self,
+                          exc_type: type[BaseException],
+                          exc_value: BaseException,
+                          exc_traceback: TracebackType | None):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
+        self.logger.error("", exc_info=(exc_type, exc_value, exc_traceback))
+
     def _on_image_load_partial(self, viewer: BaseViewer) -> Callable[[], None]:
         """
         Returns a partial function for handling image load events.
@@ -654,38 +705,27 @@ class BaseCollection(ABC, ttk.Frame):
         calls the `create_rois` method for each module.
         """
         context = self.get_context()
-        filters = warnings.filters
         for module in self.modules:
-            warnings.simplefilter("default")
             try:
                 module.create_rois(context, batch=True)
             # pylint: disable-next=broad-exception-caught
-            except Exception as exc:
-                warning = UserWarning(f"{module.verbose_name} module had an error drawing ROIs.")
-                warning.with_traceback(exc.__traceback__)
-                traceback.print_exc()
-                warnings.simplefilter("always")
-                warnings.warn(warning, stacklevel=2)
-        warnings.filters = filters
+            except Exception:
+                module.logger.warning("module had an error drawing ROIs.",
+                                      exc_info=True)
         self.update_viewers()
 
     def run_analysis(self) -> None:
         """
         By default this calls the `run_analysis` method for each module.
         """
-        filters = warnings.filters
         for module in self.modules:
-            warnings.simplefilter("default")
             try:
                 module.run_analysis(batch=True)
             # pylint: disable-next=broad-exception-caught
-            except Exception as exc:
-                warning = UserWarning(f"{module.verbose_name} module had an error on analysis.")
-                warning.with_traceback(exc.__traceback__)
-                traceback.print_exc()
-                warnings.simplefilter("always")
-                warnings.warn(warning, stacklevel=2)
-        warnings.filters = filters
+            except Exception:
+                module.logger.warning("module had an error on analysis.",
+                                      exc_info=True)
+        self.update_viewers()
 
     def create_and_run(self) -> None:
         """
@@ -739,5 +779,11 @@ class BaseCollection(ABC, ttk.Frame):
 
         collection = cls(frame, man, direction=direction)
         frame.add(collection, weight=1)
+
+        app.report_callback_exception = collection._handle_exception
+        logging.getLogger().addHandler(collection.log_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.WARNING)
+        logging.getLogger().addHandler(stream_handler)
 
         app.mainloop()

@@ -58,6 +58,7 @@ class ExampleModule(BaseModule):
                 self.average = mean
             else:
                 self.average = math.sqrt(math.sumprod(mean, mean))
+            self.logger.info("Average for ROI is: %f", mean)
 
     def on_image_load(self, viewer: BaseViewer) -> None:
         if viewer is self.viewer:
