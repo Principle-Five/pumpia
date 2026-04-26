@@ -266,7 +266,7 @@ class Manager:
                     self.load_dicom(open_dicom, filepath)
         # pylint: disable-next=broad-exception-caught
         except Exception:
-            logging.warning("%s failed to load.", filepath)
+            logging.warning("%s failed to load.", filepath, exc_info=True)
         self.update_trees()
 
     def load_images(self,
@@ -348,7 +348,7 @@ class Manager:
                         self.load_dicom(open_dicom, file)
             # pylint: disable-next=broad-exception-caught
             except Exception:
-                logging.warning("%s failed to load.", file)
+                logging.warning("%s failed to load.", file, exc_info=True)
 
             if tk_parent is not None:
                 file_count += 1
