@@ -139,6 +139,7 @@ class BaseModule(ABC, ttk.Frame):
         ROI Fields for the module
     manager : Manager | None
     parent : tk.Misc | None
+    logger : logging.Logger
     verbose_name : str | None
     direction : Literal["horizontal", "vertical"]
     main_viewer : BaseViewer | None
