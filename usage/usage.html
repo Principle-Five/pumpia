@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example" href="example.html" />
+    <link rel="prev" title="Regions of Interest" href="../components/rois.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../components/components.html">Core Components</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example.html">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html">Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="collections.html">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html">The User Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<p>See <a class="reference internal" href="example.html"><span class="doc">Example</span></a> for an implementation of the below.</p>
+<section id="modules">
+<h2><a class="reference internal" href="modules.html"><span class="doc">Modules</span></a><a class="headerlink" href="#modules" title="Link to this heading"></a></h2>
+<p>This is how most people will write analysis programs using PumpIA.
+Modules automatically handle the user interface aspect of the program.
+When subclassing one of the provided modules the following are designed to be replaced or extended:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.analyse" title="pumpia.module_handling.modules.BaseModule.analyse"><code class="xref py py-meth docutils literal notranslate"><span class="pre">analyse</span></code></a></p></li>
+<li><p><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.draw_rois" title="pumpia.module_handling.modules.BaseModule.draw_rois"><code class="xref py py-meth docutils literal notranslate"><span class="pre">draw_rois</span></code></a></p></li>
+<li><p><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.load_commands" title="pumpia.module_handling.modules.BaseModule.load_commands"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_commands</span></code></a></p></li>
+<li><p><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.link_rois_viewers" title="pumpia.module_handling.modules.BaseModule.link_rois_viewers"><code class="xref py py-meth docutils literal notranslate"><span class="pre">link_rois_viewers</span></code></a></p></li>
+<li><p><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.post_roi_register" title="pumpia.module_handling.modules.BaseModule.post_roi_register"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post_roi_register</span></code></a></p></li>
+<li><p><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.on_image_load" title="pumpia.module_handling.modules.BaseModule.on_image_load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_image_load</span></code></a></p></li>
+</ul>
+</div></blockquote>
+<p>The class method <a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.run" title="pumpia.module_handling.modules.BaseModule.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run</span></code></a> is used to run the module as a stand alone.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">context_manager</span></code> class attribute can be defined for modules, it defaults to <a class="reference internal" href="context.html#pumpia.widgets.context_managers.SimpleContextManager" title="pumpia.widgets.context_managers.SimpleContextManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleContextManagerGenerator</span></code></a>.
+If the class attribute <code class="docutils literal notranslate"><span class="pre">show_draw_rois_button</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> then a button to draw ROIs is shown.
+If the class attribute <code class="docutils literal notranslate"><span class="pre">show_analyse_button</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code> then a button to analyse the image is shown.
+If both are set to <code class="docutils literal notranslate"><span class="pre">True</span></code> then a button to do both is also shown.
+The <code class="docutils literal notranslate"><span class="pre">title</span></code> class attribute is shown in the window title, this defaults to <code class="docutils literal notranslate"><span class="pre">Pumpia</span> <span class="pre">Module</span></code>.</p>
+</section>
+<section id="fields-fields">
+<h2><a class="reference internal" href="fields/fields.html"><span class="doc">Fields</span></a><a class="headerlink" href="#fields-fields" title="Link to this heading"></a></h2>
+<p>These allow users to provide information to and get information out of the module.
+There are three categories of IOs:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><a class="reference internal" href="fields/simple.html"><span class="doc">Simple fields</span></a> handle data such as strings, options, numbers, booleans, and dates.</dt><dd><p>These can be linked through <a class="reference internal" href="fields/groups.html#pumpia.module_handling.fields.groups.FieldGroup" title="pumpia.module_handling.fields.groups.FieldGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldGroup</span></code></a> in collections so that multiple fields always have the same value.</p>
+</dd>
+</dl>
+</li>
+<li><p><a class="reference internal" href="fields/viewer_fields.html"><span class="doc">Viewer fields</span></a> represent viewers. These become viewers on module setup as well.</p></li>
+<li><p><a class="reference internal" href="fields/roi_fields.html"><span class="doc">ROI fields</span></a> handle ROIs created and used by the module.</p></li>
+</ul>
+</div></blockquote>
+<p>Fields can be grouped together in the user interface of both modules and collections by using <a class="reference internal" href="fields/windows.html#pumpia.module_handling.fields.windows.FieldWindow" title="pumpia.module_handling.fields.windows.FieldWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldWindow</span></code></a>.</p>
+</section>
+<section id="context">
+<h2><a class="reference internal" href="context.html"><span class="doc">Context</span></a><a class="headerlink" href="#context" title="Link to this heading"></a></h2>
+<p>Context is used to pass information into the module for drawing ROIs, it is useful to reduce recalculating information between modules.
+In the user interface collections of widgets called <cite>context managers</cite> use the modules <code class="docutils literal notranslate"><span class="pre">main_viewer</span></code> to generate the context.
+The context manager is set using the <code class="docutils literal notranslate"><span class="pre">context_manager</span></code> class attribute, or it can be passed into the module like with collections.
+Alternatively a modules <cite>get_context</cite> method can be overwritten.</p>
+<p>The following context managers are provided:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="context.html#pumpia.widgets.context_managers.BaseContextManager" title="pumpia.widgets.context_managers.BaseContextManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseContextManager</span></code></a></p></li>
+<li><p><a class="reference internal" href="context.html#pumpia.widgets.context_managers.SimpleContextManager" title="pumpia.widgets.context_managers.SimpleContextManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleContextManager</span></code></a></p></li>
+<li><p><a class="reference internal" href="context.html#pumpia.widgets.context_managers.PhantomContextManager" title="pumpia.widgets.context_managers.PhantomContextManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhantomContextManager</span></code></a></p></li>
+<li><p><a class="reference internal" href="context.html#pumpia.widgets.context_managers.ManualPhantomManager" title="pumpia.widgets.context_managers.ManualPhantomManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManualPhantomManager</span></code></a></p></li>
+<li><p><a class="reference internal" href="context.html#pumpia.widgets.context_managers.AutoPhantomManager" title="pumpia.widgets.context_managers.AutoPhantomManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoPhantomManager</span></code></a></p></li>
+</ul>
+</div></blockquote>
+<p>When creating your own context manager you must provide the <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context</span></code> method.</p>
+</section>
+<section id="collections">
+<h2><a class="reference internal" href="collections.html"><span class="doc">Collections</span></a><a class="headerlink" href="#collections" title="Link to this heading"></a></h2>
+<p>Collections are used to group modules together, with a main tab showing the context and any defined viewers.
+Only <a class="reference internal" href="fields/viewer_fields.html"><span class="doc">viewer fields</span></a>, <a class="reference internal" href="fields/groups.html"><span class="doc">field groups</span></a>  can be used with collections, any others will be ignored/wont function as expected.</p>
+<p>Similar to modules they have context which is shared across all the modules in the collection.
+The <code class="docutils literal notranslate"><span class="pre">context_manager</span></code> class attribute can be defined for collections, it defaults to <a class="reference internal" href="context.html#pumpia.widgets.context_managers.SimpleContextManager" title="pumpia.widgets.context_managers.SimpleContextManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleContextManagerGenerator</span></code></a>.
+The <code class="docutils literal notranslate"><span class="pre">title</span></code> class attribute is shown in the window title, this defaults to <code class="docutils literal notranslate"><span class="pre">Pumpia</span> <span class="pre">Collection</span></code>.</p>
+<p>Collections introduce two other useful classes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">WindowGroup</span></code> which shows multiple modules in the same tab instead of showing them across multiple tabs.</p></li>
+</ul>
+</div></blockquote>
+<p>When subclassing <a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection" title="pumpia.module_handling.collections.BaseCollection"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCollection</span></code></a> the following methods are designed to be overwritten:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.load_commands" title="pumpia.module_handling.collections.BaseCollection.load_commands"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_commands</span></code></a></p></li>
+<li><p><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.on_image_load" title="pumpia.module_handling.collections.BaseCollection.on_image_load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_image_load</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Link to this heading"></a></h2>
+<p>Collections and Modules have a <code class="docutils literal notranslate"><span class="pre">logger</span></code> attribute which can be used to provide information to the user.
+Messages passed to the logger can be viewed on the <code class="docutils literal notranslate"><span class="pre">Log</span></code> window of the user interface.</p>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule"><code class="docutils literal notranslate"><span class="pre">BaseModule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.context_manager"><code class="docutils literal notranslate"><span class="pre">BaseModule.context_manager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.show_draw_rois_button"><code class="docutils literal notranslate"><span class="pre">BaseModule.show_draw_rois_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.show_analyse_button"><code class="docutils literal notranslate"><span class="pre">BaseModule.show_analyse_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.show_copy_buttons"><code class="docutils literal notranslate"><span class="pre">BaseModule.show_copy_buttons</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.title"><code class="docutils literal notranslate"><span class="pre">BaseModule.title</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.fields"><code class="docutils literal notranslate"><span class="pre">BaseModule.fields</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.field_windows"><code class="docutils literal notranslate"><span class="pre">BaseModule.field_windows</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.viewers"><code class="docutils literal notranslate"><span class="pre">BaseModule.viewers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.rois"><code class="docutils literal notranslate"><span class="pre">BaseModule.rois</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.manager"><code class="docutils literal notranslate"><span class="pre">BaseModule.manager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.parent"><code class="docutils literal notranslate"><span class="pre">BaseModule.parent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.logger"><code class="docutils literal notranslate"><span class="pre">BaseModule.logger</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.verbose_name"><code class="docutils literal notranslate"><span class="pre">BaseModule.verbose_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.direction"><code class="docutils literal notranslate"><span class="pre">BaseModule.direction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.main_viewer"><code class="docutils literal notranslate"><span class="pre">BaseModule.main_viewer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.rois_loaded"><code class="docutils literal notranslate"><span class="pre">BaseModule.rois_loaded</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.analysed"><code class="docutils literal notranslate"><span class="pre">BaseModule.analysed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.input_count"><code class="docutils literal notranslate"><span class="pre">BaseModule.input_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.output_count"><code class="docutils literal notranslate"><span class="pre">BaseModule.output_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.viewer_count"><code class="docutils literal notranslate"><span class="pre">BaseModule.viewer_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.roi_count"><code class="docutils literal notranslate"><span class="pre">BaseModule.roi_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.is_setup"><code class="docutils literal notranslate"><span class="pre">BaseModule.is_setup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.setup"><code class="docutils literal notranslate"><span class="pre">BaseModule.setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.get_context"><code class="docutils literal notranslate"><span class="pre">BaseModule.get_context()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.load_commands"><code class="docutils literal notranslate"><span class="pre">BaseModule.load_commands()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.register_command"><code class="docutils literal notranslate"><span class="pre">BaseModule.register_command()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.link_rois_viewers"><code class="docutils literal notranslate"><span class="pre">BaseModule.link_rois_viewers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.post_roi_register"><code class="docutils literal notranslate"><span class="pre">BaseModule.post_roi_register()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.manual_roi_draw"><code class="docutils literal notranslate"><span class="pre">BaseModule.manual_roi_draw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.draw_rois"><code class="docutils literal notranslate"><span class="pre">BaseModule.draw_rois()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.analyse"><code class="docutils literal notranslate"><span class="pre">BaseModule.analyse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.on_image_load"><code class="docutils literal notranslate"><span class="pre">BaseModule.on_image_load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.on_tab_select"><code class="docutils literal notranslate"><span class="pre">BaseModule.on_tab_select()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.create_rois"><code class="docutils literal notranslate"><span class="pre">BaseModule.create_rois()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.run_analysis"><code class="docutils literal notranslate"><span class="pre">BaseModule.run_analysis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.create_and_run"><code class="docutils literal notranslate"><span class="pre">BaseModule.create_and_run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.setup_window"><code class="docutils literal notranslate"><span class="pre">BaseModule.setup_window()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.BaseModule.run"><code class="docutils literal notranslate"><span class="pre">BaseModule.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#pumpia.module_handling.modules.PhantomModule"><code class="docutils literal notranslate"><span class="pre">PhantomModule</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fields/fields.html">Fields</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html#simple"><span class="xref std std-doc">simple</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html#groups"><span class="xref std std-doc">groups</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html#windows"><span class="xref std std-doc">windows</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html#viewer-fields"><span class="xref std std-doc">viewer_fields</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html#roi-fields"><span class="xref std std-doc">roi_fields</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fields/fields.html#contents">Contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fields/simple.html">Simple Fields</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField"><code class="docutils literal notranslate"><span class="pre">BaseField</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.verbose_name"><code class="docutils literal notranslate"><span class="pre">BaseField.verbose_name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.value"><code class="docutils literal notranslate"><span class="pre">BaseField.value</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.label"><code class="docutils literal notranslate"><span class="pre">BaseField.label</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.label_var"><code class="docutils literal notranslate"><span class="pre">BaseField.label_var</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.value_var"><code class="docutils literal notranslate"><span class="pre">BaseField.value_var</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.hidden"><code class="docutils literal notranslate"><span class="pre">BaseField.hidden</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.parent"><code class="docutils literal notranslate"><span class="pre">BaseField.parent</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.reset_value"><code class="docutils literal notranslate"><span class="pre">BaseField.reset_value()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.new_label"><code class="docutils literal notranslate"><span class="pre">BaseField.new_label()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BaseField.new_entry"><code class="docutils literal notranslate"><span class="pre">BaseField.new_entry()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.OptionField"><code class="docutils literal notranslate"><span class="pre">OptionField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.BoolField"><code class="docutils literal notranslate"><span class="pre">BoolField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.StringField"><code class="docutils literal notranslate"><span class="pre">StringField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.IntField"><code class="docutils literal notranslate"><span class="pre">IntField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.PercField"><code class="docutils literal notranslate"><span class="pre">PercField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.FloatField"><code class="docutils literal notranslate"><span class="pre">FloatField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/simple.html#pumpia.module_handling.fields.simple.DateField"><code class="docutils literal notranslate"><span class="pre">DateField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fields/groups.html">Field Groups</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fields/groups.html#pumpia.module_handling.fields.groups.FieldGroup"><code class="docutils literal notranslate"><span class="pre">FieldGroup</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fields/groups.html#pumpia.module_handling.fields.groups.FieldGroup.fields"><code class="docutils literal notranslate"><span class="pre">FieldGroup.fields</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/groups.html#pumpia.module_handling.fields.groups.FieldGroup.name"><code class="docutils literal notranslate"><span class="pre">FieldGroup.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/groups.html#pumpia.module_handling.fields.groups.FieldGroup.verbose_name"><code class="docutils literal notranslate"><span class="pre">FieldGroup.verbose_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fields/windows.html">Field Window</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fields/windows.html#pumpia.module_handling.fields.windows.FieldWindow"><code class="docutils literal notranslate"><span class="pre">FieldWindow</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fields/windows.html#pumpia.module_handling.fields.windows.FieldWindow.fields"><code class="docutils literal notranslate"><span class="pre">FieldWindow.fields</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/windows.html#pumpia.module_handling.fields.windows.FieldWindow.field_names"><code class="docutils literal notranslate"><span class="pre">FieldWindow.field_names</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/windows.html#pumpia.module_handling.fields.windows.FieldWindow.name"><code class="docutils literal notranslate"><span class="pre">FieldWindow.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/windows.html#pumpia.module_handling.fields.windows.FieldWindow.verbose_name"><code class="docutils literal notranslate"><span class="pre">FieldWindow.verbose_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fields/viewer_fields.html">Viewer Inputs and Outputs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField"><code class="docutils literal notranslate"><span class="pre">BaseViewerField</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.row"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.row</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.column"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.column</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.allow_drag_drop"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.allow_drag_drop</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.allow_drawing_rois"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.allow_drawing_rois</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.validation_command"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.validation_command</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.main"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.main</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.ViewerField"><code class="docutils literal notranslate"><span class="pre">ViewerField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.ArrayViewerField"><code class="docutils literal notranslate"><span class="pre">ArrayViewerField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.MonochromeViewerField"><code class="docutils literal notranslate"><span class="pre">MonochromeViewerField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.DicomViewerField"><code class="docutils literal notranslate"><span class="pre">DicomViewerField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/viewer_fields.html#pumpia.module_handling.fields.viewer_fields.MonochromeDicomViewerField"><code class="docutils literal notranslate"><span class="pre">MonochromeDicomViewerField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fields/roi_fields.html">Region of Interest Fields</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField"><code class="docutils literal notranslate"><span class="pre">BaseROIField</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.name"><code class="docutils literal notranslate"><span class="pre">BaseROIField.name</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.roi"><code class="docutils literal notranslate"><span class="pre">BaseROIField.roi</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.default_type"><code class="docutils literal notranslate"><span class="pre">BaseROIField.default_type</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.self.viewer"><code class="docutils literal notranslate"><span class="pre">BaseROIField.self.viewer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.post_register_command"><code class="docutils literal notranslate"><span class="pre">BaseROIField.post_register_command</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.label_var"><code class="docutils literal notranslate"><span class="pre">BaseROIField.label_var</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.select_button"><code class="docutils literal notranslate"><span class="pre">BaseROIField.select_button</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.draw_button"><code class="docutils literal notranslate"><span class="pre">BaseROIField.draw_button</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.register_roi"><code class="docutils literal notranslate"><span class="pre">BaseROIField.register_roi()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.set_parent"><code class="docutils literal notranslate"><span class="pre">BaseROIField.set_parent()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.set_manager"><code class="docutils literal notranslate"><span class="pre">BaseROIField.set_manager()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.set_as_active"><code class="docutils literal notranslate"><span class="pre">BaseROIField.set_as_active()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.GeneralROIField"><code class="docutils literal notranslate"><span class="pre">GeneralROIField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.RectangleROIField"><code class="docutils literal notranslate"><span class="pre">RectangleROIField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.EllipseROIField"><code class="docutils literal notranslate"><span class="pre">EllipseROIField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.LineROIField"><code class="docutils literal notranslate"><span class="pre">LineROIField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.AngleROIField"><code class="docutils literal notranslate"><span class="pre">AngleROIField</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="fields/roi_fields.html#pumpia.module_handling.fields.roi_fields.PointROIField"><code class="docutils literal notranslate"><span class="pre">PointROIField</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="collections.html">Collections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.ModuleGroup"><code class="docutils literal notranslate"><span class="pre">ModuleGroup</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.ModuleGroup.modules"><code class="docutils literal notranslate"><span class="pre">ModuleGroup.modules</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.ModuleGroup.verbose_name"><code class="docutils literal notranslate"><span class="pre">ModuleGroup.verbose_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.ModuleGroup.direction"><code class="docutils literal notranslate"><span class="pre">ModuleGroup.direction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.ModuleGroup.setup"><code class="docutils literal notranslate"><span class="pre">ModuleGroup.setup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.ModuleGroup.on_tab_select"><code class="docutils literal notranslate"><span class="pre">ModuleGroup.on_tab_select()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection"><code class="docutils literal notranslate"><span class="pre">BaseCollection</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.context_manager"><code class="docutils literal notranslate"><span class="pre">BaseCollection.context_manager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.title"><code class="docutils literal notranslate"><span class="pre">BaseCollection.title</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.manager"><code class="docutils literal notranslate"><span class="pre">BaseCollection.manager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.direction"><code class="docutils literal notranslate"><span class="pre">BaseCollection.direction</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.modules"><code class="docutils literal notranslate"><span class="pre">BaseCollection.modules</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.field_groups"><code class="docutils literal notranslate"><span class="pre">BaseCollection.field_groups</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.field_windows"><code class="docutils literal notranslate"><span class="pre">BaseCollection.field_windows</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.viewers"><code class="docutils literal notranslate"><span class="pre">BaseCollection.viewers</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.module_groups"><code class="docutils literal notranslate"><span class="pre">BaseCollection.module_groups</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.main_viewer"><code class="docutils literal notranslate"><span class="pre">BaseCollection.main_viewer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.viewer_count"><code class="docutils literal notranslate"><span class="pre">BaseCollection.viewer_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.output_frame_count"><code class="docutils literal notranslate"><span class="pre">BaseCollection.output_frame_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.load_commands"><code class="docutils literal notranslate"><span class="pre">BaseCollection.load_commands()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.register_command"><code class="docutils literal notranslate"><span class="pre">BaseCollection.register_command()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.on_image_load"><code class="docutils literal notranslate"><span class="pre">BaseCollection.on_image_load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.on_main_tab_select"><code class="docutils literal notranslate"><span class="pre">BaseCollection.on_main_tab_select()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.create_rois"><code class="docutils literal notranslate"><span class="pre">BaseCollection.create_rois()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.run_analysis"><code class="docutils literal notranslate"><span class="pre">BaseCollection.run_analysis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.create_and_run"><code class="docutils literal notranslate"><span class="pre">BaseCollection.create_and_run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="collections.html#pumpia.module_handling.collections.BaseCollection.run"><code class="docutils literal notranslate"><span class="pre">BaseCollection.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="context.html">Context</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="context.html#pumpia.module_handling.context.BaseContext"><code class="docutils literal notranslate"><span class="pre">BaseContext</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#pumpia.module_handling.context.PhantomContext"><code class="docutils literal notranslate"><span class="pre">PhantomContext</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#pumpia.module_handling.context.BoundBoxContext"><code class="docutils literal notranslate"><span class="pre">BoundBoxContext</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#pumpia.module_handling.context.SimpleContext"><code class="docutils literal notranslate"><span class="pre">SimpleContext</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="context.html#context-managers">Context Managers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="context.html#pumpia.widgets.context_managers.BaseContextManager"><code class="docutils literal notranslate"><span class="pre">BaseContextManager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html#pumpia.widgets.context_managers.SimpleContextManager"><code class="docutils literal notranslate"><span class="pre">SimpleContextManager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html#pumpia.widgets.context_managers.PhantomContextManager"><code class="docutils literal notranslate"><span class="pre">PhantomContextManager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html#pumpia.widgets.context_managers.ManualPhantomManager"><code class="docutils literal notranslate"><span class="pre">ManualPhantomManager</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="context.html#pumpia.widgets.context_managers.AutoPhantomManager"><code class="docutils literal notranslate"><span class="pre">AutoPhantomManager</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">The User Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html#the-image-tree">The Image Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html#rois-in-modules">ROIs in Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_interface.html#context">Context</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user_interface.html#auto-fitting">Auto Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_interface.html#manual-boundary-control">Manual Boundary Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_interface.html#full-manual-control">Full Manual Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user_interface.html#on-image">On Image</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../components/rois.html" class="btn btn-neutral float-left" title="Regions of Interest" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example.html" class="btn btn-neutral float-right" title="Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

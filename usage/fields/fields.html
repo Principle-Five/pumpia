@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fields &mdash; PumpIA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Simple Fields" href="simple.html" />
+    <link rel="prev" title="Modules" href="../modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PumpIA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../components/components.html">Core Components</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">Usage</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">Modules</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple.html">Simple Fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="groups.html">Field Groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="windows.html">Field Window</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html">Viewer Inputs and Outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html">Region of Interest Fields</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../collections.html">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../context.html">Context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user_interface.html">The User Interface</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../file_handling/file_handling.html">File Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utilities/utilities.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../widgets/widgets.html">Widgets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PumpIA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">Usage</a></li>
+      <li class="breadcrumb-item active">Fields</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/usage/fields/fields.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fields">
+<h1>Fields<a class="headerlink" href="#fields" title="Link to this heading"></a></h1>
+<section id="simple">
+<h2><a class="reference internal" href="simple.html"><span class="doc">Simple Fields</span></a><a class="headerlink" href="#simple" title="Link to this heading"></a></h2>
+<p>Simple fields to represent the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Strings</p></li>
+<li><p>Integers</p></li>
+<li><p>Floats</p></li>
+<li><p>Dates</p></li>
+<li><p>Booleans</p></li>
+<li><p>Options</p></li>
+</ul>
+</div></blockquote>
+<p>Fields are reset before analysis if their <code class="docutils literal notranslate"><span class="pre">reset_on_analysis</span></code> parameter is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, this may be useful for debugging.</p>
+<p>Labels are automatically generated by replacing underscores with spaces and capitalising words, unless provided by <code class="docutils literal notranslate"><span class="pre">verbose_name</span></code>.
+The ttk style for the label and entry can be provided.</p>
+</section>
+<section id="groups">
+<h2><a class="reference internal" href="groups.html"><span class="doc">Field Groups</span></a><a class="headerlink" href="#groups" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="groups.html#pumpia.module_handling.fields.groups.FieldGroup" title="pumpia.module_handling.fields.groups.FieldGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldGroup</span></code></a>’s can be used to group fields together so they have the same value.
+Can only be used in collections, used to share information between modules
+(e.g. if two modules should use the same ROI size).</p>
+</section>
+<section id="windows">
+<h2><a class="reference internal" href="windows.html"><span class="doc">Field Window</span></a><a class="headerlink" href="#windows" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="windows.html#pumpia.module_handling.fields.windows.FieldWindow" title="pumpia.module_handling.fields.windows.FieldWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldWindow</span></code></a>’s can be used to group fields together in the user interface.</p>
+</section>
+<section id="viewer-fields">
+<h2><a class="reference internal" href="viewer_fields.html"><span class="doc">Viewer Inputs and Outputs</span></a><a class="headerlink" href="#viewer-fields" title="Link to this heading"></a></h2>
+<p>Viewer fields have the same parameters as <a class="reference internal" href="../../components/viewers.html#pumpia.widgets.viewers.BaseViewer" title="pumpia.widgets.viewers.BaseViewer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Viewers</span></code></a>, with the addition of the row and column that to position the viewer.
+The following viewer fields are provided:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.ViewerField" title="pumpia.module_handling.fields.viewer_fields.ViewerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ViewerField</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.ArrayViewerField" title="pumpia.module_handling.fields.viewer_fields.ArrayViewerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArrayViewerField</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.MonochromeViewerField" title="pumpia.module_handling.fields.viewer_fields.MonochromeViewerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonochromeViewerField</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.DicomViewerField" title="pumpia.module_handling.fields.viewer_fields.DicomViewerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DicomViewerField</span></code></a></p></li>
+<li><p><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.MonochromeDicomViewerField" title="pumpia.module_handling.fields.viewer_fields.MonochromeDicomViewerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">MonochromeDicomViewerFiel</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="roi-fields">
+<h2><a class="reference internal" href="roi_fields.html"><span class="doc">Region of Interest Fields</span></a><a class="headerlink" href="#roi-fields" title="Link to this heading"></a></h2>
+<p>If an <a class="reference internal" href="../../components/rois.html"><span class="doc">ROI</span></a> is generated procedurally then it must be registered with the relevant field <code class="docutils literal notranslate"><span class="pre">register_roi</span></code> to access it in the user interface.
+A registered ROI can be accessed through the <code class="docutils literal notranslate"><span class="pre">roi</span></code> attribute of the relevant field.</p>
+<p>The following ROI fields are provided:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.GeneralROIField" title="pumpia.module_handling.fields.roi_fields.GeneralROIField"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputGeneralROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.RectangleROIField" title="pumpia.module_handling.fields.roi_fields.RectangleROIField"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputRectangleROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.EllipseROIField" title="pumpia.module_handling.fields.roi_fields.EllipseROIField"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputEllipseROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.LineROIField" title="pumpia.module_handling.fields.roi_fields.LineROIField"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputLineROI</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.AngleROIField" title="pumpia.module_handling.fields.roi_fields.AngleROIField"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputAngle</span></code></a></p></li>
+<li><p><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.PointROIField" title="pumpia.module_handling.fields.roi_fields.PointROIField"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputPointROI</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simple.html">Simple Fields</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField"><code class="docutils literal notranslate"><span class="pre">BaseField</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.verbose_name"><code class="docutils literal notranslate"><span class="pre">BaseField.verbose_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.value"><code class="docutils literal notranslate"><span class="pre">BaseField.value</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.label"><code class="docutils literal notranslate"><span class="pre">BaseField.label</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.label_var"><code class="docutils literal notranslate"><span class="pre">BaseField.label_var</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.value_var"><code class="docutils literal notranslate"><span class="pre">BaseField.value_var</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.hidden"><code class="docutils literal notranslate"><span class="pre">BaseField.hidden</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.parent"><code class="docutils literal notranslate"><span class="pre">BaseField.parent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.reset_value"><code class="docutils literal notranslate"><span class="pre">BaseField.reset_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.new_label"><code class="docutils literal notranslate"><span class="pre">BaseField.new_label()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BaseField.new_entry"><code class="docutils literal notranslate"><span class="pre">BaseField.new_entry()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.OptionField"><code class="docutils literal notranslate"><span class="pre">OptionField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.BoolField"><code class="docutils literal notranslate"><span class="pre">BoolField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.StringField"><code class="docutils literal notranslate"><span class="pre">StringField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.IntField"><code class="docutils literal notranslate"><span class="pre">IntField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.PercField"><code class="docutils literal notranslate"><span class="pre">PercField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.FloatField"><code class="docutils literal notranslate"><span class="pre">FloatField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple.html#pumpia.module_handling.fields.simple.DateField"><code class="docutils literal notranslate"><span class="pre">DateField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="groups.html">Field Groups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="groups.html#pumpia.module_handling.fields.groups.FieldGroup"><code class="docutils literal notranslate"><span class="pre">FieldGroup</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="groups.html#pumpia.module_handling.fields.groups.FieldGroup.fields"><code class="docutils literal notranslate"><span class="pre">FieldGroup.fields</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="groups.html#pumpia.module_handling.fields.groups.FieldGroup.name"><code class="docutils literal notranslate"><span class="pre">FieldGroup.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="groups.html#pumpia.module_handling.fields.groups.FieldGroup.verbose_name"><code class="docutils literal notranslate"><span class="pre">FieldGroup.verbose_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">Field Window</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="windows.html#pumpia.module_handling.fields.windows.FieldWindow"><code class="docutils literal notranslate"><span class="pre">FieldWindow</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="windows.html#pumpia.module_handling.fields.windows.FieldWindow.fields"><code class="docutils literal notranslate"><span class="pre">FieldWindow.fields</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="windows.html#pumpia.module_handling.fields.windows.FieldWindow.field_names"><code class="docutils literal notranslate"><span class="pre">FieldWindow.field_names</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="windows.html#pumpia.module_handling.fields.windows.FieldWindow.name"><code class="docutils literal notranslate"><span class="pre">FieldWindow.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="windows.html#pumpia.module_handling.fields.windows.FieldWindow.verbose_name"><code class="docutils literal notranslate"><span class="pre">FieldWindow.verbose_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="viewer_fields.html">Viewer Inputs and Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField"><code class="docutils literal notranslate"><span class="pre">BaseViewerField</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.row"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.row</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.column"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.column</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.allow_drag_drop"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.allow_drag_drop</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.allow_drawing_rois"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.allow_drawing_rois</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.validation_command"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.validation_command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.BaseViewerField.main"><code class="docutils literal notranslate"><span class="pre">BaseViewerField.main</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.ViewerField"><code class="docutils literal notranslate"><span class="pre">ViewerField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.ArrayViewerField"><code class="docutils literal notranslate"><span class="pre">ArrayViewerField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.MonochromeViewerField"><code class="docutils literal notranslate"><span class="pre">MonochromeViewerField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.DicomViewerField"><code class="docutils literal notranslate"><span class="pre">DicomViewerField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="viewer_fields.html#pumpia.module_handling.fields.viewer_fields.MonochromeDicomViewerField"><code class="docutils literal notranslate"><span class="pre">MonochromeDicomViewerField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="roi_fields.html">Region of Interest Fields</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField"><code class="docutils literal notranslate"><span class="pre">BaseROIField</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.name"><code class="docutils literal notranslate"><span class="pre">BaseROIField.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.roi"><code class="docutils literal notranslate"><span class="pre">BaseROIField.roi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.default_type"><code class="docutils literal notranslate"><span class="pre">BaseROIField.default_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.self.viewer"><code class="docutils literal notranslate"><span class="pre">BaseROIField.self.viewer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.post_register_command"><code class="docutils literal notranslate"><span class="pre">BaseROIField.post_register_command</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.label_var"><code class="docutils literal notranslate"><span class="pre">BaseROIField.label_var</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.select_button"><code class="docutils literal notranslate"><span class="pre">BaseROIField.select_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.draw_button"><code class="docutils literal notranslate"><span class="pre">BaseROIField.draw_button</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.register_roi"><code class="docutils literal notranslate"><span class="pre">BaseROIField.register_roi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.set_parent"><code class="docutils literal notranslate"><span class="pre">BaseROIField.set_parent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.set_manager"><code class="docutils literal notranslate"><span class="pre">BaseROIField.set_manager()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.BaseROIField.set_as_active"><code class="docutils literal notranslate"><span class="pre">BaseROIField.set_as_active()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.GeneralROIField"><code class="docutils literal notranslate"><span class="pre">GeneralROIField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.RectangleROIField"><code class="docutils literal notranslate"><span class="pre">RectangleROIField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.EllipseROIField"><code class="docutils literal notranslate"><span class="pre">EllipseROIField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.LineROIField"><code class="docutils literal notranslate"><span class="pre">LineROIField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.AngleROIField"><code class="docutils literal notranslate"><span class="pre">AngleROIField</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="roi_fields.html#pumpia.module_handling.fields.roi_fields.PointROIField"><code class="docutils literal notranslate"><span class="pre">PointROIField</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../modules.html" class="btn btn-neutral float-left" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simple.html" class="btn btn-neutral float-right" title="Simple Fields" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Zack Ravetz.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
