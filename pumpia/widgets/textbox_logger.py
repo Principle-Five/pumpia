@@ -26,7 +26,7 @@ class TextBoxHandler(logging.Handler):
 
     def __init__(self,
                  parent: tk.Misc,
-                 level: logging._Level = 0,
+                 level: int | str = 0,
                  label_text: str = "Logger",
                  formatter: logging.Formatter | None = None) -> None:
         super().__init__(level)
