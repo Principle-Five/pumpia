@@ -14,7 +14,6 @@ Classes:
  * TempSquare
  * Viewer
 """
-import logging
 import math
 from abc import ABC, abstractmethod
 import tkinter as tk
@@ -38,6 +37,7 @@ from pumpia.file_handling.dicom_structures import Series, Instance
 from pumpia.file_handling.general_structures import GeneralImage
 from pumpia.utilities.tkinter_utils import remove_state_persistents
 from pumpia.utilities.array_utils import Position
+from pumpia.utilities.logging import logger
 
 RESIZE_DIST = 20
 TEMP_ROI_COLOUR = "yellow"
@@ -566,7 +566,7 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
                 func()
             # pylint: disable-next=broad-exception-caught
             except Exception:
-                logging.warning("Image load trace had an error.", exc_info=True)
+                logger.warning("Image load trace had an error.", exc_info=True)
 
     @overload
     def viewer_to_image_pos(self, position: Position) -> Position:

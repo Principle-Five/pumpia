@@ -2,8 +2,6 @@
 Classes:
  * Manager
 """
-
-import logging
 import gc
 import datetime
 import typing
@@ -28,6 +26,7 @@ from pumpia.utilities.dicom_utils import show_dicom_tags
 from pumpia.utilities.file_utils import get_file_tree_dict, TreePathDict
 from pumpia.utilities.typing import DirectionType
 from pumpia.utilities.tkinter_utils import tk_copy
+from pumpia.utilities.logging import logger
 
 if TYPE_CHECKING:
     from pumpia.widgets.viewers import BaseViewer
@@ -266,7 +265,7 @@ class Manager:
                     self.load_dicom(open_dicom, filepath)
         # pylint: disable-next=broad-exception-caught
         except Exception:
-            logging.warning("%s failed to load.", filepath, exc_info=True)
+            logger.warning("%s failed to load.", filepath, exc_info=True)
         self.update_trees()
 
     def load_images(self,
@@ -348,7 +347,7 @@ class Manager:
                         self.load_dicom(open_dicom, file)
             # pylint: disable-next=broad-exception-caught
             except Exception:
-                logging.warning("%s failed to load.", file, exc_info=True)
+                logger.warning("%s failed to load.", file, exc_info=True)
 
             if tk_parent is not None:
                 file_count += 1
