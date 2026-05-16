@@ -15,6 +15,7 @@ from collections.abc import Callable
 from pumpia.module_handling.context import BaseContext, SimpleContext
 from pumpia.module_handling.manager import Manager
 from pumpia.utilities.typing import DirectionType
+from pumpia.utilities.logging import logger as pumpia_logger
 from pumpia.image_handling.image_structures import ArrayImage
 from pumpia.image_handling.roi_structures import BaseROI
 from pumpia.widgets.scrolled_window import ScrolledWindow
@@ -247,7 +248,7 @@ class BaseModule(ABC, ttk.Frame):
 
         self._kw = kw
         self.verbose_name = verbose_name
-        self.name: str = ""
+        self.name: str = self.title.replace(" ", "_").lower()
 
         self._is_setup: bool = False
 
@@ -351,7 +352,10 @@ class BaseModule(ABC, ttk.Frame):
             self.paned_window.grid(column=0, row=0, sticky=tk.NSEW)
 
             self.viewer_frame = ttk.Frame(self.paned_window)
-            self.paned_window.add(self.viewer_frame, weight=1)
+            if len(type(self).viewers.viewer_fields) > 0:
+                self.paned_window.add(self.viewer_frame, weight=1)
+            else:
+                self.paned_window.add(self.viewer_frame)
 
             self.main_window = ttk.Notebook(self.paned_window)
             self.paned_window.add(self.main_window)
@@ -388,16 +392,19 @@ class BaseModule(ABC, ttk.Frame):
             self.main_window.add(self.log_handler.frame, text="Log")
 
             if parent_logger is not None:
-                self.logger = logging.getLogger(parent_logger.name + "." + self.name)
+                self.logger = logging.getLogger(parent_logger.name
+                                                + "."
+                                                + self.name.replace(" ", "_").lower())
+                self.logger.propagate = True
             else:
-                self.logger = logging.getLogger(self.name)
-                self.logger.propagate = False
                 stream_handler = logging.StreamHandler()
                 stream_handler.setLevel(logging.WARNING)
+                self.logger = logging.getLogger(pumpia_logger.name
+                                                + "."
+                                                + self.name.replace(" ", "_").lower())
+                self.logger.propagate = False
                 self.logger.addHandler(stream_handler)
-                sys.excepthook = self._handle_exception
 
-            self.logger.propagate = True
             self.logger.setLevel(logging.DEBUG)
             self.logger.addHandler(self.log_handler)
 
@@ -597,60 +604,6 @@ class BaseModule(ABC, ttk.Frame):
             sys.__excepthook__(exc_type, exc_value, exc_traceback)
             return
         self.logger.error("", exc_info=(exc_type, exc_value, exc_traceback))
-
-    @classmethod
-    def run(cls: type[Self],
-            direction: DirectionType = "Horizontal"):
-        """
-        Runs the module independently.
-
-        Parameters
-        ----------
-        direction : DirectionType, optional
-            The direction child widgets in the module (default is "Horizontal").
-        """
-        app = tk.Tk()
-        app.title(cls.title)
-        app.columnconfigure(0, weight=1)
-        app.columnconfigure(1, weight=1)
-        app.rowconfigure(1, weight=1)
-        app.resizable(True, True)
-
-        man = Manager()
-
-        load_butt = ttk.Button(app, text="Load Folder",
-                               command=lambda: man.load_folder(False, app, 0, 2))
-        load_butt.grid(column=0, row=0, sticky=tk.NSEW)
-
-        load_butt = ttk.Button(app, text="Add Folder",
-                               command=lambda: man.load_folder(True, app, 0, 2))
-        load_butt.grid(column=1, row=0, sticky=tk.NSEW)
-
-        frame = ttk.Panedwindow(app, orient="vertical")
-        frame.grid(column=0, row=1, columnspan=2, sticky=tk.NSEW)
-
-        tree_frame = man.get_tree_frame(frame)
-        frame.add(tree_frame)
-
-        options_frame = ttk.Frame(frame)
-        frame.add(options_frame)
-
-        options_combo = man.get_mouse_options_combobox(options_frame)
-        options_combo.grid(column=0, row=0, sticky=tk.NSEW)
-
-        roi_options = man.get_roi_options_frame(options_frame, "h")
-        roi_options.grid(column=2, row=0, sticky=tk.NSEW)
-
-        module = cls(frame, man, direction=direction)
-        frame.add(module, weight=1)
-
-        app.report_callback_exception = module._handle_exception
-        logging.getLogger().addHandler(module.log_handler)
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.WARNING)
-        logging.getLogger().addHandler(stream_handler)
-
-        app.mainloop()
 
     @property
     def rois_loaded(self) -> bool:
@@ -931,6 +884,57 @@ class BaseModule(ABC, ttk.Frame):
         """
         self.create_rois(context)
         self.run_analysis()
+
+    @classmethod
+    def run(cls: type[Self],
+            direction: DirectionType = "Horizontal"):
+        """
+        Runs the module independently.
+
+        Parameters
+        ----------
+        direction : DirectionType, optional
+            The direction child widgets in the module (default is "Horizontal").
+        """
+        app = tk.Tk()
+        app.title(cls.title)
+        app.columnconfigure(0, weight=1)
+        app.columnconfigure(1, weight=1)
+        app.rowconfigure(1, weight=1)
+        app.resizable(True, True)
+
+        man = Manager()
+
+        load_butt = ttk.Button(app, text="Load Folder",
+                               command=lambda: man.load_folder(False, app, 0, 2))
+        load_butt.grid(column=0, row=0, sticky=tk.NSEW)
+
+        load_butt = ttk.Button(app, text="Add Folder",
+                               command=lambda: man.load_folder(True, app, 0, 2))
+        load_butt.grid(column=1, row=0, sticky=tk.NSEW)
+
+        frame = ttk.Panedwindow(app, orient="vertical")
+        frame.grid(column=0, row=1, columnspan=2, sticky=tk.NSEW)
+
+        tree_frame = man.get_tree_frame(frame)
+        frame.add(tree_frame)
+
+        options_frame = ttk.Frame(frame)
+        frame.add(options_frame)
+
+        options_combo = man.get_mouse_options_combobox(options_frame)
+        options_combo.grid(column=0, row=0, sticky=tk.NSEW)
+
+        roi_options = man.get_roi_options_frame(options_frame, "h")
+        roi_options.grid(column=2, row=0, sticky=tk.NSEW)
+
+        module = cls(frame, man, direction=direction)
+        frame.add(module, weight=1)
+
+        app.report_callback_exception = module._handle_exception
+        pumpia_logger.addHandler(module.log_handler)
+
+        app.mainloop()
 
 
 class PhantomModule(BaseModule):

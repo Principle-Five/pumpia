@@ -12,8 +12,9 @@ from types import TracebackType
 import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self, Any
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from pumpia.utilities.typing import DirectionType
+from pumpia.utilities.logging import logger as pumpia_logger
 from pumpia.image_handling.image_structures import ArrayImage
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.widgets.context_managers import (BaseContextManager,
@@ -36,12 +37,27 @@ class ModuleFormatter(logging.Formatter):
     (pulled from the initial logger name) to the formatted string.
     """
 
+    def __init__(self,
+                 fmt: str | None = None,
+                 datefmt: str | None = None,
+                 style: Literal['%'] | Literal['{'] | Literal['$'] = "%",
+                 validate: bool = True,
+                 *,
+                 defaults: Mapping[str, Any] | None = None,
+                 logger_name: str = "") -> None:
+        super().__init__(fmt, datefmt, style, validate, defaults=defaults)
+        self.logger_name = logger_name.split(".")
+
     def format(self, record: logging.LogRecord) -> str:
         formatted_record = super().format(record)
-        try:
-            module_logger = ".".join(record.name.split(".")[1:])
-        except IndexError:
-            module_logger = record.name
+        record_logger = record.name.split(".")
+        for logger in self.logger_name:
+            try:
+                record_logger.remove(logger)
+            except ValueError:
+                pass
+        module_logger = ".".join(record_logger)
+
         if module_logger != "":
             return f"{module_logger}: {formatted_record}"
         return formatted_record
@@ -375,7 +391,10 @@ class BaseCollection(ABC, ttk.Frame):
         self._tab_change_calls[self.notebook.tabs()[-1]] = self.on_main_tab_select
 
         self.viewer_frame = ttk.Frame(self.main_frame)
-        self.main_frame.add(self.viewer_frame, weight=1)
+        if len(type(self).viewers.viewer_fields) > 0:
+            self.main_frame.add(self.viewer_frame, weight=1)
+        else:
+            self.main_frame.add(self.viewer_frame)
         self.main_window = ttk.Notebook(self.main_frame)
         self.main_frame.add(self.main_window)
 
@@ -402,16 +421,21 @@ class BaseCollection(ABC, ttk.Frame):
                                              command=self.get_context)
         self.get_context_button.grid(column=0, row=0, sticky=tk.NSEW)
 
+        self.logger = logging.getLogger(pumpia_logger.name
+                                        + "."
+                                        + self.title.replace(" ", "_").lower())
+
         self.log_handler = TextBoxHandler(self.main_window,
                                           formatter=ModuleFormatter(fmt="{levelname}: {message}",
-                                                                    style="{"))
+                                                                    style="{",
+                                                                    logger_name=self.logger.name))
         self.main_window.add(self.log_handler.frame, text="Log")
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.WARNING)
         stream_handler.setFormatter(ModuleFormatter(fmt="{levelname}: {message}",
-                                                    style="{"))
+                                                    style="{",
+                                                    logger_name=self.logger.name))
 
-        self.logger = logging.getLogger(self.title.replace(" ", "_").lower())
         self.logger.propagate = False
         self.logger.setLevel(logging.DEBUG)
         self.logger.addHandler(self.log_handler)
@@ -781,9 +805,6 @@ class BaseCollection(ABC, ttk.Frame):
         frame.add(collection, weight=1)
 
         app.report_callback_exception = collection._handle_exception
-        logging.getLogger().addHandler(collection.log_handler)
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.WARNING)
-        logging.getLogger().addHandler(stream_handler)
+        pumpia_logger.addHandler(collection.log_handler)
 
         app.mainloop()

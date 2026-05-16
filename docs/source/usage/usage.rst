@@ -75,6 +75,8 @@ Logging
 -------
 Collections and Modules have a ``logger`` attribute which can be used to provide information to the user.
 Messages passed to the logger can be viewed on the ``Log`` window of the user interface.
+There is a base pumpia ``logger`` in ``pumpia.utilities.logging`` that can also be used,
+however it is recommended to use the loggers automatically created for each module and collection.
 
 Contents
 --------
