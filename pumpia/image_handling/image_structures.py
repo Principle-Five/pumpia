@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 
 if TYPE_CHECKING:
     from pumpia.image_handling.roi_structures import BaseROI
+else:
+    type BaseROI = object
 
 
 class BaseImageSet(ABC):

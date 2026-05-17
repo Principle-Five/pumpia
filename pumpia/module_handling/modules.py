@@ -33,67 +33,8 @@ from pumpia.module_handling.fields.roi_fields import _ROIFieldsMeta, BaseROIFiel
 
 if TYPE_CHECKING:
     from pumpia.module_handling.collections import BaseCollection
-
-
-class _Modules:
-    def __init__(self, obj: BaseCollection) -> None:
-        self.modules_dict: dict[str, BaseModule] = {}
-        self.obj: BaseCollection = obj
-
-    def __iter__(self):
-        for module in self.modules_dict.values():
-            yield module
-
-    def __getitem__(self, key: str):
-        return self.modules_dict[key]
-
-
-class _ModulesMeta:
-    def __init__(self) -> None:
-        self.module_types: dict[str, BaseModule] = {}
-        self.name: str = ""
-        self.private_name: str = "_"
-        self.base_owner: type[BaseCollection] | None = None
-
-    @property
-    def module_names(self) -> list[str]:
-        """
-        The names of the modules for the module.
-
-        Returns
-        -------
-        list[str]
-        """
-        return list(self.module_types.keys())
-
-    def __set_name__(self, owner: type[BaseCollection], name: str):
-        self.name = name
-        self.private_name = "_" + name
-        self.base_owner = owner
-
-    @overload
-    def __get__(self, obj: BaseCollection, owner: type[BaseCollection]) -> _Modules: ...
-    @overload
-    def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
-
-    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _Modules | Self:
-        if obj is None:
-            if owner is self.base_owner:
-                return self
-            else:
-                meta_obj = type(self)()
-                meta_obj.name = self.name
-                meta_obj.private_name = self.private_name
-                meta_obj.base_owner = owner
-                setattr(owner, self.name, meta_obj)
-                return meta_obj
-
-        try:
-            return getattr(obj, self.private_name)
-        except AttributeError:
-            modules = _Modules(obj)
-            setattr(obj, self.private_name, modules)
-            return modules
+else:
+    type BaseCollection = object
 
 
 class BaseModule(ABC, ttk.Frame):
@@ -945,3 +886,64 @@ class PhantomModule(BaseModule):
     Uses `ManualPhantomManager` as the default `context_manager`.
     """
     context_manager: PhantomContextManager = ManualPhantomManager()
+
+
+class _Modules:
+    def __init__(self, obj: BaseCollection) -> None:
+        self.modules_dict: dict[str, BaseModule] = {}
+        self.obj: BaseCollection = obj
+
+    def __iter__(self):
+        for module in self.modules_dict.values():
+            yield module
+
+    def __getitem__(self, key: str):
+        return self.modules_dict[key]
+
+
+class _ModulesMeta:
+    def __init__(self) -> None:
+        self.module_types: dict[str, BaseModule] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseCollection] | None = None
+
+    @property
+    def module_names(self) -> list[str]:
+        """
+        The names of the modules for the module.
+
+        Returns
+        -------
+        list[str]
+        """
+        return list(self.module_types.keys())
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self, obj: BaseCollection, owner: type[BaseCollection]) -> _Modules: ...
+    @overload
+    def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
+
+    def __get__(self, obj: BaseCollection | None, owner: type[BaseCollection]) -> _Modules | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            modules = _Modules(obj)
+            setattr(obj, self.private_name, modules)
+            return modules

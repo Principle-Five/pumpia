@@ -17,77 +17,9 @@ from pumpia.image_handling.image_structures import BaseImageSet
 if TYPE_CHECKING:
     from pumpia.module_handling.modules import BaseModule
     from pumpia.module_handling.collections import BaseCollection
-
-
-class _Viewers:
-    def __init__(self, obj: BaseCollection | BaseModule) -> None:
-        self.obj: BaseCollection | BaseModule = obj
-        self.viewers_dict: dict[str, BaseViewer] = {}
-
-    def __iter__(self):
-        for viewer in self.viewers_dict.values():
-            yield viewer
-
-    def __getitem__(self, key: str):
-        return self.viewers_dict[key]
-
-
-class _ViewerFieldsMeta:
-    def __init__(self) -> None:
-        self.viewer_fields: dict[str, BaseViewerField] = {}
-        self.name: str = ""
-        self.private_name: str = "_"
-        self.base_owner: type[BaseCollection | BaseModule] | None = None
-
-    @property
-    def viewer_names(self) -> list[str]:
-        """
-        The names of the viewers for the module/collection.
-
-        Returns
-        -------
-        list[str]
-        """
-        return list(self.viewer_fields.keys())
-
-    def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
-        self.name = name
-        self.private_name = "_" + name
-        self.base_owner = owner
-
-    @overload
-    def __get__(self,
-                obj: BaseCollection | BaseModule,
-                owner: type[BaseCollection | BaseModule]
-                ) -> _Viewers: ...
-
-    @overload
-    def __get__(self,
-                obj: None,
-                owner: type[BaseCollection | BaseModule]
-                ) -> Self: ...
-
-    def __get__(self,
-                obj: BaseCollection | BaseModule | None,
-                owner: type[BaseCollection | BaseModule]
-                ) -> _Viewers | Self:
-        if obj is None:
-            if owner is self.base_owner:
-                return self
-            else:
-                meta_obj = type(self)()
-                meta_obj.name = self.name
-                meta_obj.private_name = self.private_name
-                meta_obj.base_owner = owner
-                setattr(owner, self.name, meta_obj)
-                return meta_obj
-
-        try:
-            return getattr(obj, self.private_name)
-        except AttributeError:
-            viewers = _Viewers(obj)
-            setattr(obj, self.private_name, viewers)
-            return viewers
+else:
+    type BaseModule = object
+    type BaseCollection = object
 
 
 class BaseViewerField[ViewerT:BaseViewer](ABC):
@@ -224,3 +156,74 @@ class MonochromeDicomViewerField(BaseViewerField[MonochromeDicomViewer]):
     @property
     def viewer_type(self):
         return MonochromeDicomViewer
+
+
+class _Viewers:
+    def __init__(self, obj: BaseCollection | BaseModule) -> None:
+        self.obj: BaseCollection | BaseModule = obj
+        self.viewers_dict: dict[str, BaseViewer] = {}
+
+    def __iter__(self):
+        for viewer in self.viewers_dict.values():
+            yield viewer
+
+    def __getitem__(self, key: str):
+        return self.viewers_dict[key]
+
+
+class _ViewerFieldsMeta:
+    def __init__(self) -> None:
+        self.viewer_fields: dict[str, BaseViewerField] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseCollection | BaseModule] | None = None
+
+    @property
+    def viewer_names(self) -> list[str]:
+        """
+        The names of the viewers for the module/collection.
+
+        Returns
+        -------
+        list[str]
+        """
+        return list(self.viewer_fields.keys())
+
+    def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self,
+                obj: BaseCollection | BaseModule,
+                owner: type[BaseCollection | BaseModule]
+                ) -> _Viewers: ...
+
+    @overload
+    def __get__(self,
+                obj: None,
+                owner: type[BaseCollection | BaseModule]
+                ) -> Self: ...
+
+    def __get__(self,
+                obj: BaseCollection | BaseModule | None,
+                owner: type[BaseCollection | BaseModule]
+                ) -> _Viewers | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            viewers = _Viewers(obj)
+            setattr(obj, self.private_name, viewers)
+            return viewers

@@ -19,67 +19,8 @@ from pumpia.image_handling.image_structures import ArrayImage
 
 if TYPE_CHECKING:
     from pumpia.module_handling.modules import BaseModule
-
-
-class _ROIFields:
-    def __init__(self, module: BaseModule) -> None:
-        self.module: BaseModule = module
-        self.rois_dict: dict[str, BaseROIField] = {}
-
-    def __iter__(self):
-        for window in self.rois_dict.values():
-            yield window
-
-    def __getitem__(self, key: str):
-        return self.rois_dict[key]
-
-
-class _ROIFieldsMeta:
-    def __init__(self) -> None:
-        self.rois: dict[str, BaseROIField] = {}
-        self.name: str = ""
-        self.private_name: str = "_"
-        self.base_owner: type[BaseModule] | None = None
-
-    @property
-    def roi_names(self) -> list[str]:
-        """
-        The names of the ROIs for the module.
-
-        Returns
-        -------
-        list[str]
-        """
-        return list(self.rois.keys())
-
-    def __set_name__(self, owner: type[BaseModule], name: str):
-        self.name = name
-        self.private_name = "_" + name
-        self.base_owner = owner
-
-    @overload
-    def __get__(self, obj: BaseModule, owner=None) -> _ROIFields: ...
-    @overload
-    def __get__(self, obj: None, owner=None) -> Self: ...
-
-    def __get__(self, obj: BaseModule | None, owner=None) -> _ROIFields | Self:
-        if obj is None:
-            if owner is self.base_owner:
-                return self
-            else:
-                meta_obj = type(self)()
-                meta_obj.name = self.name
-                meta_obj.private_name = self.private_name
-                meta_obj.base_owner = owner
-                setattr(owner, self.name, meta_obj)
-                return meta_obj
-
-        try:
-            return getattr(obj, self.private_name)
-        except AttributeError:
-            windows = _ROIFields(obj)
-            setattr(obj, self.private_name, windows)
-            return windows
+else:
+    type BaseModule = object
 
 
 class BaseROIField[ROI:BaseROI]:
@@ -422,3 +363,64 @@ class PointROIField(BaseROIField[PointROI]):
                          default_type="ROI point",
                          allow_manual_draw=allow_manual_draw,
                          button_style=button_style)
+
+
+class _ROIFields:
+    def __init__(self, module: BaseModule) -> None:
+        self.module: BaseModule = module
+        self.rois_dict: dict[str, BaseROIField] = {}
+
+    def __iter__(self):
+        for window in self.rois_dict.values():
+            yield window
+
+    def __getitem__(self, key: str):
+        return self.rois_dict[key]
+
+
+class _ROIFieldsMeta:
+    def __init__(self) -> None:
+        self.rois: dict[str, BaseROIField] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseModule] | None = None
+
+    @property
+    def roi_names(self) -> list[str]:
+        """
+        The names of the ROIs for the module.
+
+        Returns
+        -------
+        list[str]
+        """
+        return list(self.rois.keys())
+
+    def __set_name__(self, owner: type[BaseModule], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self, obj: BaseModule, owner=None) -> _ROIFields: ...
+    @overload
+    def __get__(self, obj: None, owner=None) -> Self: ...
+
+    def __get__(self, obj: BaseModule | None, owner=None) -> _ROIFields | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            windows = _ROIFields(obj)
+            setattr(obj, self.private_name, windows)
+            return windows

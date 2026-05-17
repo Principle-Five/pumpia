@@ -19,82 +19,8 @@ from pumpia.widgets.entry_boxes import IntEntry, FloatEntry, DateEntry, PercEntr
 
 if TYPE_CHECKING:
     from pumpia.module_handling.modules import BaseModule
-
-
-class _Fields:
-    def __init__(self, module: BaseModule) -> None:
-        self.fields_dict: dict[str, BaseField] = {}
-        self.module: BaseModule = module
-
-    def __iter__(self):
-        for field in self.fields_dict.values():
-            yield field
-
-    def __getitem__(self, key: str):
-        return self.fields_dict[key]
-
-    @overload
-    def __getattr__(self, name: Literal["module"]) -> BaseModule: ...
-    @overload
-    def __getattr__(self, name: Literal["fields_dict"]) -> dict[str, BaseField]: ...
-    @overload
-    def __getattr__(self, name: str) -> BaseField: ...
-
-    def __getattr__(self, name: str) -> BaseModule | BaseField | dict[str, BaseField]:
-        if name == "module":
-            return self.module
-        elif name == "fields_dict":
-            return self.fields_dict
-        else:
-            return self.fields_dict[name]
-
-
-class _FieldsMeta:
-    def __init__(self) -> None:
-        self.field_types: dict[str, BaseField] = {}
-        self.name: str = ""
-        self.private_name: str = "_"
-        self.base_owner: type[BaseModule] | None = None
-
-    @property
-    def field_names(self) -> list[str]:
-        """
-        The names of the fields for the module.
-
-        Returns
-        -------
-        list[str]
-        """
-        return list(self.field_types.keys())
-
-    def __set_name__(self, owner: type[BaseModule], name: str):
-        self.name = name
-        self.private_name = "_" + name
-        self.base_owner = owner
-
-    @overload
-    def __get__(self, obj: BaseModule, owner: type[BaseModule]) -> _Fields: ...
-    @overload
-    def __get__(self, obj: None, owner: type[BaseModule]) -> Self: ...
-
-    def __get__(self, obj: BaseModule | None, owner: type[BaseModule]) -> _Fields | Self:
-        if obj is None:
-            if owner is self.base_owner:
-                return self
-            else:
-                meta_obj = type(self)()
-                meta_obj.name = self.name
-                meta_obj.private_name = self.private_name
-                meta_obj.base_owner = owner
-                setattr(owner, self.name, meta_obj)
-                return meta_obj
-
-        try:
-            return getattr(obj, self.private_name)
-        except AttributeError:
-            fields = _Fields(obj)
-            setattr(obj, self.private_name, fields)
-            return fields
+else:
+    type BaseModule = object
 
 
 class BaseField[ValT, TkVarT:tk.Variable](ABC):
@@ -987,3 +913,79 @@ class DateField(BaseField[date, DateVar]):
     @property
     def value_type(self) -> type[DateValue]:
         return DateValue
+
+
+class _Fields:
+    def __init__(self, module: BaseModule) -> None:
+        self.fields_dict: dict[str, BaseField] = {}
+        self.module: BaseModule = module
+
+    def __iter__(self):
+        for field in self.fields_dict.values():
+            yield field
+
+    def __getitem__(self, key: str):
+        return self.fields_dict[key]
+
+    @overload
+    def __getattr__(self, name: Literal["module"]) -> BaseModule: ...
+    @overload
+    def __getattr__(self, name: Literal["fields_dict"]) -> dict[str, BaseField]: ...
+    @overload
+    def __getattr__(self, name: str) -> BaseField: ...
+
+    def __getattr__(self, name: str) -> BaseModule | BaseField | dict[str, BaseField]:
+        if name == "module":
+            return self.module
+        elif name == "fields_dict":
+            return self.fields_dict
+        else:
+            return self.fields_dict[name]
+
+
+class _FieldsMeta:
+    def __init__(self) -> None:
+        self.field_types: dict[str, BaseField] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseModule] | None = None
+
+    @property
+    def field_names(self) -> list[str]:
+        """
+        The names of the fields for the module.
+
+        Returns
+        -------
+        list[str]
+        """
+        return list(self.field_types.keys())
+
+    def __set_name__(self, owner: type[BaseModule], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self, obj: BaseModule, owner: type[BaseModule]) -> _Fields: ...
+    @overload
+    def __get__(self, obj: None, owner: type[BaseModule]) -> Self: ...
+
+    def __get__(self, obj: BaseModule | None, owner: type[BaseModule]) -> _Fields | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            fields = _Fields(obj)
+            setattr(obj, self.private_name, fields)
+            return fields

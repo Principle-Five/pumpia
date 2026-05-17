@@ -18,7 +18,7 @@ When subclassing one of the provided modules the following are designed to be re
 
 The class method :py:meth:`run <pumpia.module_handling.modules.BaseModule.run>` is used to run the module as a stand alone.
 
-The ``context_manager`` class attribute can be defined for modules, it defaults to :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManager>`.
+The ``context_manager`` class attribute can be defined for modules, it defaults to :py:class:`SimpleContextManager <pumpia.widgets.context_managers.SimpleContextManager>`.
 If the class attribute ``show_draw_rois_button`` is set to ``True`` then a button to draw ROIs is shown.
 If the class attribute ``show_analyse_button`` is set to ``True`` then a button to analyse the image is shown.
 If both are set to ``True`` then a button to do both is also shown.
@@ -59,7 +59,7 @@ Collections are used to group modules together, with a main tab showing the cont
 Only :doc:`viewer fields <fields/viewer_fields>`, :doc:`field groups <fields/groups>`  can be used with collections, any others will be ignored/wont function as expected.
 
 Similar to modules they have context which is shared across all the modules in the collection.
-The ``context_manager`` class attribute can be defined for collections, it defaults to :py:class:`SimpleContextManagerGenerator <pumpia.widgets.context_managers.SimpleContextManager>`.
+The ``context_manager`` class attribute can be defined for collections, it defaults to :py:class:`SimpleContextManager <pumpia.widgets.context_managers.SimpleContextManager>`.
 The ``title`` class attribute is shown in the window title, this defaults to ``Pumpia Collection``.
 
 Collections introduce two other useful classes:

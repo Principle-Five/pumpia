@@ -21,6 +21,8 @@ from pumpia.utilities.array_utils import Pixel
 
 if TYPE_CHECKING:
     from pumpia.image_handling.image_structures import ArrayImage
+else:
+    type ArrayImage = object
 
 ROI_COLOUR = "yellow"
 ACTIVE_ROI_COLOUR = "red"

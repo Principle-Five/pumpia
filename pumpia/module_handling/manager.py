@@ -30,6 +30,8 @@ from pumpia.utilities.logging import logger
 
 if TYPE_CHECKING:
     from pumpia.widgets.viewers import BaseViewer
+else:
+    type BaseViewer = object
 
 ReducedMouseOptionsType = Literal["Pointer",
                                   "Zoom",

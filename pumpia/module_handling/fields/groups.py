@@ -6,6 +6,57 @@ from pumpia.module_handling.fields.simple import BaseField
 
 if TYPE_CHECKING:
     from pumpia.module_handling.collections import BaseCollection
+else:
+    type BaseCollection = object
+
+
+class FieldGroup:
+    """
+    Represents a group of field objects that should have the same value.
+    Fields should only be a member of one group.
+
+    Attributes
+    ----------
+    fields : list[BaseField]
+    name : str
+    verbose_name : str | None
+    """
+
+    def __init__(self, *fields: BaseField, verbose_name: str | None = None):
+        self.verbose_name: str | None = verbose_name
+        self.fields: list[BaseField] = list(fields)
+        self.name: str = ""
+
+    def __set_name__(self, owner: type[BaseCollection], name: str):
+        self.name = name
+        if self.verbose_name is None:
+            self.verbose_name = name.replace("_", " ").title()
+        owner.field_groups.groups[name] = self
+
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
+        if obj is None:
+            return self
+
+        try:
+            return obj.field_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
+        except KeyError as exc:
+            fields: list[BaseField] = [getattr(getattr(obj, field.module.name).fields, field.name)
+                                       for field in self.fields
+                                       if field.module is not None]
+
+            value_type = fields[0].value_type
+            for field in fields[1:]:
+                if field.value_type is not value_type:
+                    raise ValueError(
+                        f"Field values are not the same type for group {self.name}"
+                    ) from exc
+                field.value = fields[0].value_store
+
+            group = type(self)(*fields, verbose_name=self.verbose_name)
+            obj.field_groups.groups_dict[self.name] = group
+            return group
+        except AttributeError:
+            return self
 
 
 class _FieldGroups:
@@ -77,52 +128,3 @@ class _FieldGroupsMeta:
             groups = _FieldGroups(obj)
             setattr(obj, self.private_name, groups)
             return groups
-
-
-class FieldGroup:
-    """
-    Represents a group of field objects that should have the same value.
-    Fields should only be a member of one group.
-
-    Attributes
-    ----------
-    fields : list[BaseField]
-    name : str
-    verbose_name : str | None
-    """
-
-    def __init__(self, *fields: BaseField, verbose_name: str | None = None):
-        self.verbose_name: str | None = verbose_name
-        self.fields: list[BaseField] = list(fields)
-        self.name: str = ""
-
-    def __set_name__(self, owner: type[BaseCollection], name: str):
-        self.name = name
-        if self.verbose_name is None:
-            self.verbose_name = name.replace("_", " ").title()
-        owner.field_groups.groups[name] = self
-
-    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
-        if obj is None:
-            return self
-
-        try:
-            return obj.field_groups.groups_dict[self.name]  # pyright: ignore[reportReturnType]
-        except KeyError as exc:
-            fields: list[BaseField] = [getattr(getattr(obj, field.module.name).fields, field.name)
-                                       for field in self.fields
-                                       if field.module is not None]
-
-            value_type = fields[0].value_type
-            for field in fields[1:]:
-                if field.value_type is not value_type:
-                    raise ValueError(
-                        f"Field values are not the same type for group {self.name}"
-                    ) from exc
-                field.value = fields[0].value_store
-
-            group = type(self)(*fields, verbose_name=self.verbose_name)
-            obj.field_groups.groups_dict[self.name] = group
-            return group
-        except AttributeError:
-            return self

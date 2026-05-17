@@ -11,67 +11,9 @@ from pumpia.module_handling.fields.simple import BaseField
 if TYPE_CHECKING:
     from pumpia.module_handling.modules import BaseModule
     from pumpia.module_handling.collections import BaseCollection
-
-
-class _FieldWindows:
-    def __init__(self, obj: BaseCollection | BaseModule) -> None:
-        self.obj: BaseCollection | BaseModule = obj
-        self.windows_dict: dict[str, FieldWindow] = {}
-
-    def __iter__(self):
-        for window in self.windows_dict.values():
-            yield window
-
-    def __getitem__(self, key: str):
-        return self.windows_dict[key]
-
-
-class _FieldWindowsMeta:
-    def __init__(self) -> None:
-        self.windows: dict[str, FieldWindow] = {}
-        self.name: str = ""
-        self.private_name: str = "_"
-        self.base_owner: type[BaseCollection | BaseModule] | None = None
-
-    @property
-    def window_names(self) -> list[str]:
-        """
-        The names of the windows for the module/collection.
-
-        Returns
-        -------
-        list[str]
-        """
-        return list(self.windows.keys())
-
-    def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
-        self.name = name
-        self.private_name = "_" + name
-        self.base_owner = owner
-
-    @overload
-    def __get__(self, obj: BaseCollection | BaseModule, owner: type[BaseCollection | BaseModule]) -> _FieldWindows: ...
-    @overload
-    def __get__(self, obj: None, owner: type[BaseCollection | BaseModule]) -> Self: ...
-
-    def __get__(self, obj: BaseCollection | BaseModule | None, owner: type[BaseCollection | BaseModule]) -> _FieldWindows | Self:
-        if obj is None:
-            if owner is self.base_owner:
-                return self
-            else:
-                meta_obj = type(self)()
-                meta_obj.name = self.name
-                meta_obj.private_name = self.private_name
-                meta_obj.base_owner = owner
-                setattr(owner, self.name, meta_obj)
-                return meta_obj
-
-        try:
-            return getattr(obj, self.private_name)
-        except AttributeError:
-            windows = _FieldWindows(obj)
-            setattr(obj, self.private_name, windows)
-            return windows
+else:
+    type BaseModule = object
+    type BaseCollection = object
 
 
 class FieldWindow:
@@ -238,3 +180,64 @@ class FieldWindow:
         Copies the vertical string representation of the variable values to the clipboard.
         """
         tk_copy(self.vertical_str)
+
+
+class _FieldWindows:
+    def __init__(self, obj: BaseCollection | BaseModule) -> None:
+        self.obj: BaseCollection | BaseModule = obj
+        self.windows_dict: dict[str, FieldWindow] = {}
+
+    def __iter__(self):
+        for window in self.windows_dict.values():
+            yield window
+
+    def __getitem__(self, key: str):
+        return self.windows_dict[key]
+
+
+class _FieldWindowsMeta:
+    def __init__(self) -> None:
+        self.windows: dict[str, FieldWindow] = {}
+        self.name: str = ""
+        self.private_name: str = "_"
+        self.base_owner: type[BaseCollection | BaseModule] | None = None
+
+    @property
+    def window_names(self) -> list[str]:
+        """
+        The names of the windows for the module/collection.
+
+        Returns
+        -------
+        list[str]
+        """
+        return list(self.windows.keys())
+
+    def __set_name__(self, owner: type[BaseCollection | BaseModule], name: str):
+        self.name = name
+        self.private_name = "_" + name
+        self.base_owner = owner
+
+    @overload
+    def __get__(self, obj: BaseCollection | BaseModule, owner: type[BaseCollection | BaseModule]) -> _FieldWindows: ...
+    @overload
+    def __get__(self, obj: None, owner: type[BaseCollection | BaseModule]) -> Self: ...
+
+    def __get__(self, obj: BaseCollection | BaseModule | None, owner: type[BaseCollection | BaseModule]) -> _FieldWindows | Self:
+        if obj is None:
+            if owner is self.base_owner:
+                return self
+            else:
+                meta_obj = type(self)()
+                meta_obj.name = self.name
+                meta_obj.private_name = self.private_name
+                meta_obj.base_owner = owner
+                setattr(owner, self.name, meta_obj)
+                return meta_obj
+
+        try:
+            return getattr(obj, self.private_name)
+        except AttributeError:
+            windows = _FieldWindows(obj)
+            setattr(obj, self.private_name, windows)
+            return windows
