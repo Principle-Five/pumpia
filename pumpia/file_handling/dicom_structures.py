@@ -431,7 +431,7 @@ class Series(ImageCollection):
                 return np.expand_dims(array, axis=0)
             return array
         else:
-            return np.concatenate([a.raw_array for a in self.instances])  # type: ignore
+            return np.concatenate([a.raw_array for a in self.instances])
 
     @property
     def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
@@ -470,7 +470,7 @@ class Series(ImageCollection):
                     except KeyError:
                         return raw_array
         else:
-            return np.concatenate([a.raw_array for a in self.instances])  # type: ignore
+            return np.concatenate([a.image_array for a in self.instances])
 
     @property
     def array(self
@@ -516,7 +516,7 @@ class Series(ImageCollection):
                     except KeyError:
                         return raw_array
         else:
-            return np.concatenate([a.array for a in self.instances])  # type: ignore
+            return np.concatenate([a.array for a in self.instances])
 
     @property
     def current_slice_array(self) -> np.ndarray[tuple[int, int, int] | tuple[int, int], np.dtype]:
@@ -729,7 +729,8 @@ class Series(ImageCollection):
 
 class Instance(FileImageSet):
     """
-    Represents a DICOM instance if file has 1 frame or a frame if file has multiple frames.
+    Represents a DICOM instance if file has 1 slice (non-enhanced)
+    or a frame if file has multiple frames (enhanced).
     Has the same attributes and methods as FileImageSet unless stated below.
 
     Parameters
@@ -737,8 +738,9 @@ class Instance(FileImageSet):
     series : Series
         The series associated with the instance.
     slice_number : int
-        The slice number of the instance, equivalent to the frame number for enhanced dicom.
+        The slice number of the instance, or the frame number for enhanced dicom.
         For a frame this will be the frame number, otherwise this will be the instance number.
+        Starts from 1.
     filepath : Path, optional
         The file path of the instance (default is None).
     is_frame : bool, optional
@@ -858,21 +860,25 @@ class Instance(FileImageSet):
 
     @property
     def raw_array(self
-                  ) -> np.ndarray[tuple[int, int, int, Literal[3]]
-                                  | tuple[int, int, int],
+                  ) -> np.ndarray[tuple[Literal[1], int, int, Literal[3]]
+                                  | tuple[Literal[1], int, int],
                                   np.dtype]:
         """Returns the raw array of the instance as stored in the dicom file.
-        This is usually an unsigned dtype so users should be careful when processing."""
+        This is usually an unsigned dtype so users should be careful when processing.
+        Accessed through (0, y-position, x-position[, multisample/RGB values])"""
         if self.is_frame:
-            return np.array([self.series.raw_array[self.slice_number - 1]])  # type: ignore
+            return np.array([self.series.raw_array[self.slice_number - 1]])
         elif self._dicom is not None:
-            return np.array([self._dicom.pixel_array])  # type: ignore
+            return np.array([self._dicom.pixel_array])
         else:
-            return np.zeros((1, 1, 1), dtype=np.uint8)
+            return np.zeros((1, 1, 1), dtype=np.uint8)  # pyright: ignore[reportReturnType]
 
     @property
-    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        """Returns an array suitable for passing to the viewer"""
+    def image_array(self) -> np.ndarray[tuple[Literal[1], int, int, int]
+                                        | tuple[Literal[1], int, int],
+                                        np.dtype]:
+        """Returns an array suitable for passing to the viewer.
+        Accessed through (0, y-position, x-position[, multisample/RGB values])"""
         raw_array = self.raw_array
         if not self.is_colour:
             try:
@@ -908,12 +914,12 @@ class Instance(FileImageSet):
 
     @property
     def array(self
-              ) -> np.ndarray[tuple[int, int, int, Literal[3]]
-                              | tuple[int, int, int],
+              ) -> np.ndarray[tuple[Literal[1], int, int, Literal[3]]
+                              | tuple[Literal[1], int, int],
                               np.dtype]:
         """Returns the array with corrections defined by the slope and intercept tags.
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
-        Accessed through (slice, y-position, x-position[, multisample/RGB values])
+        Accessed through (0, y-position, x-position[, multisample/RGB values])
         """
         raw_array = np.astype(self.raw_array, float)
         if not self.is_colour:

@@ -98,20 +98,23 @@ class TagLink:
 def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             tag: Tag,
             frame: int | None = None,
-            get_first: Literal[False] = False) -> pydicom.DataElement | list[pydicom.DataElement]: ...
+            get_first: Literal[False] = False
+            ) -> pydicom.DataElement | list[pydicom.DataElement]: ...
 
 
 @overload
 def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             tag: Tag,
             frame: int | None = None,
-            get_first: Literal[True] = True) -> pydicom.DataElement: ...
+            get_first: Literal[True] = True
+            ) -> pydicom.DataElement: ...
 
 
 def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             tag: Tag,
             frame: int | None = None,
-            get_first: bool = False) -> pydicom.DataElement | list[pydicom.DataElement]:
+            get_first: bool = False
+            ) -> pydicom.DataElement | list[pydicom.DataElement]:
     """
     Returns the dicom element from the pydicom Dataset defined by tag.
     If the Dataset is an enhanced dicom then the frame can be provided for frame specific elements.
@@ -130,7 +133,8 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
     Returns
     -------
     DataElement | list[DataElement]
-        pydicom DataElement of the provided tag, or a list of pydicom DataElements for the provided tag.
+        pydicom DataElement of the provided tag,
+        or a list of pydicom DataElements for the provided tag.
         Use DataElement.value attribute to get the value of the element.
 
     Raises
@@ -225,9 +229,9 @@ def get_value(dicom_image: pydicom.Dataset | pydicom.DataElement,
 
     Returns
     -------
-    DataElement | list[DataElement]
-        pydicom DataElement of the provided tag, or a list of pydicom DataElements for the provided tag.
-        Use DataElement.value attribute to get the value of the element.
+    Any | list[Any]
+        value of the pydicom DataElement of the provided tag,
+        or a list of values for pydicom DataElements for the provided tag.
 
     Raises
     ------

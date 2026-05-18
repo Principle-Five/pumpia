@@ -56,18 +56,17 @@ class GeneralImage(FileImageSet):
     def raw_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """Returns the raw array of the image as stored in the file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        frame_list = [np.array(frame) for frame in ImageSequence.Iterator(self.pil_image)]
-
-        try:
-            array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-                np.array(frame_list))  # type: ignore
-        except ValueError as exc:
-            if self.pil_image.format == "GIF":
-                array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-                    np.array(frame_list[1:]))  # type: ignore
-            else:
-                raise exc
-
+        # https://github.com/python-pillow/Pillow/issues/5929
+        # first frame of GIF is a pallet, rest are RGB, need to convert to same
+        # https://stackoverflow.com/questions/74731252/fastest-way-to-load-an-animated-gif-in-python-into-a-numpy-array
+        if self.mode is not None and self.mode[0] == "P" and self.is_colour:
+            mode = "RGB"
+        else:
+            mode = self.mode
+        array = np.array([
+            np.array(frame.convert(mode))
+            for frame in ImageSequence.Iterator(self.pil_image)
+        ])
         return array
 
     @property
@@ -77,19 +76,7 @@ class GeneralImage(FileImageSet):
 
     @property
     def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        frame_list = [np.array(frame) for frame in ImageSequence.Iterator(self.pil_image)]
-
-        try:
-            array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-                np.array(frame_list, float))  # type: ignore
-        except ValueError as exc:
-            if self.pil_image.format == "GIF":
-                array: np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype] = (
-                    np.array(frame_list[1:], float))  # type: ignore
-            else:
-                raise exc
-
-        return array
+        return self.raw_array.astype(float)
 
     # current_slice_array could be optimised here, but need to be careful with GIFs
 

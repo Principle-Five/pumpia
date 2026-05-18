@@ -166,7 +166,7 @@ class ArrayImage(BaseImageSet):
     @property
     def is_colour(self) -> bool:
         """Whether the image is RGB."""
-        return (not self.mode is None) and self.is_multisample
+        return (self.mode is not None) and self.is_multisample
 
     @property
     def current_slice(self) -> int:
