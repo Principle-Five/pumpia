@@ -97,7 +97,7 @@ class ModuleGroup(ttk.Panedwindow):
         owner.module_groups.groups[name] = self
         self.module_names = [module.name for module in self.modules]
 
-    def __get__(self, obj: 'BaseCollection | None', owner=None) -> Self:
+    def __get__(self, obj: BaseCollection | None, owner=None) -> Self:
         if obj is None:
             return self
 
@@ -189,7 +189,7 @@ class _ModuleGroupsMeta:
     def __get__(self, obj: None, owner: type[BaseCollection]) -> Self: ...
 
     def __get__(self,
-                obj: 'BaseCollection | None',
+                obj: BaseCollection | None,
                 owner: type[BaseCollection]
                 ) -> _ModuleGroups | Self:
         if obj is None:

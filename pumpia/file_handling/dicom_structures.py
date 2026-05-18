@@ -9,7 +9,7 @@ Classes:
 import datetime
 from copy import copy
 from pathlib import Path
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any, Literal, overload
 import pydicom
 from pydicom.errors import InvalidDicomError
@@ -774,7 +774,7 @@ class Instance(FileImageSet):
                  slice_number: int,
                  filepath: Path | None = None,
                  is_frame: bool = False,
-                 dimension_index_values: list[int] | tuple[int, ...] | None = None,
+                 dimension_index_values: Sequence[int] | None = None,
                  open_dicom: pydicom.Dataset | None = None,) -> None:
         self.series: Series = series
 
@@ -782,7 +782,7 @@ class Instance(FileImageSet):
 
         self.slice_number: int = slice_number
 
-        if isinstance(dimension_index_values, list):
+        if not isinstance(dimension_index_values, tuple) and dimension_index_values is not None:
             self.dimension_index_values = tuple(dimension_index_values)
         else:
             self.dimension_index_values = dimension_index_values

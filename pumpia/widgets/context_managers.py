@@ -16,6 +16,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import overload, Literal, Self
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 
 from pumpia.widgets.typing import ScreenUnits, Cursor, Padding, Relief, TakeFocusValue
 from pumpia.widgets.entry_boxes import IntEntry, PercEntry, FloatEntry
@@ -239,7 +240,7 @@ class PhantomContextManager(BaseContextManager):
     def _show_rectangles(self,
                          bounds: BoundBoxContext | PhantomContext,
                          image: ArrayImage,
-                         secondary_images: None | list[ArrayImage] = None,
+                         secondary_images: None | Sequence[ArrayImage] = None,
                          name: str = "Phantom Bound Box") -> RectangleROI:
         """
         Shows the bounding box or rectangle boundary for the phantom as an ROI on the image.
@@ -276,7 +277,7 @@ class PhantomContextManager(BaseContextManager):
     def _show_ellipses(self,
                        bounds: BoundBoxContext | PhantomContext,
                        image: ArrayImage,
-                       secondary_images: None | list[ArrayImage] = None,
+                       secondary_images: None | Sequence[ArrayImage] = None,
                        name: str = "Phantom Boundary") -> EllipseROI:
         """
         Shows the boundary ellipse as an ROI on the image.
@@ -319,7 +320,7 @@ class PhantomContextManager(BaseContextManager):
 
     def get_bound_box_roi(self,
                           image: ArrayImage,
-                          secondary_images: None | list[ArrayImage] = None,
+                          secondary_images: None | Sequence[ArrayImage] = None,
                           ) -> RectangleROI:
         """
         Gets the bounding box ROI for the given image.
@@ -338,7 +339,7 @@ class PhantomContextManager(BaseContextManager):
 
     def get_boundary_roi(self,
                          image: ArrayImage,
-                         secondary_images: None | list[ArrayImage] = None,
+                         secondary_images: None | Sequence[ArrayImage] = None,
                          ) -> BaseROI:
         """
         Gets the boundary ROI for the given image.
@@ -919,7 +920,7 @@ class AutoPhantomManager(PhantomContextManager):
 
     def get_boundary_roi(self,
                          image: ArrayImage,
-                         secondary_images: None | list[ArrayImage] = None,
+                         secondary_images: None | Sequence[ArrayImage] = None,
                          ) -> BaseROI:
         roi = super().get_boundary_roi(image, secondary_images)
         self._show_on_image()

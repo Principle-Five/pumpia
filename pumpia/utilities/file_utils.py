@@ -5,19 +5,20 @@ Functions:
  * get_file_tree_dict
 """
 from pathlib import Path
+from collections.abc import Sequence
 from pumpia.image_handling.image_structures import FileImageSet
 
 type TreeDict = dict[str, 'TreeDict | FileImageSet']
 type TreePathDict = dict[Path, 'TreePathDict | FileImageSet']
 
 
-def get_file_tree_dict(images: list[FileImageSet]) -> TreePathDict:
+def get_file_tree_dict(images: Sequence[FileImageSet]) -> TreePathDict:
     """
     Returns a dictionary representing a file tree for the given images.
 
     Parameters
     ----------
-    images : list[FileImageSet]
+    images : Sequence[FileImageSet]
 
     Returns
     -------

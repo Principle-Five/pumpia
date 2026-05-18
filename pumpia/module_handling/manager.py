@@ -6,7 +6,7 @@ import gc
 import datetime
 import typing
 from typing import TYPE_CHECKING, Literal
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askdirectory
@@ -271,7 +271,7 @@ class Manager:
         self.update_trees()
 
     def load_images(self,
-                    files: list[Path],
+                    files: Sequence[Path],
                     add: bool = True,
                     tk_parent: tk.Misc | None = None,
                     counter_column: int = 0,
@@ -282,7 +282,7 @@ class Manager:
 
         Parameters
         ----------
-        files : list[Path]
+        files : Sequence[Path]
             The list of files.
         add : bool, optional
             Whether to add to the existing data,
