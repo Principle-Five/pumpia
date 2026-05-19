@@ -64,21 +64,10 @@ class GeneralImage(FileImageSet):
         else:
             mode = self.mode
         array = np.array([
-            np.array(frame.convert(mode))
+            frame.convert(mode)
             for frame in ImageSequence.Iterator(self.pil_image)
         ])
         return array
-
-    @property
-    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        """Returns an array suitable for passing to the viewer"""
-        return self.raw_array
-
-    @property
-    def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        return self.raw_array.astype(float)
-
-    # current_slice_array could be optimised here, but need to be careful with GIFs
 
     @property
     def id_string(self) -> str:

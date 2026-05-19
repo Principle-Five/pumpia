@@ -150,45 +150,65 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
         pass
 
     if element is None:
+        element = []
         for seq_link in tag.links:
             try:
                 sequence = get_tag(dicom_image, seq_link.tag, frame, get_first)
-                if isinstance(sequence, pydicom.DataElement):
-                    value = sequence.value
-                    if seq_link.frame_link and frame is not None:
-                        element = get_tag(value[frame - 1], tag, frame, get_first)
-                    else:
-                        if get_first:
-                            element = get_tag(value[0], tag, frame, get_first)
+            except KeyError:
+                continue
+            if isinstance(sequence, pydicom.DataElement):
+                value = sequence.value
+                if seq_link.frame_link and frame is not None:
+                    try:
+                        subelement = get_tag(value[frame - 1], tag, frame, get_first)
+                        if isinstance(subelement, pydicom.DataElement):
+                            element.append(subelement)
                         else:
-                            element = []
-                            for entry in value:
+                            element.extend(subelement)
+                    except KeyError:
+                        pass
+                else:
+                    if get_first:
+                        try:
+                            subelement = get_tag(value[0], tag, frame, get_first)
+                            element.append(subelement)
+                        except KeyError:
+                            pass
+                    else:
+                        for entry in value:
+                            try:
                                 subelement = get_tag(entry, tag, frame, get_first)
                                 if isinstance(subelement, pydicom.DataElement):
                                     element.append(subelement)
                                 else:
                                     element.extend(subelement)
+                            except KeyError:
+                                pass
+            else:
+                if get_first:
+                    try:
+                        subelement = get_tag(sequence[0].value[0], tag, frame, get_first)
+                        element.append(subelement)
+                    except KeyError:
+                        pass
                 else:
-                    if get_first:
-                        element = get_tag(sequence[0].value[0], tag, frame, get_first)
-                    else:
-                        element = []
-                        for entry in sequence:
-                            for value in entry.value:
+                    for entry in sequence:
+                        for value in entry.value:
+                            try:
                                 subelement = get_tag(value, tag, frame, get_first)
                                 if isinstance(subelement, pydicom.DataElement):
                                     element.append(subelement)
                                 else:
                                     element.extend(subelement)
-            except KeyError:
-                pass
+                            except KeyError:
+                                pass
 
     if element is None:
         raise KeyError(f"{tag}, {tag.name}")
     elif isinstance(element, list):
         if len(element) == 0:
             raise KeyError(f"{tag}, {tag.name}")
-        elif len(element) == 1:
+        elif len(element) == 1 or get_first:
             element = element[0]
 
     return element

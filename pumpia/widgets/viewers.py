@@ -712,24 +712,22 @@ class BaseViewer[ImageT: BaseImageSet](ABC, tk.Canvas):
             self.image.current_slice = self.current_slice
 
             if isinstance(self.image, (Series, Instance)):
-                axes_array = self.image.image_array[self.current_slice,
-                                                    lower_h:upper_h,
-                                                    lower_w:upper_w]
-                if axes_array.ndim == 2:
+                array_to_show = self.image[self.current_slice,
+                                           lower_h:upper_h,
+                                           lower_w:upper_w]
+                if array_to_show.ndim == 2:
                     if (self._user_level is not None
                             and self._user_window is not None):
                         mult = 255 / self._user_window
                         intercept = (self._user_level
                                      - (self._user_window / 2))
-                        array_to_show = (axes_array - intercept) * mult
-                        array_to_show[array_to_show > 255] = 255
-                        array_to_show[array_to_show < 0] = 0
+                        array_to_show = (array_to_show - intercept) * mult
+                        np.clip(array_to_show, 0, 255, out=array_to_show)
                         array_to_show = array_to_show.astype(np.uint8)
-
                         self.pil_image = Image.fromarray(array_to_show)
 
                 elif self.image.is_colour:
-                    self.pil_image = Image.fromarray(axes_array.astype(np.uint8))
+                    self.pil_image = Image.fromarray(array_to_show.astype(np.uint8))
 
             elif isinstance(self.image, GeneralImage):
                 self.image.pil_image.seek(self.current_slice)

@@ -174,10 +174,10 @@ class SimpleContextManager(BaseContextManager):
         """
         Gets the center context for the given image.
         """
-        return SimpleContext(image.array.shape[2] / 2,
-                             image.array.shape[1] / 2,
-                             image.array.shape[2],
-                             image.array.shape[1])
+        return SimpleContext(image.raw_array.shape[2] / 2,
+                             image.raw_array.shape[1] / 2,
+                             image.raw_array.shape[2],
+                             image.raw_array.shape[1])
 
 
 class PhantomContextManager(BaseContextManager):

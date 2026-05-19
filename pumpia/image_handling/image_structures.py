@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from pathlib import Path
 from copy import copy
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, overload
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -213,26 +213,64 @@ class ArrayImage(BaseImageSet):
         """Returns the raw array of the image as stored in the file.
         This is usually an unsigned dtype so users should be careful when processing."""
 
-    @property
-    @abstractmethod
-    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        """Returns the raw array of the image as stored in the file.
-        This is usually an unsigned dtype so users should be careful when processing."""
+    @overload
+    def slice_array(self,
+                    key: slice | tuple[slice, slice] | tuple[slice, slice, slice]
+                    ) -> np.ndarray[tuple[int, int, int, int]
+                                    | tuple[int, int, int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: int
+                    | tuple[int, slice]
+                    | tuple[slice, int]
+                    | tuple[int, slice, slice]
+                    | tuple[slice, int, slice]
+                    | tuple[slice, slice, int]
+                    ) -> np.ndarray[tuple[int, int, int]
+                                    | tuple[int, int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: tuple[int, int]
+                    | tuple[int, int, slice]
+                    | tuple[slice, int, int]
+                    | tuple[int, slice, int]
+                    ) -> np.ndarray[tuple[int, int] | tuple[int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: tuple[int, int, int]
+                    ) -> np.ndarray[tuple[int], np.dtype] | np.dtype: ...
+
+    def slice_array(self, key: slice
+                    | int
+                    | tuple[slice | int, slice | int]
+                    | tuple[slice | int, slice | int, slice | int]
+                    ) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int] | tuple[int, int] | tuple[int], np.dtype] | np.dtype:
+        """Returns a section of the array of the image,
+        may be more efficient than slicing the 'array' attribute
+        depending on subclass implementation"""
+        if key == slice(None, None, None):
+            array = self.raw_array
+        else:
+            array = self.raw_array[key]
+        return array.astype(float)
 
     @property
-    @abstractmethod
     def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
         """
         The array representation of the image.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
+        return self.slice_array(slice(None))
 
     @property
     def current_slice_array(self) -> np.ndarray[tuple[int, int, int] | tuple[int, int], np.dtype]:
         """
         The array representation of the current slice.
         """
-        return self.array[self.current_slice]
+        return self[self.current_slice]
 
     @property
     def vmax(self) -> float | None:
@@ -292,29 +330,73 @@ class ArrayImage(BaseImageSet):
         """
         return [roi.name for roi in self.rois]
 
-    def __getitem__(self, roi_name: str) -> 'BaseROI':
+    @overload
+    def __getitem__(self,
+                    key: str
+                    ) -> BaseROI: ...
+
+    @overload
+    def __getitem__(self,
+                    key: slice | tuple[slice, slice] | tuple[slice, slice, slice]
+                    ) -> np.ndarray[tuple[int, int, int, int]
+                                    | tuple[int, int, int], np.dtype]: ...
+
+    @overload
+    def __getitem__(self,
+                    key: int
+                    | tuple[int, slice]
+                    | tuple[slice, int]
+                    | tuple[int, slice, slice]
+                    | tuple[slice, int, slice]
+                    | tuple[slice, slice, int]
+                    ) -> np.ndarray[tuple[int, int, int]
+                                    | tuple[int, int], np.dtype]: ...
+
+    @overload
+    def __getitem__(self,
+                    key: tuple[int, int]
+                    | tuple[int, int, slice]
+                    | tuple[slice, int, int]
+                    | tuple[int, slice, int]
+                    ) -> np.ndarray[tuple[int, int] | tuple[int], np.dtype]: ...
+
+    @overload
+    def __getitem__(self,
+                    key: tuple[int, int, int]
+                    ) -> np.ndarray[tuple[int], np.dtype] | np.dtype: ...
+
+    def __getitem__(self,
+                    key: str
+                    | slice
+                    | int
+                    | tuple[slice | int, slice | int]
+                    | tuple[slice | int, slice | int, slice | int]
+                    ) -> BaseROI | np.ndarray[tuple[int, int, int, int] | tuple[int, int, int] | tuple[int, int] | tuple[int], np.dtype] | np.dtype:
         """
         Returns the ROI with the given name.
 
         Parameters
         ----------
-        roi_name : str
-            The name of the ROI.
+        key : str | slice | int | tuple[slice | int, slice | int] | tuple[slice | int, slice | int, slice | int]
+            If a str is the name of an ROI on the image.
+            Else returns the output of 'slice_array'.
 
         Returns
         -------
-        BaseROI
-            The ROI with the given name.
+        BaseROI or the sliced array
 
         Raises
         ------
         KeyError
             If the ROI is not found.
         """
-        for roi in self.get_rois():
-            if roi.name == roi_name:
-                return roi
-        raise KeyError("ROI not found")
+        if isinstance(key, str):
+            for roi in self._rois:
+                if roi.name == key:
+                    return roi
+            raise KeyError("ROI not found")
+        else:
+            return self.slice_array(key)
 
     def get_rois(self, slice_num: int | Literal["All"] | None = None) -> set['BaseROI']:
         """
@@ -541,8 +623,10 @@ class ImageCollection(ArrayImage):
         return list(self._image_set)
 
     @property
-    def array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        return np.array([a.array[0] for a in self.image_set], dtype=float)  # type: ignore
+    def raw_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
+        """Returns the raw array of the image as stored in the file.
+        This is usually an unsigned dtype so users should be careful when processing."""
+        return np.concatenate([a.array for a in self.image_set], axis=0)
 
     @property
     def current_slice_array(self) -> np.ndarray:

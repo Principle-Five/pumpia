@@ -471,7 +471,7 @@ class BaseROI(ABC):
         Loads the pixel values of the ROI.
         """
         array: np.ndarray[tuple[int, int, int]
-                          | tuple[int, int], np.dtype] = self.image.array[self.slice_num]
+                          | tuple[int, int], np.dtype] = self.image[self.slice_num]
         indices = np.indices(array.shape[:2])
         mask = self.pixel_is_in(indices[1],
                                 indices[0])
@@ -2320,7 +2320,7 @@ class LineROI(BaseROI):
                        active_colour=active_colour)
 
     def _load_pixels(self):
-        array: np.ndarray = self.image.array[self.slice_num]
+        array: np.ndarray = self.image[self.slice_num]
         num_points = round(self.length) + 1
         if self.length == 0:
             x_frac = 1

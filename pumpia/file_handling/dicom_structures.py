@@ -425,52 +425,194 @@ class Series(ImageCollection):
                                   np.dtype]:
         """Returns the raw array of the series as stored in the dicom file.
         This is usually an unsigned dtype so users should be careful when processing."""
-        if self.is_enhanced and self._dicom is not None:
-            array = self._dicom.pixel_array
-            if array.ndim == 2:
-                return np.expand_dims(array, axis=0)
-            return array
-        else:
-            return np.concatenate([a.raw_array for a in self.instances])
-
-    @property
-    def image_array(self) -> np.ndarray[tuple[int, int, int, int] | tuple[int, int, int], np.dtype]:
-        """Returns an array suitable for passing to the viewer"""
         if self.is_enhanced:
-            raw_array = self.raw_array
+            if self._dicom is not None:
+                array = self._dicom.pixel_array
+                if self.is_colour:
+                    if array.ndim == 2:
+                        return array[np.newaxis, np.newaxis, ...]
+                    elif array.ndim == 3:
+                        return array[np.newaxis, ...]
+                    return array
+                else:
+                    if array.ndim == 2:
+                        return array[np.newaxis, ...]
+                    return array
+            else:
+                return np.array([[[0]]], dtype=np.uint8)
+        else:
+            return np.concatenate([a.raw_array for a in self.instances], axis=0)
+
+    @overload
+    def slice_array(self,
+                    key: slice | tuple[slice, slice] | tuple[slice, slice, slice]
+                    ) -> np.ndarray[tuple[int, int, int, Literal[3]]
+                                    | tuple[int, int, int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: int
+                    | tuple[int, slice]
+                    | tuple[slice, int]
+                    | tuple[int, slice, slice]
+                    | tuple[slice, int, slice]
+                    | tuple[slice, slice, int]
+                    ) -> np.ndarray[tuple[int, int, Literal[3]]
+                                    | tuple[int, int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: tuple[int, int]
+                    | tuple[int, int, slice]
+                    | tuple[slice, int, int]
+                    | tuple[int, slice, int]
+                    ) -> np.ndarray[tuple[int, Literal[3]] | tuple[int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: tuple[int, int, int]
+                    ) -> np.ndarray[tuple[Literal[3]], np.dtype] | np.dtype: ...
+
+    def slice_array(self, key: slice
+                    | int
+                    | tuple[slice | int, slice | int]
+                    | tuple[slice | int, slice | int, slice | int]
+                    ) -> np.ndarray[tuple[int, int, int, Literal[3]] | tuple[int, int, int] | tuple[int, int] | tuple[int], np.dtype] | np.dtype:
+        """Returns a slice of the array with corrections defined by the slope and intercept tags.
+        If there are no slope and intercept tags then this is equivelant to `raw_array` as a float type.
+        key in format (slice, y-position, x-position[, multisample/RGB values])
+        """
+        if self.is_enhanced:
+            orig_key = key
+            if isinstance(key, int):
+                key = slice(key, key + 1)
+                final_key = 0
+            elif isinstance(key, tuple):
+                new_key: list[slice] = []
+                final_key = []
+                for k in key:
+                    if isinstance(k, int):
+                        new_key.append(slice(k, k + 1))
+                        final_key.append(0)
+                    else:
+                        new_key.append(k)
+
+                        if k.stop is None:
+                            stop = None
+                        elif k.start is None:
+                            stop = k.stop
+                        else:
+                            stop = k.stop - k.start
+                        final_key.append(slice(0, stop, k.step))
+
+                key = tuple(new_key)  # pyright: ignore[reportAssignmentType]
+                final_key = tuple(final_key)
+            else:
+                if key.stop is None:
+                    stop = None
+                elif key.start is None:
+                    stop = key.stop
+                else:
+                    stop = key.stop - key.start
+                final_key = slice(0, stop, key.step)
+
+            raw_array = self.raw_array[key].astype(float)
+
             if not self.is_colour:
                 try:
-                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                    return raw_array * slope + intercept
+                    slope = self.get_value(_CoreTags.RescaleSlope, "All")
+                    intercept = self.get_value(_CoreTags.RescaleIntercept, "All")
+                    if isinstance(orig_key, (int, slice)):
+                        si_key = orig_key
+                    else:
+                        si_key = orig_key[0]
+                    if isinstance(slope, list):
+                        if len(slope) == 1:
+                            slope = slope[0]
+                        else:
+                            slope = np.array(slope[si_key])
+                    if isinstance(intercept, list):
+                        if len(intercept) == 1:
+                            intercept = intercept[0]
+                        else:
+                            intercept = np.array(intercept[si_key])
+                    array = raw_array * slope + intercept
                 except KeyError:
-                    return raw_array
+                    array = raw_array
             else:
                 try:
-                    photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
+                    photo_interp = self.get_value(_CoreTags.PhotometricInterpretation)
                     if isinstance(photo_interp, str):
                         if photo_interp != "RGB":
-                            return convert_color_space(self.raw_array,
-                                                       photo_interp,
-                                                       'RGB')
+                            array = convert_color_space(self.raw_array,
+                                                        photo_interp,
+                                                        'RGB')
                         else:
-                            return raw_array
+                            array = raw_array
                     else:
                         try:
-                            slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                            intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                            return raw_array * slope + intercept
+                            slope = self.get_value(_CoreTags.RescaleSlope, "All")
+                            intercept = self.get_value(_CoreTags.RescaleIntercept, "All")
+                            if isinstance(orig_key, (int, slice)):
+                                si_key = orig_key
+                            else:
+                                si_key = orig_key[0]
+                            if isinstance(slope, list):
+                                if len(slope) == 1:
+                                    slope = slope[0]
+                                else:
+                                    slope = np.array(slope[si_key])
+                            if isinstance(intercept, list):
+                                if len(intercept) == 1:
+                                    intercept = intercept[0]
+                                else:
+                                    intercept = np.array(intercept[si_key])
+                            array = raw_array * slope + intercept
                         except KeyError:
-                            return raw_array
+                            array = raw_array
                 except (KeyError, NotImplementedError):
                     try:
-                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                        return raw_array * slope + intercept
+                        slope = self.get_value(_CoreTags.RescaleSlope, "All")
+                        intercept = self.get_value(_CoreTags.RescaleIntercept, "All")
+                        if isinstance(orig_key, (int, slice)):
+                            si_key = orig_key
+                        else:
+                            si_key = orig_key[0]
+                        if isinstance(slope, list):
+                            if len(slope) == 1:
+                                slope = slope[0]
+                            else:
+                                slope = np.array(slope[si_key])
+                        if isinstance(intercept, list):
+                            if len(intercept) == 1:
+                                intercept = intercept[0]
+                            else:
+                                intercept = np.array(intercept[si_key])
+                        array = raw_array * slope + intercept
                     except KeyError:
-                        return raw_array
+                        array = raw_array
+
+            if (final_key == slice(None, None, None)
+                or (isinstance(final_key, tuple)
+                    and all([k == slice(None, None, None) for k in final_key]))):
+                return array
+            return array[final_key]
         else:
-            return np.concatenate([a.image_array for a in self.instances])
+            if (key == slice(None, None, None)
+                or (isinstance(key, tuple)
+                    and all([k == slice(None, None, None) for k in key]))):
+                return np.concatenate([i[:] for i in self.instances], axis=0)
+            elif isinstance(key, int):
+                return self.instances[key][0]
+            elif isinstance(key, slice):
+                return np.concatenate([i[:] for i in self.instances[key]], axis=0)
+            else:
+                if isinstance(key[0], int):
+                    ins_key1: tuple[int, slice | int] | tuple[int, slice | int, slice | int] = tuple([0, *key[1:]])  # pyright: ignore[reportAssignmentType]
+                    return self.instances[key[0]][ins_key1]
+                else:
+                    ins_key2: tuple[slice, slice | int] | tuple[slice, slice | int, slice | int] = tuple([slice(None), *key[1:]])  # pyright: ignore[reportAssignmentType]
+                    return np.concatenate([i[ins_key2] for i in self.instances[key[0]]], axis=0)
 
     @property
     def array(self
@@ -481,42 +623,7 @@ class Series(ImageCollection):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (slice, y-position, x-position[, multisample/RGB values])
         """
-        if self.is_enhanced:
-            raw_array = np.astype(self.raw_array, float)
-            if not self.is_colour:
-                try:
-                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                    return raw_array * slope + intercept
-                except KeyError:
-                    return raw_array
-            else:
-                try:
-                    photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
-                    if isinstance(photo_interp, str):
-                        if photo_interp != "RGB":
-                            return np.astype(convert_color_space(self.raw_array,
-                                                                 photo_interp,
-                                                                 'RGB'),
-                                             float)
-                        else:
-                            return raw_array
-                    else:
-                        try:
-                            slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                            intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                            return raw_array * slope + intercept
-                        except KeyError:
-                            return raw_array
-                except (KeyError, NotImplementedError):
-                    try:
-                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                        return raw_array * slope + intercept
-                    except KeyError:
-                        return raw_array
-        else:
-            return np.concatenate([a.array for a in self.instances])
+        return self.slice_array(slice(None))
 
     @property
     def current_slice_array(self) -> np.ndarray[tuple[int, int, int] | tuple[int, int], np.dtype]:
@@ -570,11 +677,7 @@ class Series(ImageCollection):
                 return window
             else:
                 return super().window
-        except KeyError:
-            return super().window
-        except IndexError:
-            return super().window
-        except TypeError:
+        except KeyError, IndexError, TypeError:
             return super().window
 
     @property
@@ -587,9 +690,7 @@ class Series(ImageCollection):
                 return level
             else:
                 return super().level
-        except KeyError:
-            return super().level
-        except IndexError:
+        except KeyError, IndexError:
             return super().level
 
     @property
@@ -698,11 +799,24 @@ class Series(ImageCollection):
             raise IndexError("instance_number not valid")
 
     @overload
-    def get_value(self, tag: Tag, instance_number: int | None = None, get_first: Literal[False] = False) -> Any | list[Any] | None: ...
-    @overload
-    def get_value(self, tag: Tag, instance_number: int | None = None, get_first: Literal[True] = True) -> Any | None: ...
+    def get_value(self,
+                  tag: Tag,
+                  instance_number: int | Literal['All'] | None = None,
+                  get_first: Literal[False] = False
+                  ) -> Any | list[Any] | None: ...
 
-    def get_value(self, tag: Tag, instance_number: int | None = None, get_first: bool = False) -> Any | list[Any] | None:
+    @overload
+    def get_value(self,
+                  tag: Tag,
+                  instance_number: int | Literal['All'] | None = None,
+                  get_first: Literal[True] = True
+                  ) -> Any | None: ...
+
+    def get_value(self,
+                  tag: Tag,
+                  instance_number: int | Literal['All'] | None = None,
+                  get_first: bool = False
+                  ) -> Any | list[Any] | None:
         """
         Gets the value of a DICOM tag for a specific instance in the series.
 
@@ -721,6 +835,15 @@ class Series(ImageCollection):
         """
         if instance_number is None:
             instance_number = self.current_instance_number
+        elif instance_number == "All":
+            if self.is_enhanced:
+                dataset = self.dicom_dataset
+                if dataset is not None:
+                    return get_value(dataset, tag, None, get_first)
+                else:
+                    raise AttributeError("Series has no dicom_dataset loaded.")
+            else:
+                return [i.get_value(tag, get_first) for i in self.instances]
         if 0 < instance_number and instance_number <= self.num_slices:
             return self.instances[instance_number - 1].get_value(tag, get_first)
         else:
@@ -867,50 +990,123 @@ class Instance(FileImageSet):
         This is usually an unsigned dtype so users should be careful when processing.
         Accessed through (0, y-position, x-position[, multisample/RGB values])"""
         if self.is_frame:
-            return np.array([self.series.raw_array[self.slice_number - 1]])
+            return self.series.raw_array[self.slice_number - 1:self.slice_number]
         elif self._dicom is not None:
-            return np.array([self._dicom.pixel_array])
+            return self._dicom.pixel_array[np.newaxis, ...]
         else:
-            return np.zeros((1, 1, 1), dtype=np.uint8)  # pyright: ignore[reportReturnType]
+            return np.array([[[0]]], dtype=np.uint8)
 
-    @property
-    def image_array(self) -> np.ndarray[tuple[Literal[1], int, int, int]
-                                        | tuple[Literal[1], int, int],
-                                        np.dtype]:
-        """Returns an array suitable for passing to the viewer.
-        Accessed through (0, y-position, x-position[, multisample/RGB values])"""
-        raw_array = self.raw_array
+    @overload
+    def slice_array(self,
+                    key: slice | tuple[slice, slice] | tuple[slice, slice, slice]
+                    ) -> np.ndarray[tuple[Literal[1], int, int, Literal[3]]
+                                    | tuple[Literal[1], int, int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: int
+                    | tuple[int, slice]
+                    | tuple[slice, int]
+                    | tuple[int, slice, slice]
+                    | tuple[slice, int, slice]
+                    | tuple[slice, slice, int]
+                    ) -> np.ndarray[tuple[int, int, Literal[3]]
+                                    | tuple[int, int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: tuple[int, int]
+                    | tuple[int, int, slice]
+                    | tuple[slice, int, int]
+                    | tuple[int, slice, int]
+                    ) -> np.ndarray[tuple[int, Literal[3]] | tuple[int], np.dtype]: ...
+
+    @overload
+    def slice_array(self,
+                    key: tuple[int, int, int]
+                    ) -> np.ndarray[tuple[Literal[3]], np.dtype] | np.dtype: ...
+
+    def slice_array(self, key: slice
+                    | int
+                    | tuple[slice | int, slice | int]
+                    | tuple[slice | int, slice | int, slice | int]
+                    ) -> np.ndarray[tuple[Literal[1], int, int, Literal[3]] | tuple[int, int, int] | tuple[int, int] | tuple[int], np.dtype] | np.dtype:
+        """Returns a slice of the array with corrections defined by the slope and intercept tags.
+        If there are no slope and intercept tags then this is equivelant to `raw_array` as a float type.
+        key in format (0, y-position, x-position[, multisample/RGB values])
+        """
+
+        if isinstance(key, int):
+            key = slice(key, key + 1)
+            final_key = 0
+        elif isinstance(key, tuple):
+            new_key: list[slice] = []
+            final_key = []
+            for k in key:
+                if isinstance(k, int):
+                    new_key.append(slice(k, k + 1))
+                    final_key.append(0)
+                else:
+                    new_key.append(k)
+
+                    if k.stop is None:
+                        stop = None
+                    elif k.start is None:
+                        stop = k.stop
+                    else:
+                        stop = k.stop - k.start
+                    final_key.append(slice(0, stop, k.step))
+
+            key = tuple(new_key)  # pyright: ignore[reportAssignmentType]
+            final_key = tuple(final_key)
+        else:
+            if key.stop is None:
+                stop = None
+            elif key.start is None:
+                stop = key.stop
+            else:
+                stop = key.stop - key.start
+            final_key = slice(0, stop, key.step)
+
+        raw_array = self.raw_array[key].astype(float)
+
         if not self.is_colour:
             try:
                 slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
                 intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                return raw_array * slope + intercept
+                array = raw_array * slope + intercept
             except KeyError:
-                return raw_array
+                array = raw_array
         else:
             try:
                 photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
                 if isinstance(photo_interp, str):
                     if photo_interp != "RGB":
-                        return convert_color_space(self.raw_array,
-                                                   photo_interp,
-                                                   'RGB')
+                        array = convert_color_space(self.raw_array,
+                                                    photo_interp,
+                                                    'RGB')
                     else:
-                        return raw_array
+                        array = raw_array
                 else:
                     try:
                         slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
                         intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                        return raw_array * slope + intercept
+                        array = raw_array * slope + intercept
                     except KeyError:
-                        return raw_array
+                        array = raw_array
             except (KeyError, NotImplementedError):
                 try:
                     slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
                     intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                    return raw_array * slope + intercept
+                    array = raw_array * slope + intercept
                 except KeyError:
-                    return raw_array
+                    array = raw_array
+
+        if (final_key == slice(None, None, None)
+            or (isinstance(final_key, tuple)
+                and all([k == slice(None, None, None) for k in final_key]))):
+            return array
+        return array[final_key]
 
     @property
     def array(self
@@ -921,38 +1117,7 @@ class Instance(FileImageSet):
         If there are no slope and intercept tags then this is equivelant to `raw_array`.
         Accessed through (0, y-position, x-position[, multisample/RGB values])
         """
-        raw_array = np.astype(self.raw_array, float)
-        if not self.is_colour:
-            try:
-                slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                return raw_array * slope + intercept
-            except KeyError:
-                return raw_array
-        else:
-            try:
-                photo_interp = self.get_value(_CoreTags.PhotometricInterpretation, get_first=True)
-                if isinstance(photo_interp, str):
-                    if photo_interp != "RGB":
-                        return np.astype(convert_color_space(self.raw_array,
-                                                             photo_interp,
-                                                             'RGB'), float)
-                    else:
-                        return raw_array
-                else:
-                    try:
-                        slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                        intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                        return raw_array * slope + intercept
-                    except KeyError:
-                        return raw_array
-            except (KeyError, NotImplementedError):
-                try:
-                    slope = self.get_value(_CoreTags.RescaleSlope, get_first=True)
-                    intercept = self.get_value(_CoreTags.RescaleIntercept, get_first=True)
-                    return raw_array * slope + intercept
-                except KeyError:
-                    return raw_array
+        return self.slice_array(slice(None))
 
     @property
     def vmax(self) -> float | None:
