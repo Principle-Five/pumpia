@@ -99,7 +99,7 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
             tag: Tag,
             frame: int | None = None,
             get_first: Literal[False] = False
-            ) -> pydicom.DataElement | list[pydicom.DataElement]: ...
+            ) -> list[pydicom.DataElement]: ...
 
 
 @overload
@@ -142,74 +142,50 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
     KeyError
         raised if an element is not found.
     """
-    element: pydicom.DataElement | list[pydicom.DataElement] | None = None
+    elements: list[pydicom.DataElement] | None = None
 
     try:
-        element = dicom_image[int(tag)]
+        if get_first:
+            return dicom_image[int(tag)]
+        else:
+            return [dicom_image[int(tag)]]
     except KeyError:
         pass
 
-    if element is None:
-        element = []
+    if elements is None:
+        elements = []
         for seq_link in tag.links:
             try:
-                sequence = get_tag(dicom_image, seq_link.tag, frame, get_first)
+                sequence = get_tag(dicom_image, seq_link.tag, frame, False)
             except KeyError:
                 continue
-            if isinstance(sequence, pydicom.DataElement):
-                value = sequence.value
+            for seq in sequence:
+                value = seq.value
                 if seq_link.frame_link and frame is not None:
                     try:
-                        subelement = get_tag(value[frame - 1], tag, frame, get_first)
-                        if isinstance(subelement, pydicom.DataElement):
-                            element.append(subelement)
-                        else:
-                            element.extend(subelement)
+                        element = get_tag(value[frame - 1], tag, frame, False)
+                        if get_first:
+                            return element[0]
+                        elements.extend(element)
                     except KeyError:
                         pass
+                    except IndexError as exc:
+                        raise IndexError("'frame' is invalid number.") from exc
                 else:
-                    if get_first:
+                    for entry in value:
                         try:
-                            subelement = get_tag(value[0], tag, frame, get_first)
-                            element.append(subelement)
+                            element = get_tag(entry, tag, frame, False)
+                            if get_first:
+                                return element[0]
+                            elements.extend(element)
                         except KeyError:
                             pass
-                    else:
-                        for entry in value:
-                            try:
-                                subelement = get_tag(entry, tag, frame, get_first)
-                                if isinstance(subelement, pydicom.DataElement):
-                                    element.append(subelement)
-                                else:
-                                    element.extend(subelement)
-                            except KeyError:
-                                pass
-            else:
-                if get_first:
-                    try:
-                        subelement = get_tag(sequence[0].value[0], tag, frame, get_first)
-                        element.append(subelement)
-                    except KeyError:
-                        pass
-                else:
-                    for entry in sequence:
-                        for value in entry.value:
-                            try:
-                                subelement = get_tag(value, tag, frame, get_first)
-                                if isinstance(subelement, pydicom.DataElement):
-                                    element.append(subelement)
-                                else:
-                                    element.extend(subelement)
-                            except KeyError:
-                                pass
 
-    if element is None:
-        raise KeyError(f"{tag}, {tag.name}")
-    elif isinstance(element, list):
+    if isinstance(element, list):
         if len(element) == 0:
             raise KeyError(f"{tag}, {tag.name}")
-        elif len(element) == 1 or get_first:
-            element = element[0]
+        elif get_first:
+            return element[0]
 
     return element
 
