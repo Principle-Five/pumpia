@@ -526,17 +526,29 @@ class Series(ImageCollection):
                         si_key = orig_key
                     else:
                         si_key = orig_key[0]
+
                     if isinstance(slope, list):
                         if len(slope) == 1:
                             slope = slope[0]
                         else:
-                            slope = np.array(slope[si_key])
+                            slope = slope[si_key]
+                    slope = np.array(slope)
+                    if len(slope.shape) == 0:
+                        raw_array = raw_array * slope
+                    else:
+                        raw_array = np.array([a * s for a, s in zip(raw_array, slope)])
+
                     if isinstance(intercept, list):
                         if len(intercept) == 1:
                             intercept = intercept[0]
                         else:
-                            intercept = np.array(intercept[si_key])
-                    array = raw_array * slope + intercept
+                            intercept = intercept[si_key]
+                    intercept = np.array(intercept)
+                    if len(intercept.shape) == 0:
+                        array = raw_array + intercept
+                    else:
+                        array = np.array([a + i for a, i in zip(raw_array, intercept)])
+
                 except KeyError:
                     array = raw_array
             else:
@@ -557,17 +569,29 @@ class Series(ImageCollection):
                                 si_key = orig_key
                             else:
                                 si_key = orig_key[0]
+
                             if isinstance(slope, list):
                                 if len(slope) == 1:
                                     slope = slope[0]
                                 else:
-                                    slope = np.array(slope[si_key])
+                                    slope = slope[si_key]
+                            slope = np.array(slope)
+                            if len(slope.shape) == 0:
+                                raw_array = raw_array * slope
+                            else:
+                                raw_array = np.array([a * s for a, s in zip(raw_array, slope)])
+
                             if isinstance(intercept, list):
                                 if len(intercept) == 1:
                                     intercept = intercept[0]
                                 else:
-                                    intercept = np.array(intercept[si_key])
-                            array = raw_array * slope + intercept
+                                    intercept = intercept[si_key]
+                            intercept = np.array(intercept)
+                            if len(intercept.shape) == 0:
+                                array = raw_array + intercept
+                            else:
+                                array = np.array([a + i for a, i in zip(raw_array, intercept)])
+
                         except KeyError:
                             array = raw_array
                 except (KeyError, NotImplementedError):
@@ -578,17 +602,28 @@ class Series(ImageCollection):
                             si_key = orig_key
                         else:
                             si_key = orig_key[0]
+
                         if isinstance(slope, list):
                             if len(slope) == 1:
                                 slope = slope[0]
                             else:
-                                slope = np.array(slope[si_key])
+                                slope = slope[si_key]
+                        slope = np.array(slope)
+                        if len(slope.shape) == 0:
+                            raw_array = raw_array * slope
+                        else:
+                            raw_array = np.array([a * s for a, s in zip(raw_array, slope)])
+
                         if isinstance(intercept, list):
                             if len(intercept) == 1:
                                 intercept = intercept[0]
                             else:
-                                intercept = np.array(intercept[si_key])
-                        array = raw_array * slope + intercept
+                                intercept = intercept[si_key]
+                        intercept = np.array(intercept)
+                        if len(intercept.shape) == 0:
+                            array = raw_array + intercept
+                        else:
+                            array = np.array([a + i for a, i in zip(raw_array, intercept)])
                     except KeyError:
                         array = raw_array
 

@@ -181,7 +181,7 @@ def get_tag(dicom_image: pydicom.Dataset | pydicom.DataElement,
                         except KeyError:
                             pass
 
-    if elements is None or len(elements) == 0:
+    if len(elements) == 0:
         raise KeyError(f"{tag}, {tag.name}")
     elif get_first:
         return elements[0]

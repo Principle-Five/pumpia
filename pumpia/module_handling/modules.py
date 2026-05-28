@@ -505,7 +505,7 @@ class BaseModule(ABC, ttk.Frame):
                         roi_field.draw_button.grid(column=2 * self.roi_count + 1,
                                                    row=0,
                                                    sticky=tk.NSEW)
-                    self.roi_count += 1
+                self.roi_count += 1
 
             if add_context_buttons:
                 if (self.main_viewer is not None
