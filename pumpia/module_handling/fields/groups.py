@@ -119,6 +119,7 @@ class _FieldGroupsMeta:
                 meta_obj.name = self.name
                 meta_obj.private_name = self.private_name
                 meta_obj.base_owner = owner
+                meta_obj.groups = self.groups.copy()
                 setattr(owner, self.name, meta_obj)
                 return meta_obj
 

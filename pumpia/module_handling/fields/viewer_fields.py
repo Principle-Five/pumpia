@@ -218,6 +218,7 @@ class _ViewerFieldsMeta:
                 meta_obj.name = self.name
                 meta_obj.private_name = self.private_name
                 meta_obj.base_owner = owner
+                meta_obj.viewer_fields = self.viewer_fields.copy()
                 setattr(owner, self.name, meta_obj)
                 return meta_obj
 

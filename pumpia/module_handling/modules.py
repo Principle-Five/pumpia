@@ -938,6 +938,7 @@ class _ModulesMeta:
                 meta_obj.name = self.name
                 meta_obj.private_name = self.private_name
                 meta_obj.base_owner = owner
+                meta_obj.module_types = self.module_types.copy()
                 setattr(owner, self.name, meta_obj)
                 return meta_obj
 
