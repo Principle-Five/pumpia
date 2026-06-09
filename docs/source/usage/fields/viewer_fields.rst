@@ -1,4 +1,4 @@
-Viewer Inputs and Outputs
+Viewer Fields
 =========================
 .. autoclass:: pumpia.module_handling.fields.viewer_fields.BaseViewerField
 
