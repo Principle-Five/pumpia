@@ -712,7 +712,7 @@ class Series(ImageCollection):
                 return window
             else:
                 return super().window
-        except KeyError, IndexError, TypeError:
+        except (KeyError, IndexError, TypeError):
             return super().window
 
     @property
@@ -725,7 +725,7 @@ class Series(ImageCollection):
                 return level
             else:
                 return super().level
-        except KeyError, IndexError:
+        except (KeyError, IndexError):
             return super().level
 
     @property
