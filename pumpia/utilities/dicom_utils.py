@@ -5,9 +5,9 @@ Functions:
  * show_dicom_tags
 """
 import tkinter as tk
-from tkinter import ttk
 import pydicom
 from pumpia.file_handling.dicom_structures import Series, Instance
+from pumpia.widgets.treeviews import SearchTreeview
 
 
 def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
@@ -27,13 +27,13 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
         else:
             return
 
-    root = tk.Tk()
+    root = tk.Toplevel()
     root.title(title)
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     root.resizable(True, True)
 
-    tree = ttk.Treeview(root, columns=["Name", "Value"])
+    tree = SearchTreeview(root, columns=["Name", "Value"])
     tree.heading("#0", text="Tag")
     tree.heading("Name", text="Name")
     tree.heading("Value", text="Value")
@@ -41,16 +41,6 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
     tree.column("#0", stretch=False)
     tree.column("Name", stretch=True)
     tree.column("Value", stretch=True)
-
-    yscrollbar = ttk.Scrollbar(
-        root, orient=tk.VERTICAL, command=tree.yview)
-    tree.configure(yscrollcommand=yscrollbar.set)
-    yscrollbar.grid(row=0, column=1, sticky=tk.NS)
-
-    xscrollbar = ttk.Scrollbar(
-        root, orient=tk.HORIZONTAL, command=tree.xview)
-    tree.configure(xscrollcommand=xscrollbar.set)
-    xscrollbar.grid(row=1, column=0, columnspan=2, sticky=tk.EW)
 
     def add_to_tree(elem: pydicom.DataElement | pydicom.Dataset, parent: str = ''):
         """
@@ -81,5 +71,3 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
     add_to_tree(dicom)
 
     tree.grid(column=0, row=0, sticky=tk.NSEW)
-
-    root.mainloop()
