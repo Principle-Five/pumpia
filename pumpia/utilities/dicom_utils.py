@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 import tkinter as tk
 import pydicom
 from pumpia.file_handling.dicom_structures import Series, Instance
-from pumpia.widgets.treeviews import SearchTreeview
+from pumpia.widgets.treeviews import SearchTreeview, DiffTreeview
 
 
 @dataclass
@@ -71,8 +71,8 @@ def show_dicom_tags(dicom: pydicom.Dataset | Series | Instance):
             entry = tree.insert(parent,
                                 'end',
                                 text=tag,
-                                values=[elem.name,
-                                        elem.repval])
+                                values=[str(elem.name).strip(),
+                                        str(elem.repval).strip()])
             if elem.VR == 'SQ':
                 for index, item in enumerate(elem.value):
                     if len(elem.value) > 1:
@@ -99,8 +99,10 @@ def compare_dicom_tags(*dicoms: pydicom.Dataset | Series | Instance):
     title = "DICOM Tags Comparison"
     dicom_datasets: list[pydicom.Dataset] = []
     columns = ["Name"]
+    diff_checks: list[bool] = [False]
     for i, dicom in enumerate(dicoms):
         columns.append(f"Value{i}")
+        diff_checks.append(True)
         if isinstance(dicom, (Series, Instance)):
             if dicom.dicom_dataset is not None:
                 dicom_datasets.append(dicom.dicom_dataset)
@@ -115,7 +117,7 @@ def compare_dicom_tags(*dicoms: pydicom.Dataset | Series | Instance):
     root.rowconfigure(0, weight=1)
     root.resizable(True, True)
 
-    tree = SearchTreeview(root, columns=columns)
+    tree = DiffTreeview(root, columns=columns, diff_checks=diff_checks)
     tree.heading("#0", text="Tag")
     tree.heading("Name", text="Name")
     tree.column("#0", stretch=False)
@@ -130,7 +132,7 @@ def compare_dicom_tags(*dicoms: pydicom.Dataset | Series | Instance):
 
     dicom_values: TagInfo = TagInfo("", "")
 
-    def add_to_dict(elem: pydicom.DataElement | pydicom.Dataset, parent: TagInfo = dicom_values):
+    def add_to_dict(elem: pydicom.DataElement | pydicom.Dataset, index: int, parent: TagInfo = dicom_values):
         """
         Adds elements to the treeview.
 
@@ -143,25 +145,28 @@ def compare_dicom_tags(*dicoms: pydicom.Dataset | Series | Instance):
         """
         if isinstance(elem, pydicom.Dataset):
             for item in elem:
-                add_to_dict(item, parent)
+                add_to_dict(item, index, parent)
 
         elif isinstance(elem, pydicom.DataElement):
             tag = f"({elem.tag.group:04X}, {elem.tag.element:04X})"
             if tag not in parent.children:
-                parent.children[tag] = TagInfo(tag, elem.name)
-            parent.children[tag].values.append(elem.repval)
-            if elem.VR == 'SQ':
-                for index, item in enumerate(elem.value):
-                    if len(elem.value) > 1:
-                        name = str(index + 1)
-                        if name not in parent.children:
-                            parent.children[name] = TagInfo(name, name)
-                        add_to_dict(item, parent.children[name])
-                    else:
-                        add_to_dict(item, parent.children[tag])
+                parent.children[tag] = TagInfo(tag, str(elem.name).strip())
+            while len(parent.children[tag].values) < index:
+                parent.children[tag].values.append("")
+            parent.children[tag].values.append(str(elem.repval).strip())
 
-    for dicom in dicom_datasets:
-        add_to_dict(dicom)
+            if elem.VR == 'SQ':
+                for i, item in enumerate(elem.value):
+                    if len(elem.value) > 1:
+                        name = str(i + 1)
+                        if name not in parent.children[tag].children:
+                            parent.children[tag].children[name] = TagInfo(name, "")
+                        add_to_dict(item, index, parent.children[tag].children[name])
+                    else:
+                        add_to_dict(item, index, parent.children[tag])
+
+    for i, dicom in enumerate(dicom_datasets):
+        add_to_dict(dicom, i)
 
     def add_to_tree(elem: TagInfo, parent: str = ''):
         """
