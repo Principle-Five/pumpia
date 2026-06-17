@@ -22,7 +22,7 @@ from pumpia.file_handling.general_structures import GeneralImage
 from pumpia.image_handling.image_structures import BaseImageSet, FileImageSet, ImageCollection
 from pumpia.image_handling.roi_structures import BaseROI
 from pumpia.file_handling.dicom_tags import _CoreTags, get_value
-from pumpia.utilities.dicom_utils import show_dicom_tags
+from pumpia.utilities.dicom_utils import show_dicom_tags, compare_dicom_tags
 from pumpia.utilities.file_utils import get_file_tree_dict, TreePathDict
 from pumpia.utilities.typing import DirectionType
 from pumpia.utilities.tkinter_utils import tk_copy
@@ -180,7 +180,14 @@ class Manager:
                 menu_options.extend([("Delete ROI", self.delete_current_roi)])
             elif isinstance(self.focus, (Series, Instance, FileImageSet)):
                 if isinstance(self.focus, (Series, Instance)):
-                    menu_options.extend([("Show Tags", self.show_tags)])
+                    menu_options.append(("Show Tags", self.show_tags))
+                    dicoms = []
+                    for item in self.selected:
+                        if isinstance(item, (Series, Instance)):
+                            dicoms.append(item)
+                    if len(dicoms) > 1:
+                        menu_options.append(("Compare Tags", self.compare_tags))
+
                 menu_options.extend([("Copy Filepath", self.copy_filepath),
                                      ("Copy Filepath as posix", self.copy_filepath_as_posix),
                                      ("Copy Directory", self.copy_directory),
@@ -727,6 +734,14 @@ class Manager:
         """
         if isinstance(self.focus, (Series, Instance)):
             show_dicom_tags(self.focus)
+
+    def compare_tags(self):
+        dicoms = []
+        for item in self.selected:
+            if isinstance(item, (Series, Instance)):
+                dicoms.append(item)
+        if len(dicoms) > 0:
+            compare_dicom_tags(*dicoms)
 
     def copy_filepath(self):
         """

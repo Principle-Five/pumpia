@@ -84,6 +84,11 @@ class Patient:
         return self.patient_id + ": " + self.name
 
     @property
+    def full_string(self) -> str:
+        """A string containing all parent information as well as the str of the object"""
+        return self.patient_id
+
+    @property
     def id_string(self) -> str:
         """Returns the ID string of the patient. This is "DICOM : `patient_id`"."""
         return "DICOM : " + self.patient_id
@@ -191,6 +196,11 @@ class Study:
     def __str__(self) -> str:
         """Returns the string representation of the study."""
         return self.study_datetime.strftime("%d/%m/%Y, %H:%M:%S ") + "- " + self.study_description
+
+    @property
+    def full_string(self) -> str:
+        """A string containing all parent information as well as the str of the object"""
+        return self.patient.full_string + "; " + str(self)
 
     @property
     def id_string(self) -> str:
@@ -362,6 +372,16 @@ class Series(ImageCollection):
         # from docs: A class that overrides __eq__() and does not define __hash__()
         # will have its __hash__() implicitly set to None.
         return super().__hash__()
+
+    @property
+    def patient(self) -> Patient:
+        "Patient of the Series"
+        return self.study.patient
+
+    @property
+    def full_string(self) -> str:
+        """A string containing all parent information as well as the str of the object"""
+        return self.study.full_string + "; " + str(self)
 
     @property
     def id_string(self) -> str:
@@ -1000,6 +1020,21 @@ class Instance(FileImageSet):
         # from docs: A class that overrides __eq__() and does not define __hash__()
         # will have its __hash__() implicitly set to None.
         return super().__hash__()
+
+    @property
+    def study(self) -> Study:
+        "Study of the Instance"
+        return self.series.study
+
+    @property
+    def patient(self) -> Patient:
+        "Patient of the Instance"
+        return self.study.patient
+
+    @property
+    def full_string(self) -> str:
+        """A string containing all parent information as well as the str of the object"""
+        return self.series.full_string + "; " + str(self)
 
     @property
     def id_string(self) -> str:
