@@ -336,11 +336,11 @@ class DiffTreeview(ttk.Treeview):
         self.y_scroll = y_scroll
 
         self.outer_frame = ttk.Frame(parent)
-        self.outer_frame.columnconfigure(1, weight=1)
-        self.outer_frame.rowconfigure(2, weight=1)
+        self.outer_frame.columnconfigure(3, weight=1)
+        self.outer_frame.rowconfigure(3, weight=1)
 
         super().__init__(self.outer_frame, **kw)
-        super().grid(column=0, row=2, columnspan=2, sticky=tk.NSEW)
+        super().grid(column=0, row=3, columnspan=4, sticky=tk.NSEW)
 
         if (diff_checks is not None
             and "columns" in kw
@@ -357,30 +357,35 @@ class DiffTreeview(ttk.Treeview):
         self.diff_checks: list[bool] = diff_checks
 
         self.search_label = ttk.Label(self.outer_frame, text="Search:", anchor=tk.E)
-        self.search_label.grid(column=0, row=0, sticky=tk.EW)
+        self.search_label.grid(column=0, row=0, sticky=tk.E)
         self.search_var = tk.StringVar(self.outer_frame)
         self.search_var.trace_add('write', self.filter_tree)
         self.search_entry = ttk.Entry(self.outer_frame, textvariable=self.search_var)
-        self.search_entry.grid(column=1, row=0, sticky=tk.EW)
+        self.search_entry.grid(column=1, row=0, columnspan=3, sticky=tk.EW)
 
         self.diff_label = ttk.Label(self.outer_frame, text="Show Same Values", anchor=tk.E)
-        self.diff_label.grid(column=0, row=1, sticky=tk.EW)
+        self.diff_label.grid(column=0, row=1, sticky=tk.E)
         self.diff_var = tk.BooleanVar(self.outer_frame, True)
-        self.diff_var.trace_add('write', self.filter_tree)
+        self.diff_var.trace_add('write', self.show_same_switch)
         self.diff_entry = ttk.Checkbutton(self.outer_frame, variable=self.diff_var)
-        self.diff_entry.grid(column=1, row=1, sticky=tk.EW)
+        self.diff_entry.grid(column=1, row=1, sticky=tk.W)
+
+        self.diff_parents_label = ttk.Label(self.outer_frame, text="Show Same Values If Parents Differ", anchor=tk.E)
+        self.diff_parents_var = tk.BooleanVar(self.outer_frame, True)
+        self.diff_parents_var.trace_add('write', self.filter_tree)
+        self.diff_parents_entry = ttk.Checkbutton(self.outer_frame, variable=self.diff_parents_var)
 
         self.yscrollbar = ttk.Scrollbar(
             self.outer_frame, orient=tk.VERTICAL, command=self.yview)
         if self.y_scroll:
             self.configure(yscrollcommand=self.yscrollbar.set)
-            self.yscrollbar.grid(row=2, column=2, sticky=tk.NS)
+            self.yscrollbar.grid(row=3, column=4, sticky=tk.NS)
 
         self.xscrollbar = ttk.Scrollbar(
             self.outer_frame, orient=tk.HORIZONTAL, command=self.xview)
         if self.x_scroll:
             self.configure(xscrollcommand=self.xscrollbar.set)
-            self.xscrollbar.grid(row=3, column=0, columnspan=3, sticky=tk.EW)
+            self.xscrollbar.grid(row=4, column=0, columnspan=5, sticky=tk.EW)
 
         self.entries: dict[str, str] = {}
         self.parents: dict[str, list[str]] = {}
@@ -434,6 +439,16 @@ class DiffTreeview(ttk.Treeview):
             if item in self.parents:
                 self.add_parent_items(item, *self.parents[item])
 
+    def show_same_switch(self, *_):
+        if self.diff_var.get():
+            self.diff_parents_label.grid_forget()
+            self.diff_parents_entry.grid_forget()
+        else:
+            self.diff_parents_label.grid(column=2, row=1, sticky=tk.E)
+            self.diff_parents_entry.grid(column=3, row=1, sticky=tk.W)
+
+        self.filter_tree()
+
     def filter_tree(self, *_):
         """
         Filters the tree based on the search and diff checkbox
@@ -441,6 +456,7 @@ class DiffTreeview(ttk.Treeview):
         self.detach(*self.entries)
         text = self.search_var.get().strip().lower()
         show_same = self.diff_var.get()
+        show_same_parents = self.diff_parents_var.get()
         if text == "" and show_same:
             self.add_parent_items("", *self.parents[""])
         else:
@@ -453,6 +469,8 @@ class DiffTreeview(ttk.Treeview):
                               if self.diff_checks[i]]
                     if len(values) > 1:
                         show = not all(value == values[0] for value in values[1:])
+                        if not show_same_parents:
+                            show = show and (not entry in self.parents)
                     elif len(values) == 0:
                         show = False
                 if show and (text in item["text"].lower()
