@@ -77,7 +77,7 @@ def tk_copy(text: str):
     """
     win = tk.Tk()
     win.withdraw()
+    win.update()
     win.clipboard_clear()
     win.clipboard_append(text)
-    win.update()  # now it stays on the clipboard after the window is closed
     win.destroy()
